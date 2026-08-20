@@ -1,24 +1,52 @@
-# Cena Raiz — Adobe Integration and Motion Intelligence Plan
+# Cena Raiz — Audiovisual Evolution and Creative Direction Plan
 
-Status: Proposed architecture and implementation roadmap  
-Target repository: `cena-raiz-desktop`  
-Target branch: `main-cena-desktop`  
-Primary runtime: Electron modular monolith  
+Status: Active Cena Raiz audiovisual evolution blueprint
+Target repository: `daniela-socoloski/raiz-engine` monorepository
+Current implementation roots: `cena-raiz/cenaraiz/cena-raiz-desktop` and `cena-raiz/cenaraiz/cena-raiz`
+Primary runtime: Electron modular monolith
 External execution engines: Adobe Premiere Pro MCP, Adobe After Effects MCP, Remotion, FFmpeg
 
 ## 1. Purpose
 
 This document defines how to evolve the existing Cena Raiz video system without replacing the architecture that already works.
 
-The goal is to add a professional motion and editorial layer powered by the locally installed Adobe Premiere Pro and After Effects MCP servers while preserving:
+The goal is to add brand-aware audiovisual direction, narrative and editorial
+planning, motion intelligence, asset reuse, and deterministic execution routing.
+The system selects among the appropriate engines—including the locally installed
+Adobe MCPs when available—while preserving:
 
 - `TimelineModel` as the canonical non-destructive editing model.
 - FFmpeg as the deterministic media-processing engine.
 - Remotion as the scalable template, caption, preview, and batch-render engine.
 - The current chat, approval, project, provider, runtime, packaging, and update systems.
-- Original media and original Adobe project files.
+- Original media and external editor project files.
 
 This is an extension of the current product, not a rewrite and not a parallel video editor.
+
+### 1.1 Role in Raiz Engine construction
+
+This document is an active construction blueprint for evolving Cena Raiz from an
+execution-focused editor into the audiovisual production consumer of Raiz Engine.
+It is not a document that becomes relevant only when Adobe writes are enabled.
+
+The following decisions govern construction now:
+
+- typed planning and execution contracts;
+- `TimelineModel` and the canonical project state;
+- Brand Runtime Profile and motion direction boundaries;
+- Asset Registry and reuse-before-generation policy;
+- deterministic execution routing and explicit fallbacks;
+- job lifecycle, idempotency, readback, validation, recovery, and human review;
+- security, observability, tests, and project data layout;
+- optional Adobe capability detection in bootstrap and `doctor` flows.
+
+Only the provider-specific mutation layer remains deferred to the controlled Adobe
+phase: writing through MCP tools, changing copied compositions or sequences,
+rendering through Adobe, and importing selected Adobe-side changes.
+
+`ARQUITETURA-MOTOR-CRIATIVO-RAIZ.md` owns the system-wide architecture and roadmap.
+This document is its specialized audiovisual projection for Cena Raiz and must not
+create a second core, timeline, router, registry, or bootstrap implementation.
 
 ## 2. Product intent
 
@@ -71,24 +99,40 @@ Reconsider Adobe as a system of record only if a stable, versioned, fully testab
 
 ## 5. Target system flow
 
+This is an operational sequence, not a set of unrelated starting boxes. The
+engine must be installed and verified first. Brand Intelligence is then compiled
+once per brand and reused by every video. `VideoBrief` and `ContentAnalysis` are
+artifacts produced inside the per-video intake phase; they are not parallel
+product phases competing with Brand Intelligence.
+
 ```mermaid
 flowchart TD
-    BI[Brand Intelligence] --> VP[Video and Motion Planning]
-    VP --> AR[Motion Asset Registry]
-    AR --> EP[Validated Execution Plan]
-    EP --> EX[Execution Router]
-    EX --> RM[Remotion Adapter]
-    EX --> AE[After Effects MCP Adapter]
-    EX --> PR[Premiere MCP Adapter]
-    EX --> FF[FFmpeg Adapter]
-    RM --> RB[Readback and Validation]
+    P0["0. Install and verify Raiz Engine"] --> P1["1. Compile Brand Intelligence"]
+    P1 --> BRP["Brand Runtime Profile"]
+    BRP --> P2["2. Video intake and content analysis"]
+    P2 --> VB["Video Brief + Content Analysis"]
+    VB --> P3["3. Narrative and audiovisual direction"]
+    P3 --> DP["Audiovisual Direction Plan"]
+    DP --> HA["Human approval"]
+    HA --> P4["4. Asset Intelligence"]
+    P4 --> EP["Validated Execution Plan"]
+    EP --> P5["5. Execution Router"]
+    P5 --> RM["Remotion"]
+    P5 --> FF["FFmpeg"]
+    P5 -. "optional professional capability" .-> AE["After Effects MCP"]
+    P5 -. "optional professional capability" .-> PR["Premiere MCP"]
+    RM --> RB["Readback and validation"]
+    FF --> RB
     AE --> RB
     PR --> RB
-    FF --> RB
-    RB --> CT[Canonical Timeline]
-    CT --> HR[Human Review]
-    HR --> CM[Creative Memory]
+    RB --> CT["Canonical Project State"]
+    CT --> P6["6. Review, delivery and Creative Memory"]
 ```
+
+Operationally, a new video starts at phase 2 only when an approved
+`BrandRuntimeProfile` already exists. If it does not, the system routes the user
+through phase 1 first. Adobe belongs to product phase 7 and appears above only as
+an optional adapter selected by phase 5; it never blocks the core path.
 
 ## 6. Responsibility boundaries
 
@@ -331,7 +375,102 @@ export interface AdobeCapabilitySnapshot {
 
 Never persist credentials, OAuth codes, cookies, tokens, or sensitive MCP transport payloads.
 
-### 8.2 Internal adapters
+### 8.2 Verified local-machine snapshot and portable installation contract
+
+Captured on `2026-08-20` from the current Windows machine. This snapshot is
+verified operational evidence, not a requirement that future machines use the
+username `RAIZ`, Adobe version `2026`, or the same absolute directories.
+
+Resolved roots on this machine:
+
+| Resolver | Verified value |
+|---|---|
+| `<USER_HOME>` | `C:\Users\RAIZ` |
+| `<ROAMING_APP_DATA>` | `C:\Users\RAIZ\AppData\Roaming` |
+| `<LOCAL_APP_DATA>` | `C:\Users\RAIZ\AppData\Local` |
+| `<TEMP>` | `C:\Users\RAIZ\AppData\Local\Temp` |
+| `<PROGRAM_FILES>` | `C:\Program Files` |
+| `<AE_PROFILE_VERSION>` | `26.3` |
+
+Verified addresses and their portable equivalents:
+
+| Capability | Verified address on this machine | Portable path rule |
+|---|---|---|
+| Node.js executable | `C:\Program Files\nodejs\node.exe` | Resolve `node` from `PATH`; do not assume `Program Files` |
+| After Effects application | `C:\Program Files\Adobe\Adobe After Effects 2026\Support Files\AfterFX.exe` | Detect installed supported versions under Adobe installation metadata or registered application paths |
+| After Effects MCP root | `C:\Users\RAIZ\mcp-servers\after-effects-mcp` | `<USER_HOME>\mcp-servers\after-effects-mcp` |
+| After Effects MCP entry | `C:\Users\RAIZ\mcp-servers\after-effects-mcp\build\index.js` | `<USER_HOME>\mcp-servers\after-effects-mcp\build\index.js` |
+| After Effects ScriptUI panel | `C:\Users\RAIZ\AppData\Roaming\Adobe\After Effects\26.3\Scripts\ScriptUI Panels\mcp-bridge-auto.jsx` | `<ROAMING_APP_DATA>\Adobe\After Effects\<AE_PROFILE_VERSION>\Scripts\ScriptUI Panels\mcp-bridge-auto.jsx` |
+| After Effects file bridge | `C:\Users\RAIZ\Documents\ae-mcp-bridge` | Resolve the Windows Documents known folder, then append `ae-mcp-bridge` |
+| Premiere Pro application | `C:\Program Files\Adobe\Adobe Premiere Pro 2026\Adobe Premiere Pro.exe` | Detect installed supported versions under Adobe installation metadata or registered application paths |
+| Premiere MCP root | `C:\Users\RAIZ\mcp-servers\Adobe_Premiere_Pro_MCP` | `<USER_HOME>\mcp-servers\Adobe_Premiere_Pro_MCP` |
+| Premiere MCP entry | `C:\Users\RAIZ\mcp-servers\Adobe_Premiere_Pro_MCP\dist\index.js` | `<USER_HOME>\mcp-servers\Adobe_Premiere_Pro_MCP\dist\index.js` |
+| Premiere CEP panel | `C:\Users\RAIZ\AppData\Roaming\Adobe\CEP\extensions\MCPBridgeCEP` | `<ROAMING_APP_DATA>\Adobe\CEP\extensions\MCPBridgeCEP` |
+| Premiere file bridge | `C:\Users\RAIZ\AppData\Local\Temp\premiere-mcp-bridge` | `<TEMP>\premiere-mcp-bridge` |
+| Codex configuration | `C:\Users\RAIZ\.codex\config.toml` | `<USER_HOME>\.codex\config.toml` |
+| Claude Code executable | `C:\Users\RAIZ\.local\bin\claude.exe` | Resolve `claude` from `PATH`; use `<USER_HOME>\.local\bin\claude.exe` only as a detected Windows fallback |
+| Claude Desktop configuration | `C:\Users\RAIZ\AppData\Roaming\Claude\claude_desktop_config.json` | `<ROAMING_APP_DATA>\Claude\claude_desktop_config.json` |
+
+Verified MCP sources:
+
+| Server | Package | Verified source | Verified revision | Entry | License file |
+|---|---|---|---|---|---|
+| After Effects | `after-effects-mcp@1.0.0` | `https://github.com/Dakkshin/after-effects-mcp.git` | `88d5fbf08b7ae9f015ee98e5f8c4904095cf8202` | `build/index.js` | `LICENSE` |
+| Premiere Pro | `adobe-premiere-pro-mcp@1.2.0` | `https://github.com/hetpatel-11/Adobe_Premiere_Pro_MCP.git` | `50f534b17639aafc615a10b38325957bf73e6515` | `dist/index.js` | `LICENSE.md` |
+
+Inherited-base issue disclosed from executable evidence:
+
+- Origin: `INHERITED` from the third-party After Effects MCP.
+- Affected responsibility: portable resolution of the After Effects file bridge.
+- Evidence: the compiled server derives the bridge with
+  `path.join(homeDir, "Documents", "ae-mcp-bridge")`.
+- Current effect: it resolves correctly on this machine.
+- Risk: it can target the wrong directory when the Windows Documents known folder
+  is redirected, localized, or managed through OneDrive.
+- Required treatment: the future bootstrap and `doctor` must resolve and probe the
+  actual known folder or supply a verified configurable bridge path before claiming
+  support for those profiles. Do not silently classify the current hard-coded
+  derivation as portable.
+
+Current client-registration state:
+
+| Client | After Effects | Premiere Pro | Required treatment |
+|---|---|---|---|
+| Claude Desktop | Registered | Registered | Preserve and validate; do not duplicate entries |
+| Claude Code | Registered at user scope | Registered at user scope | Preserve and validate; future bootstrap must reproduce the local stdio registrations |
+| Codex | Registered; next session required | Registered; next session required | Preserve and validate; future bootstrap must reproduce the local `mcp_servers` entries |
+
+This registration state is expected to change. Any agent that changes it must
+update this snapshot in the same change set or replace it with a generated,
+sanitized capability report referenced from here.
+
+Portable installation sequence for a future Windows developer machine:
+
+1. Resolve the environment roots and installed Adobe versions; never substitute a
+   copied username or version number.
+2. Check whether each MCP checkout, compiled entry, panel, bridge directory, and
+   client registration already exists before changing anything.
+3. Clone only the registered upstream source and verify the selected revision,
+   package version, and applicable license before building.
+4. Use the repository lockfile and documented build command; do not copy
+   `node_modules` from another machine.
+5. Install Adobe panels in the user profile when supported, detecting the actual
+   After Effects profile version and CEP location.
+6. Generate local Codex and Claude Code registrations from the resolved paths.
+   Machine-specific generated configuration must not become a shared repository
+   requirement and must never contain credentials.
+7. Start with read-only capability probes and bridge diagnostics. Adobe mutation
+   tools remain disabled until the global controlled Adobe phase.
+8. Persist a sanitized capability snapshot containing versions, paths, source
+   revisions, tool schemas, and readiness states, but no tokens or private data.
+
+The executable implementation of this contract belongs to
+`operations/bootstrap/toolchain.json`, `raiz-bootstrap.ps1`, and
+`raiz-doctor.ps1`. Until those files explicitly declare Adobe support, this section
+documents the required future behavior; it does not claim the current bootstrap
+already installs or registers Adobe MCPs.
+
+### 8.3 Internal adapters
 
 Application code must call internal adapters, not provider tool names.
 
@@ -357,7 +496,7 @@ export interface PremiereAdapter {
 }
 ```
 
-### 8.3 Adobe worker
+### 8.4 Adobe worker
 
 Run Adobe MCP orchestration in a dedicated local worker controlled by the Electron main process.
 
@@ -375,7 +514,7 @@ Responsibilities:
 
 Do not create a separate cloud service for the first version. Keep this inside the current modular Electron application.
 
-### 8.4 Job state machine
+### 8.5 Job state machine
 
 ```text
 queued
@@ -656,7 +795,7 @@ export interface MotionPlanningContext {
 - Persist job state before and after each external call.
 - On process restart, reconcile all non-terminal jobs through readback.
 - Provide a degraded path using Remotion or a pre-rendered asset when Adobe is unavailable.
-- Adobe failure must never block Phase 1 clean-cut editing.
+- Adobe failure must never block the core clean-cut editing workflow.
 - Preview failure must never overwrite the last approved render.
 
 Recommended error taxonomy:
@@ -689,7 +828,7 @@ Add visual states and controls:
 
 - Adobe connection status in Settings > Connections.
 - Premiere and After Effects capability details.
-- `Create motion` action after Phase 2 approval.
+- `Create motion` action after audiovisual direction approval and capability validation.
 - Motion suggestions shown as visual cards with preview, purpose, engine, and duration.
 - `Use existing`, `Create variation`, and `Do not use` decisions.
 - Render progress below the relevant motion item.
@@ -736,17 +875,27 @@ Do not log full prompts, credentials, source transcripts, or unnecessary local p
 
 ## 19. Implementation roadmap
 
-### Phase 0 — Repository and MCP discovery
+These work packages are subordinate to the global phases in
+`ARQUITETURA-MOTOR-CRIATIVO-RAIZ.md`. They do not authorize agents to start Adobe
+before the repository execution gate allows it. Their numbers are local delivery
+packages, not a second lifecycle: product phase 0 still owns installation, product
+phase 1 still owns Brand Intelligence, and the video flow starts only afterward.
+Work packages 0–3 shape the audiovisual consumer after their corresponding global
+phase prerequisites are available. Work packages 4–7 activate the Adobe-specific
+runtime progressively; Adobe writes begin only in global product phase 7.
+
+### Work package 0 — Repository and capability discovery
 
 Goal: establish verified current state before changing architecture.
 
 Tasks:
 
 - Inspect repository structure, branch, dirty worktree, package scripts, types, IPC contracts, and tests.
-- Locate the current developer instructions and all places that parse or invent Phase 2 fields.
+- Locate the current developer instructions and all places that parse or invent fields for the inherited Cena Raiz Phase 2 workflow.
 - Inspect the installed Premiere and After Effects MCP configurations.
 - Enumerate actual MCP tools and schemas.
 - Verify both Adobe applications and their required panels/extensions.
+- Revalidate the paths, sources, revisions, and client-registration state in section 8.2.
 - Produce capability snapshots and a gap report.
 - Create ADR-001 with the final adapter boundaries.
 
@@ -757,28 +906,79 @@ Acceptance criteria:
 - Actual MCP capabilities are documented from inspection, not assumption.
 - Unsupported requirements are explicitly marked.
 
-### Phase 1 — Domain contracts and local registry
+### Work package 1 — Brand Runtime compilation
 
-Goal: create the owned core without calling Adobe.
+Goal: make the output of product phase 1 consumable by Cena Raiz without calling
+Adobe or injecting the complete brand kernel into each video task.
 
 Tasks:
 
-- Add versioned schemas for `BrandRuntimeProfile`, `MotionProfile`, `MotionAssetManifest`, `SceneMotionNeed`, `MotionExecutionPlan`, and `MotionJob`.
-- Add runtime validators.
-- Implement filesystem registry discovery and validation.
-- Register 5–10 existing assets, starting with current Remotion components and available MOGRT/After Effects templates.
-- Generate or attach thumbnail and preview references.
-- Add tests for invalid manifests, duplicate IDs, incompatible versions, and missing files.
+- Finalize the versioned `BrandRuntimeProfile` and `MotionProfile` schemas and validators.
+- Implement `compileBrandRuntimeProfile` from the canonical
+  `marca-raiz-prisma/inteligencias` method and project evidence.
+- Preserve source IDs, source versions, compiler version, warnings, and human approval.
+- Validate the compiler against the three canonical brand cases.
+- Persist the approved profile separately from per-video project state.
 
 Acceptance criteria:
 
-- Registry loads deterministically.
-- Duplicate or invalid assets never reach the planner.
-- The planner can select assets by compact metadata without reading implementation files.
+- The same brand evidence compiles deterministically.
+- Invalid or incomplete profiles never reach video planning.
+- Cena Raiz consumes the compact profile without loading the full intelligence corpus.
+- Human corrections produce a new version with provenance rather than mutating history silently.
 
-### Phase 2 — Adobe capability layer
+### Work package 2 — Video intake and audiovisual direction
 
-Goal: establish safe, provider-specific adapters.
+Goal: connect the approved brand profile, video objective, and analyzed content to
+the owned direction contracts before selecting assets or an execution engine.
+
+Tasks:
+
+- Add and validate `VideoBrief` and `ContentAnalysis`.
+- Produce `NarrativePlan`, `AudiovisualDirectionPlan`, and `SceneMotionNeed[]`.
+- Make every text, image, silence, sound, and motion decision cite a narrative or brand purpose.
+- Show the plan for human approval before execution compilation.
+- Persist approval, rejection, replacement, and parameter corrections.
+
+Acceptance criteria:
+
+- Every scene decision traces to the brief, content evidence, or approved brand profile.
+- No execution engine is selected before the direction plan is validated and approved.
+- The system abstains when evidence is insufficient instead of inventing a direction.
+- Reopening the project restores the active approved plan.
+
+### Work package 3 — Asset registry and execution router without Adobe mutations
+
+Goal: improve the existing Cena Raiz production engine before making Adobe a runtime
+dependency.
+
+Tasks:
+
+- Add versioned schemas and validators for `MotionAssetManifest`,
+  `MotionExecutionPlan`, and `MotionJob`.
+- Implement filesystem registry discovery and validation.
+- Register 5–10 existing assets, beginning with current Remotion components.
+- Generate or attach thumbnail and preview references; rank only compatible assets.
+- Route clean cuts, media operations, and audio work to FFmpeg.
+- Route registered layouts, captions, and reusable motion to Remotion.
+- Validate `ValidatedExecutionPlan` before dispatch.
+- Persist job state and perform output readback.
+- Provide explicit unavailable-engine and simplified-render fallbacks.
+- Preserve the current Cena Raiz editing, approval, installer, and updater behavior.
+
+Acceptance criteria:
+
+- Registry loads deterministically; duplicate, invalid, or incompatible assets do
+  not reach the planner.
+- Every selected asset cites an ID, source, compatibility result, and scene purpose.
+- The same approved plan produces repeatable routing decisions.
+- Cena Raiz remains usable when Adobe applications and MCP servers are absent.
+- Failed execution never overwrites an approved result.
+- Provider-specific semantics do not escape adapter boundaries.
+
+### Work package 4 — Adobe capability layer
+
+Goal: establish safe, provider-specific adapters, beginning with read-only inspection.
 
 Tasks:
 
@@ -795,7 +995,7 @@ Acceptance criteria:
 - Provider-specific response shapes do not escape the adapter layer.
 - No mutation tool is enabled without a verified capability.
 
-### Phase 3 — After Effects registered-asset loop
+### Work package 5 — After Effects registered-asset loop
 
 Goal: prove `select -> parameterize -> execute -> readback -> preview`.
 
@@ -817,7 +1017,7 @@ Acceptance criteria:
 - Failed jobs preserve the last approved result.
 - Remotion fallback is available.
 
-### Phase 4 — Premiere sequence handoff
+### Work package 6 — Premiere sequence handoff
 
 Goal: create a professional finishing sequence from canonical state.
 
@@ -838,31 +1038,12 @@ Acceptance criteria:
 - Sequence readback is stored as a snapshot.
 - The canonical timeline remains unchanged unless the user explicitly approves an import operation.
 
-### Phase 5 — Brand-to-motion planning
-
-Goal: connect the intelligence panel to the execution system.
-
-Tasks:
-
-- Compile relevant intelligence modules into `BrandRuntimeProfile`.
-- Add `MotionProfile` generation and human review.
-- Generate `SceneMotionNeed[]` from the approved narrative and timeline.
-- Rank compatible registry assets.
-- Show recommendations as visual cards.
-- Record user approval, rejection, replacement, and parameter corrections.
-
-Acceptance criteria:
-
-- Every motion suggestion cites a scene purpose and asset ID.
-- Every selected asset is compatible with the brand and runtime constraints.
-- The system abstains when no compatible asset exists.
-- User corrections persist as structured creative memory.
-
-### Phase 6 — Controlled two-way synchronization
+### Work package 7 — Controlled two-way synchronization
 
 Goal: import selected human Adobe changes only after one-way handoff is reliable.
 
-Do not start this phase until Phase 4 has a low readback mismatch rate across real projects.
+Do not start this work package until work package 6 has a low readback mismatch rate
+across real projects.
 
 Potential scope:
 
@@ -874,11 +1055,29 @@ Potential scope:
 
 ## 20. MVP hypothesis and stop conditions
 
-### Hypothesis
+### Core hypothesis
+
+Structured brand intelligence and an approved audiovisual direction plan can make
+the existing Cena Raiz production engine produce more coherent, repeatable, and
+brand-specific editorial decisions without depending on Adobe.
+
+### Core MVP slice
+
+- One real `BrandRuntimeProfile`.
+- One vertical short-form video supported by the current Cena Raiz timeline.
+- One reviewable `AudiovisualDirectionPlan`.
+- Five registered Remotion assets.
+- FFmpeg and Remotion execution through a validated plan and explicit router.
+- Human approval, readback, correction, and persisted creative decisions.
+
+This core slice is the first product proof. It must remain installable and useful on
+a supported machine without Premiere Pro, After Effects, or their MCP servers.
+
+### Adobe extension hypothesis
 
 A registered-asset workflow using the installed After Effects MCP can produce more sophisticated, brand-consistent motion with less model context and less manual work than generating each animation as new Remotion code.
 
-### MVP slice
+### Adobe validation slice
 
 - One real brand profile.
 - One vertical short-form video.
@@ -886,6 +1085,9 @@ A registered-asset workflow using the installed After Effects MCP can produce mo
 - Five existing Remotion assets.
 - One After Effects preview workflow.
 - One Premiere sequence handoff.
+
+This slice begins only after the core slice and the global controlled Adobe gate are
+accepted.
 
 ### Success threshold
 
@@ -895,6 +1097,7 @@ A registered-asset workflow using the installed After Effects MCP can produce mo
 - At least 50% of motion decisions reuse registered assets.
 - Model context for an asset placement is materially smaller than the current custom-code prompt and source context.
 - User can complete review and recovery without reading raw MCP errors.
+- The core Cena Raiz workflow remains green and usable when Adobe is unavailable.
 
 ### Stop or redesign conditions
 
@@ -904,6 +1107,8 @@ A registered-asset workflow using the installed After Effects MCP can produce mo
 - Required Adobe UI/panel state creates unacceptable user friction.
 - Cross-version behavior cannot be bounded by capability probes.
 - A simpler Remotion or MOGRT path produces equivalent quality and control.
+- Structured direction does not improve brand coherence or reduce revision burden
+  relative to the existing Cena Raiz baseline.
 
 ## 21. Testing strategy
 
@@ -946,25 +1151,28 @@ Add tests in layers.
 
 Real Adobe tests must run behind explicit environment flags and must use disposable fixtures, never personal projects.
 
-## 22. First Claude Code execution instructions
+## 22. First Codex or Claude Code execution instructions
 
-When this document is first given to Claude Code, execute only Phase 0.
+When this document is first given to Codex or Claude Code, obey the current
+repository execution gate. Before the global controlled Adobe phase, execute only
+the read-only parts of work package 0; do not interpret this blueprint as authority
+to enable Adobe writes.
 
 Use this instruction:
 
 ```text
-Read README-ADOBE-INTEGRATION-PLAN.md and the existing consolidated project context completely.
+Read PLANO-EVOLUCAO-AUDIOVISUAL-CENA-RAIZ.md, AGENTS.md, ARQUITETURA-MOTOR-CRIATIVO-RAIZ.md, and the current repository execution gate completely.
 
-Work only in the cena-raiz-desktop repository. Do not modify the cena-raiz skill repository or any individual video project.
+Work only in the raiz-engine monorepository and inside the explicitly authorized file scope. Preserve the Cena Raiz desktop, Cena Raiz skill, and unrelated worktree changes.
 
-For this turn, perform Phase 0 only. Inspect the repository and the actually installed Premiere Pro and After Effects MCP capabilities. Do not implement mutation operations yet. Do not install packages, change runtime versions, create a new architecture beside the existing TimelineModel, or modify user Adobe projects.
+For this turn, perform the permitted read-only portion of work package 0 only. Inspect the repository and the actually installed Premiere Pro and After Effects MCP capabilities. Do not implement mutation operations, install packages, change runtime versions, create a new architecture beside the existing TimelineModel, or modify user Adobe projects.
 
 Deliver:
 1. Current Architecture Map.
 2. MCP Capability Matrix based on actual discovered tools and schemas.
 3. Gap Analysis against this plan.
 4. ADR-001 with the proposed adapter boundaries.
-5. Minimal file-by-file implementation plan for Phase 1.
+5. Minimal file-by-file implementation plan mapped to the global Raiz Engine roadmap.
 6. Risks and unknowns that can materially change the architecture.
 
 Clearly separate verified evidence, inference, and recommendation. Preserve the dirty worktree and do not expose credentials or absolute local paths in user-facing output.
@@ -984,13 +1192,24 @@ The Adobe integration is complete when:
 - Original media and Adobe projects are never overwritten.
 - Token usage, asset reuse, failures, corrections, and completion time are measurable.
 - Mac and Windows behavior is validated on real machines.
-- The existing clean-cut, J-Cut, Phase 2, provider, installer, and updater flows remain green.
+- The bootstrap detects existing Adobe capabilities and can reproduce their local
+  setup without hardcoded usernames, copied dependencies, or committed credentials.
+- The existing clean-cut, J-Cut, inherited Phase 2, provider, installer, and updater flows remain green.
 
 ## 24. Immediate next decision
 
-The next engineering decision must be based on evidence from Phase 0:
+The immediate engineering decision for the owned core is:
+
+**At which verified seam can `AudiovisualDirectionPlan` and
+`ValidatedExecutionPlan` enter the current Cena Raiz workflow without replacing
+`TimelineModel` or changing inherited behavior before approval?**
+
+The Adobe activation decision remains a later gate based on read-only capability
+evidence:
 
 **Can the installed After Effects MCP and Premiere MCP provide sufficient readback and identifier stability to support safe, idempotent adapters?**
 
-If yes, proceed to Phase 1 and Phase 2. If no, keep the same owned domain architecture but replace mutation through the MCP with a controlled local Adobe bridge, MOGRT workflow, ExtendScript/UXP adapter, or render-only integration.
-
+If yes, activate the Adobe work packages only when the global roadmap reaches the
+controlled Adobe phase. If no, keep the same owned domain architecture and replace
+MCP mutation with a controlled local bridge, MOGRT workflow, ExtendScript/UXP
+adapter, or render-only integration.

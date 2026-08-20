@@ -181,7 +181,7 @@ excluem também os dois documentos criados por esta etapa.
 | Área | Arquivos | Bytes | Papel observado | Classe preliminar |
 |---|---:|---:|---|---|
 | `marca-raiz-prisma/` | 575 | 395.418.750 | inteligência de marca e projetos | próprio alegado; proveniência a confirmar |
-| `cena-raiz/` | 795 | 39.744.912 | herdados, plano Adobe e referências externas | misto |
+| `cena-raiz/` | 795 | 39.744.912 | herdados, plano de evolução audiovisual e referências externas | misto |
 | `ASSETS/` | 12 | 12.146.000 | mídia e referências visuais | material-fonte a classificar |
 | `slide-raiz/` | 19 | 249.531 | sistema editorial e narrativa | próprio alegado; proveniência a confirmar |
 | `raiz-Images/` | 9 | 103.115 | direção e geração de imagem | próprio alegado; proveniência a confirmar |
@@ -198,7 +198,7 @@ Não foram encontrados links simbólicos ou outros pontos de reparse.
 | `cena-raiz/cenaraiz/cena-raiz/` | 99 | 2.444.138 | skill herdada, helpers, workflows e templates |
 | `cena-raiz/cenaraiz/cena-raiz-desktop/` | 115 | 2.754.256 | aplicativo Electron herdado |
 | `cena-raiz/cenaraiz/cena-raiz-desktop-clone/` | 0 | 0 | pasta vazia; não é uma terceira implementação |
-| `cena-raiz/cenaraiz/README-ADOBE-INTEGRATION-PLAN.md` | 1 | 34.550 | plano de integração |
+| `cena-raiz/cenaraiz/PLANO-EVOLUCAO-AUDIOVISUAL-CENA-RAIZ.md` | 1 | 34.550 | plano de evolução audiovisual; nome canônico atual |
 | `cena-raiz/gh repos clones/` | 580 | 34.511.968 | biblioteca-base intencional; ainda não é código próprio ativo |
 | `marca-raiz-prisma/inteligencias/` | 25 | 658.785 | modelos de inteligência |
 | `marca-raiz-prisma/projetos/` | 545 | 394.607.148 | três projetos e seus materiais |
@@ -513,8 +513,8 @@ Ordem necessária no Windows:
    `architect-ai-systems.skill` dentro dela;
 3. `cena-raiz/cenaraiz/cena-raiz/` → `skills/cena-raiz/`;
 4. `cena-raiz/cenaraiz/cena-raiz-desktop/` → `apps/cena-raiz-desktop/`;
-5. `cena-raiz/cenaraiz/README-ADOBE-INTEGRATION-PLAN.md` →
-   `docs/integrations/adobe.md`;
+5. `cena-raiz/cenaraiz/PLANO-EVOLUCAO-AUDIOVISUAL-CENA-RAIZ.md` →
+   `docs/architecture/cena-raiz-audiovisual-evolution.md`;
 6. confirmar novamente que `cena-raiz-desktop-clone/` está vazia e obter
    aprovação para removê-la;
 7. remover somente os contêineres antigos que ficarem vazios;
@@ -727,8 +727,10 @@ Seis fatos que definem esse commit:
    em `docs/provenance/`.
 5. **A Etapa 5 foi executada localmente e aguarda aceitação humana.** O commit
    existe; a etapa não está formalmente aceita.
-6. **O push continua pendente** e exige autorização separada. O repositório remoto
-   segue vazio.
+6. **O primeiro push ocorreu somente depois das reescritas descritas acima.** O
+   remoto privado contém `231e746` e o commit documental `5fcccf3`. No snapshot
+   de 2026-08-20, o `HEAD` local `cce7889` está um commit à frente; novo push
+   continua exigindo autorização separada.
 
 ## 15.9 Git LFS — dependência obrigatória
 

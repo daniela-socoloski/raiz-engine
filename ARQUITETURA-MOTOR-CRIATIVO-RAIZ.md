@@ -45,7 +45,7 @@ Este documento é a referência arquitetural inicial. Contratos e decisões conf
 - [Guia de organização do repositório](GUIA-ORGANIZACAO-REPOSITORIO.md) — primeira leitura operacional. Define como preservar as duas bases herdadas, consolidar o monorepositório e criar o baseline antes de mudar código.
 - [Plano de migração de identidade](PLANO-MIGRACAO-IDENTIDADE.md) — nomenclatura, compatibilidade e retirada gradual do legado depois da consolidação estrutural.
 - [Política de fonte única funcional](POLITICA-FONTE-UNICA-FUNCIONAL.md) — regra obrigatória para atualizar a implementação canônica e remover arquivos, nomes e duplicatas obsoletos depois da migração validada.
-- [Plano de integração Adobe](cena-raiz/cenaraiz/README-ADOBE-INTEGRATION-PLAN.md) — plano especializado de execução com After Effects e Premiere. Deve ser retomado na Fase 7 deste roadmap, depois da validação da direção e dos contratos centrais.
+- [Plano de evolução audiovisual do Cena Raiz](cena-raiz/cenaraiz/PLANO-EVOLUCAO-AUDIOVISUAL-CENA-RAIZ.md) — blueprint ativo de direção audiovisual, narrativa, motion, assets, timeline, execução, revisão e memória. Adobe é apenas uma das integrações de execução; suas mutações reais por MCP e sincronização são ativadas somente na Fase 7.
 - [Cena Raiz Desktop](cena-raiz/cenaraiz/cena-raiz-desktop/README.md) — estado operacional do aplicativo.
 - [Cena Raiz skill](cena-raiz/cenaraiz/cena-raiz/README.md) — origem do fluxo de edição por agente e dos helpers.
 - [Marca Raiz Prisma](marca-raiz-prisma/start-here.md) — entrada atual da inteligência de marca.
@@ -517,7 +517,7 @@ Adicionar planos e adapters ao redor dessas capacidades. Não criar uma segunda 
 | ads-produto | `ADAPT` como recipe | fluxo especializado já validado conceitualmente |
 | FFmpeg e WhisperX | `INTEGRATE` | infraestrutura madura |
 | Remotion | `INTEGRATE` por adapter | renderer substituível |
-| After Effects e Premiere | `INTEGRATE` depois do core | ampliam execução, não criam direção |
+| After Effects e Premiere | `INTEGRATE` por contrato desde o core; ativar mutações na Fase 7 | o core precisa prever capacidades e fallbacks, mas Adobe amplia execução e não cria direção |
 | Geração livre de código de motion | `REMOVE` do caminho padrão | imprevisível e cara em contexto |
 | Prompts livres como único contrato | `REMOVE` gradualmente | não são estado executável confiável |
 | Sincronização Adobe irrestrita | `DEFER` | alto risco e baixo valor antes do core |
@@ -535,37 +535,59 @@ raiz-engine/
 │   └── cena-raiz-desktop/
 ├── skills/
 │   └── cena-raiz/
+├── recipes/
+│   └── ads-produto/
 ├── packages/
 │   ├── contracts/
 │   │   ├── brand/
-│   │   ├── creative/
+│   │   ├── audiovisual/
 │   │   ├── assets/
-│   │   └── execution/
-│   └── core/
-│       ├── domain/
-│       ├── application/
-│       ├── adapters/
-│       ├── registry/
-│       ├── memory/
-│       └── evals/
-├── recipes/
-│   └── ads-produto/
+│   │   ├── execution/
+│   │   └── memory/
+│   ├── core/
+│   │   ├── brand/
+│   │   ├── planning/
+│   │   ├── assets/
+│   │   ├── execution/
+│   │   ├── memory/
+│   │   └── evals/
+│   └── adapters/
+│       ├── ffmpeg/
+│       ├── remotion/
+│       └── adobe/
 ├── operations/
 │   ├── bootstrap/
-│   ├── doctor/
-│   └── release/
+│   └── distribution/
 ├── docs/
 │   ├── architecture/
 │   ├── decisions/
 │   ├── integrations/
 │   └── provenance/
-├── marca-raiz-prisma/
-├── raiz-Images/
-├── slide-raiz/
-└── ASSETS/
+├── marca-raiz-prisma/       # fonte da Brand Intelligence e corpus de avaliação
+├── raiz-Images/             # consumidor de imagem
+├── slide-raiz/              # consumidor editorial e de apresentações
+└── ASSETS/                  # acervo em catalogação; não é o Asset Registry
 ```
 
-No início, `packages/contracts/` e `packages/core/` podem conter apenas documentação, schemas e fixtures. Eles não precisam virar serviços ou pacotes publicados. O repositório inteiro já representa o `Raiz Engine`; por isso o núcleo interno se chama `core`, sem repetir `raiz-engine/raiz-engine`.
+As pastas são organizadas por **responsabilidade estável**, não por número de fase.
+As fases mudam conforme o produto evolui; `brand`, `planning`, `assets`, `execution`
+e `memory` continuam representando capacidades reais. A numeração canônica vive no
+roadmap da seção 15.
+
+`marca-raiz-prisma/` permanece explícita na raiz porque não é apenas código: ela
+contém o kernel de inteligência em `inteligencias/` e o corpus aplicado em
+`projetos/`. Sua saída para o restante do motor é o contrato compacto
+`BrandRuntimeProfile`; nenhum consumidor deve carregar todo o kernel para produzir
+uma cena.
+
+No início, `packages/contracts/`, `packages/core/` e `packages/adapters/` podem
+conter apenas documentação, schemas, fixtures e módulos extraídos de um primeiro
+consumidor real. Eles não precisam virar serviços ou pacotes publicados. O
+repositório inteiro já representa o `Raiz Engine`; por isso o núcleo interno se
+chama `core`, sem repetir `raiz-engine/raiz-engine`.
+
+`doctor` pertence a `operations/bootstrap/`, junto da única fonte de instalação.
+Separá-lo em outra árvore criaria duas autoridades sobre a saúde da máquina.
 
 Mapeamento estrutural inicial:
 
@@ -573,7 +595,7 @@ Mapeamento estrutural inicial:
 |---|---|
 | `cena-raiz/cenaraiz/cena-raiz/` | `skills/cena-raiz/` |
 | `cena-raiz/cenaraiz/cena-raiz-desktop/` | `apps/cena-raiz-desktop/` |
-| `cena-raiz/cenaraiz/README-ADOBE-INTEGRATION-PLAN.md` | `docs/integrations/adobe.md` |
+| `cena-raiz/cenaraiz/PLANO-EVOLUCAO-AUDIOVISUAL-CENA-RAIZ.md` | `docs/architecture/cena-raiz-audiovisual-evolution.md` |
 | `SKILLS/ads-produto/` | `recipes/ads-produto/` |
 
 Movimentação estrutural e rebranding devem ocorrer em commits diferentes.
@@ -740,122 +762,197 @@ edit/
 - nenhum novo provider ou dependência é necessário;
 - existe teste de criação, validação, persistência e migração.
 
-## 15. Roadmap de evolução
+## 15. Roadmap canônico do produto
 
-### Fase 0 — Baseline e governança
+Este roadmap responde **como o Raiz Engine passa a funcionar**, do computador
+vazio ao aprendizado após uma produção. Ele não substitui as Etapas 0–11 do
+[Guia de organização](GUIA-ORGANIZACAO-REPOSITORIO.md):
 
-Objetivo: tornar o estado atual recuperável e compreensível.
+- `Etapa` é uma operação única de segurança e transformação do repositório;
+- `Fase` é uma capacidade do produto, construída nessa ordem e depois reutilizada.
 
-- executar inventário somente de leitura;
-- criar backup recuperável fora do repositório;
-- registrar os dois upstreams e as divergências locais;
-- definir `raiz-engine/.git` como a única fronteira Git do produto;
-- criar `.gitignore` para outputs, runtimes, caches, segredos e clones de referência;
-- registrar proveniência e licenças;
-- criar um commit-base herdado antes de movimentar pastas;
-- consolidar skill, desktop, recipes e documentação em diretórios explícitos;
-- criar um segundo commit somente estrutural;
-- decidir o que será publicado no remoto;
-- mapear testes e capacidades reais.
+Portanto, a Etapa 10 do guia constrói a Fase 0 do produto. Depois de a fundação do
+repositório ser concluída, a Etapa 11 começa a Fase 1. Essa distinção evita que
+“Fase 0” volte a significar baseline, instalação e contrato ao mesmo tempo.
 
-Não alterar comportamento, identidade interna ou contratos do produto nesta fase. O procedimento detalhado está em [GUIA-ORGANIZACAO-REPOSITORIO.md](GUIA-ORGANIZACAO-REPOSITORIO.md).
+### Visão sequencial
 
-### Fase 0.5 — Recuperação do baseline técnico
+```text
+Fase 0  Instalar e comprovar o motor
+→ Fase 1  Entender e compilar a marca
+→ Fase 2  Receber o objetivo e analisar o conteúdo
+→ Fase 3  Planejar narrativa e direção audiovisual
+→ Fase 4  Localizar e selecionar assets
+→ Fase 5  Compilar e executar com os motores adequados
+→ Fase 6  Revisar, entregar e aprender
+→ Fase 7  Ativar engines profissionais opcionais
+```
 
-Objetivo: tornar o Cena Raiz Desktop novamente verificável antes de introduzir contratos novos.
+### Fase 0 — Install & Runtime Foundation
 
-- corrigir identificadores TypeScript inválidos criados por substituição mecânica;
-- recuperar `npm run typecheck`;
-- rodar os testes existentes de timeline, mídia, helpers e J-Cut;
-- abrir o aplicativo em desenvolvimento;
-- registrar falhas herdadas separadamente de regressões;
-- preservar protocolos, storage, autenticação, update e bundle ID.
+**Pergunta:** esta máquina consegue instalar, abrir, verificar, reparar e atualizar
+o Raiz Engine sem depender da memória ou dos caminhos do computador original?
 
-### Fase 0.75 — Bootstrap mínimo do Raiz Engine
+**Entrega:** bootstrap versionado, `doctor`, manifest canônico da toolchain,
+perfil `developer`, instalador `creator`, relatório de instalação e snapshot das
+capacidades disponíveis.
 
-Objetivo: permitir que a construção continue em outra máquina sem depender de
-memória manual ou da configuração atual.
+- concluir a consolidação estrutural das Etapas 6 e 7 sem duplicar componentes;
+- adaptar as garantias úteis do instalador herdado para uma única fonte própria;
+- instalar e verificar Git, Git LFS, `gh`, Node, `uv`/Python e dependências;
+- materializar ou pular o corpus LFS de forma explícita;
+- instalar skills e preparar os runtimes exigidos pelo perfil escolhido;
+- detectar capacidades opcionais como FFmpeg, GPU e Adobe sem bloquear o core;
+- construir o perfil `creator` sem exigir Git, VS Code ou Node no usuário final;
+- testar instalação, repetição, reparo e falha parcial em Windows 11 x64 limpo;
+- publicar uma entrada remota somente depois de repositório, payload e checksum existirem.
 
-- inventariar e testar o comportamento real do instalador herdado;
-- definir a matriz inicial como Windows 11 x64;
-- criar o manifest canônico da toolchain e o perfil `developer`;
-- adaptar as garantias úteis do instalador herdado para o namespace próprio;
-- instalar e verificar Git, `gh`, SSH, Node, `uv`/Python e FFmpeg;
-- instalar dependências a partir dos locks existentes;
-- oferecer um comando `doctor` que não altere a máquina;
-- validar instalação, repetição, reparo e falha parcial numa máquina virtual limpa;
-- publicar URL estável somente depois que o payload próprio estiver no remoto.
+**Pronto quando:** uma VM Windows limpa instala e abre o produto por uma entrada
+oficial, o `doctor` explica o estado final e nenhum caminho como
+`C:\\Users\\RAIZ` é requisito de funcionamento.
 
-### Fase 1 — Contrato de direção
+**Estado atual:** `operations/bootstrap/` já contém um bootstrap `developer`, um
+`doctor` e um manifest iniciais. O perfil `creator`, a instalação de skills e
+runtimes, a validação em VM e a distribuição própria continuam pendentes; portanto
+a Fase 0 está **em construção**, não concluída.
 
-Objetivo: inserir `AudiovisualDirectionPlan` sem introduzir nova decisão de IA.
+### Fase 1 — Brand Intelligence
 
-- criar schema e validator;
-- converter `ProjectStyleState` para o plano;
-- persistir e carregar o plano;
-- compilar o plano para o fluxo atual;
-- manter resultado visual compatível.
+**Pergunta:** quem é esta marca e quais decisões ela permite, exige ou proíbe?
 
-### Fase 2 — Brand Runtime Profile
+**Fonte canônica:** `marca-raiz-prisma/inteligencias/` é o kernel do método;
+`marca-raiz-prisma/projetos/` é o corpus aplicado e a base inicial de avaliação.
 
-Objetivo: ligar `marca-raiz-prisma` ao produto sem despejar o kernel inteiro no contexto.
+**Entrega:** `BrandRuntimeProfile` compacto, versionado, revisável e com
+proveniência.
 
-- definir `BrandRuntimeProfile`;
-- compilar voz, visual, motion, som, audiência e restrições;
-- versionar e registrar proveniência;
-- permitir revisão humana do perfil;
-- associar o perfil ao projeto de vídeo.
+- reconciliar o fluxo local atual com documentos antigos que ainda pressupõem Notion;
+- compilar posicionamento, audiência, voz, visual, fotografia, motion, som,
+  restrições e anti-patterns;
+- registrar fontes e versões usadas na compilação;
+- permitir correção e aprovação humana antes do uso criativo;
+- validar o compilador nos três casos canônicos do corpus;
+- disponibilizar o perfil aos consumidores sem injetar todo o kernel em cada tarefa.
 
-### Fase 3 — Direction MVP
+**Pronto quando:** o mesmo conjunto de evidências gera um perfil determinístico e
+validado, e os casos do corpus demonstram diferenças de marca perceptíveis.
 
-Objetivo: provar direção audiovisual diferenciada usando apenas o motor atual.
+### Fase 2 — Production Intake & Content Analysis
 
-- escolher um vídeo vertical talking-head;
-- produzir `NarrativePlan` e `SceneDirection[]`;
-- sugerir texto, imagem, silêncio, ritmo e motion por função;
-- revisar o plano antes da execução;
-- compilar para Remotion e FFmpeg existentes.
+**Pergunta:** o que este vídeo precisa alcançar e o que existe no material recebido?
 
-### Fase 4 — Asset Registry
+**Entrega:** `VideoBrief` e `ContentAnalysis` tipados, vinculados ao
+`BrandRuntimeProfile` aprovado.
 
-Objetivo: reutilizar antes de gerar.
+- registrar objetivo, público, canal, formato, duração, CTA e restrições;
+- ingerir mídia sem alterar os originais;
+- transcrever e analisar temas, falas, momentos fortes, lacunas e riscos;
+- separar fatos extraídos do conteúdo de hipóteses criativas;
+- reutilizar as capacidades herdadas de transcrição, limpeza e corte.
 
-- registrar 5–10 componentes Remotion existentes;
-- registrar imagens, overlays, sons e recipes relevantes;
-- gerar thumbnail e preview;
-- filtrar por marca, função, formato e duração;
-- devolver poucos candidatos ao planner;
-- bloquear incompatibilidades.
+**Pronto quando:** direção pode ser planejada sem voltar ao usuário para recuperar
+dados que já estavam no briefing ou na mídia.
 
-### Fase 5 — Creative Memory e avaliações
+### Fase 3 — Audiovisual Direction
 
-Objetivo: aprender sem transformar chat em banco de dados.
+**Pergunta:** qual narrativa e qual linguagem audiovisual transformam esse
+conteúdo em uma peça coerente com a marca e com o objetivo?
 
-- registrar aprovações e rejeições;
-- registrar parâmetros corrigidos;
+**Entrega:** `NarrativePlan` e `AudiovisualDirectionPlan` revisáveis.
+
+- definir hook, tensão, progressão, encerramento e ritmo;
+- decidir onde usar fala, silêncio, texto, imagem, gráfico, som e motion;
+- justificar cada recurso pela função narrativa ou de marca;
+- validar o plano antes de qualquer execução;
+- persistir a versão aprovada e compilar compatibilidade com o fluxo atual.
+
+**Pronto quando:** duas marcas aplicadas a conteúdos comparáveis produzem decisões
+narrativas, visuais, sonoras e de movimento diferentes e repetíveis.
+
+O contrato `AudiovisualDirectionPlan` já possui um esqueleto introduzido no
+desktop, mas isso não conclui a fase: falta alimentá-lo com as saídas reais das
+Fases 1 e 2 e provar o round-trip sem alterar o render aprovado.
+
+### Fase 4 — Asset Intelligence
+
+**Pergunta:** quais recursos existentes cumprem o plano antes de gerar ou criar
+algo novo?
+
+**Entrega:** `AssetRegistry`, candidatos compatíveis e seleção aprovada.
+
+- registrar componentes Remotion, imagens, overlays, fontes, sons, recipes,
+  composições e templates permitidos;
+- gerar metadados, thumbnail e preview;
+- filtrar por marca, função, formato, duração, licença e engine;
+- devolver poucos candidatos relevantes ao planner;
+- bloquear incompatibilidades e registrar o motivo da seleção.
+
+**Pronto quando:** o sistema reutiliza assets verificáveis antes de gerar novos e
+consegue explicar de onde cada recurso veio.
+
+### Fase 5 — Execution Compilation
+
+**Pergunta:** como transformar o plano aprovado em operações determinísticas sem
+entregar o estado canônico a uma ferramenta externa?
+
+**Entrega:** `ValidatedExecutionPlan`, `CanonicalTimeline` atualizada e jobs
+auditáveis.
+
+- compilar direção e assets em operações tipadas;
+- escolher FFmpeg, Remotion, `raiz-Images` ou outro adapter por capacidade;
+- manter fallback explícito, idempotência, cancelamento, custo e readback;
+- preservar `TimelineModel`, originais, EDL, J-Cut e edição não destrutiva;
+- validar o resultado real, não a alegação do modelo.
+
+**Pronto quando:** o mesmo plano aprovado pode ser reexecutado com resultado
+previsível, falhar com segurança e retomar sem corromper o projeto.
+
+### Fase 6 — Review, Delivery & Creative Memory
+
+**Pergunta:** o resultado está correto, foi aprovado e o que deve ser lembrado?
+
+**Entrega:** revisão humana, variantes finais, relatório de qualidade e
+`CreativeMemoryEntry` estruturada.
+
+- separar qualidade técnica de qualidade criativa;
+- permitir aprovar, rejeitar, corrigir, desfazer e gerar variantes;
+- registrar aprovações, rejeições e parâmetros corrigidos por escopo;
 - distinguir preferência da marca, do usuário e do projeto;
-- criar dataset de comparação entre plano e resultado;
-- medir consistência, retrabalho, reuso, custo e tempo.
+- medir consistência, retrabalho, reuso, custo e tempo;
+- devolver aprendizado aprovado às próximas execuções das Fases 1, 3 e 4.
 
-### Fase 6 — Execution Router
+**Pronto quando:** uma correção útil deixa de viver apenas no chat e influencia a
+próxima produção sem transformar conversa em fonte de verdade.
 
-Objetivo: escolher engines de forma determinística.
+### Fase 7 — Professional Engine Adapters
 
-- FFmpeg para mídia e áudio determinísticos;
-- Remotion para layouts e motion registrado;
-- `raiz-Images` para assets ausentes;
-- fallback explícito;
-- capability probe e custo antes da execução.
+**Pergunta:** quais acabamentos exigem capacidades profissionais opcionais que o
+core não deve reimplementar?
 
-### Fase 7 — Adobe controlado
+**Entrega:** adapters controlados de After Effects e Premiere, com os mesmos
+contratos, validações e fallbacks da Fase 5.
 
-Objetivo: ampliar acabamento depois de a direção funcionar.
+- detectar Adobe e MCPs sem torná-los requisito da instalação básica;
+- operar somente em cópias de projetos, sequências e composições;
+- exigir idempotência, readback, validação e recuperação;
+- começar com handoff one-way e ativar sincronização de volta somente após prova;
+- manter Remotion e FFmpeg como caminho degradado quando Adobe estiver indisponível.
 
-- adapter de After Effects para assets registrados;
-- adapter de Premiere para handoff e finishing;
-- duplicação obrigatória de projetos, sequências e composições;
-- idempotência, readback, validação e recuperação;
-- sincronização de volta apenas depois de one-way handoff confiável.
+**Pronto quando:** Adobe amplia o acabamento sem possuir a timeline canônica,
+corromper originais ou impedir o uso do Raiz Engine em máquinas sem Adobe.
+
+### Estado resumido das fases do produto
+
+| Fase | Estado verificável agora |
+|---|---|
+| 0 — instalação | **em construção**; bootstrap `developer` inicial existe, instalador `creator` e prova em VM não |
+| 1 — Brand Intelligence | **próxima capacidade central**; corpus e contrato existem, compilador não |
+| 2 — intake e análise | **parcialmente existente** na base adquirida, ainda sem contrato canônico completo |
+| 3 — direção audiovisual | esqueleto de contrato iniciado antecipadamente; planner e integração com as Fases 1–2 pendentes |
+| 4 — Asset Intelligence | planejada |
+| 5 — execução compilada | motores herdados existem; router próprio e plano validado pendentes |
+| 6 — revisão e memória | revisão herdada existe; memória criativa estruturada pendente |
+| 7 — engines profissionais | fronteiras planejadas; mutações Adobe adiadas |
 
 ## 16. MVP estratégico
 
@@ -960,7 +1057,7 @@ O modelo deve pesquisar o catálogo e receber poucos candidatos. Ele não deve l
 - construir o `Raiz Engine` como núcleo compartilhado, não como simples renomeação de um dos componentes herdados;
 - manter uma única implementação funcional por responsabilidade; o Git preserva versões antigas e o repositório ativo não mantém cópias de backup;
 - manter uma única timeline canônica;
-- criar direção antes de aprofundar Adobe;
+- aplicar desde já o blueprint audiovisual do Cena Raiz e criar direção antes de ativar mutações Adobe;
 - usar contratos estruturados entre IA e execução;
 - reutilizar assets antes de gerar novos;
 - manter engines substituíveis;
@@ -986,23 +1083,35 @@ O modelo deve pesquisar o catálogo e receber poucos candidatos. Ele não deve l
 - quais modelos e assets grandes serão baixados sob demanda em vez de acompanharem o pacote;
 - formato final de distribuição do perfil `creator` e política de assinatura de builds.
 
-Essas escolhas não bloqueiam a Fase 1, mas a Fase 0 e a recuperação do baseline técnico precisam terminar primeiro.
+Essas escolhas não bloqueiam a compilação inicial da Brand Intelligence, mas a
+Fase 0 precisa chegar ao menos ao perfil `developer` comprovado para que qualquer
+capacidade nova possa ser reproduzida em outra máquina.
 
 ## 22. Próxima ação recomendada
 
-A sequência segura é:
+A sequência atual, considerando o que já foi executado, é:
 
-1. executar somente o inventário descrito na Etapa 1 do guia de organização;
-2. criar backup e consolidar a fronteira Git depois de aprovação;
-3. criar o baseline — executado como `reconciled Raiz Engine baseline` — e depois o commit exclusivamente estrutural;
-4. recuperar o typecheck e os testes do Cena Raiz Desktop;
-5. definir o manifest da toolchain e validar o perfil `developer` numa máquina limpa;
-6. implementar somente o `AudiovisualDirectionPlan v1`;
-7. persistir o plano sem mudar o render atual;
-8. validar o round-trip num projeto real;
-9. só então conectar o `BrandRuntimeProfile` e o planner.
+1. formalizar a aceitação do `reconciled Raiz Engine baseline` sem confundi-la
+   com autorização de push;
+2. encerrar ou congelar as edições concorrentes e executar as Etapas 6 e 7 do
+   guia: consolidar a estrutura e validar que não ficaram cópias ativas;
+3. reconciliar os caminhos do manifest e concluir o bootstrap `developer` da
+   Fase 0;
+4. provar `bootstrap → doctor → typecheck → testes → aplicativo aberto` em uma
+   VM Windows 11 x64 limpa;
+5. construir o perfil `creator` e gerar o primeiro instalador local, sem publicar;
+6. começar a Fase 1 pelo compilador
+   `marca-raiz-prisma → BrandRuntimeProfile` e validá-lo no corpus canônico;
+7. somente então ligar `VideoBrief` e `ContentAnalysis` ao
+   `AudiovisualDirectionPlan` já iniciado;
+8. persistir e aprovar o plano antes de compilá-lo para o render atual;
+9. adicionar Asset Intelligence, router próprio, memória e adapters profissionais
+   nas fases seguintes.
 
-O primeiro lote de trabalho é somente inventário. Ele não deve mover arquivos, remover `.git`, renomear código, instalar dependências ou incluir Adobe, Asset Registry, memória ou interface nova.
+Enquanto Claude Code ou outro agente estiver modificando `cena-raiz/cenaraiz/`,
+a nova arquitetura pode ser documentada, mas a movimentação física desses arquivos
+deve esperar o worktree ficar congelado. Essa espera evita perder trabalho; ela
+não muda o destino aprovado da estrutura.
 
 ## 23. Definição de pronto do Motor Criativo Raiz
 

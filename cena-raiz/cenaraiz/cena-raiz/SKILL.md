@@ -31,14 +31,20 @@ description: Conversation-driven video editing for short-form vertical (Reels, T
 12. **Verify numerically first.** Run `verify_cut.py` on every rendered cut; open images only for flagged junctions. Batch any multi-frame look into one `contact_sheet.py` / `grade.py --candidates` montage.
 13. **Never Read machine data into context**: `transcripts/*.json` (raw), `captions.json`, `track.json`, `segments.json`, matte/track binaries. Read `takes_packed.md` and helper stdout instead.
 
-## Execution medium — ffmpeg pipeline (default) vs Adobe Premiere (MCP)
+## Execution medium — local pipeline vs Adobe MCP
 
-The default engine is the ffmpeg/Remotion pipeline below. **If the user asks for the
-edit inside Adobe Premiere Pro via the `premiere-pro` MCP** ("edite a sequência no
-Premiere", "corte via MCP"), the METHOD is unchanged — audio-primary, cut on
-silence, phase gate, grade with taste — but the hands change: **read
-`references/premiere-mcp.md`**. Transcription and `edl.json` are identical and
-cached, so reuse an approved EDL and skip `cut.mp4`/preview.
+The default engine is the ffmpeg/Remotion pipeline below. For connection,
+diagnostics, capability discovery, or controlled work through the local Adobe
+MCPs, **read `references/adobe-mcp.md` first**. It is client-neutral: the same
+procedure applies from Codex and Claude Code.
+
+If the user asks for the edit inside Adobe Premiere Pro via the `premiere-pro`
+MCP ("edite a sequência no Premiere", "corte via MCP"), also **read
+`references/premiere-mcp.md`**. The METHOD is unchanged — audio-primary, cut on
+silence, phase gate, grade with taste — but the hands change. Transcription and
+`edl.json` are identical and cached, so reuse an approved EDL and skip
+`cut.mp4`/preview. After Effects writes remain subject to the repository's
+controlled Adobe phase; MCP availability alone does not authorize mutation.
 
 ## Directory layout
 

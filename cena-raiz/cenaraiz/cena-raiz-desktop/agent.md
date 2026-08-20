@@ -473,7 +473,7 @@ Decisões apuradas com teste, não por suposição:
   Windows. Daí a instalação sob demanda, no mesmo padrão do modelo do
   WhisperX.
 - **Bug herdado da skill, corrigido aqui**: a cor de destaque estava literal
-  (`#ff5200`) em três pontos do template e a escolha do usuário era ignorada
+  (`#09b5b7`) em três pontos do template e a escolha do usuário era ignorada
   no render. Agora `hook.accent` alimenta realce e misto, e
   `captions.accent` alimenta a linha serifada da empilhada. Verificado
   renderizando com `#0b72b1`.
@@ -1345,7 +1345,7 @@ Dependências do Fill:
 - 0.8.5: as thumbnails de headline (4) e legenda (6) da aba Estilos são
   stills renderizados pelo próprio template do Remotion
   (scripts/render-style-thumbs.mjs: backdrop sintético por FFmpeg, legendas
-  pelos helpers oficiais, accent padrão #ff5200, recortes por estilo em
+  pelos helpers oficiais, accent padrão #09b5b7, recortes por estilo em
   src/brand/thumbs/*.png). Mudou o template? Rodar o script de novo. O
   FFmpeg empacotado não tem encoder webp — saída em PNG. Sem loading=lazy
   nos cards: dentro do scroll da aba as imagens nunca disparavam. Os cards

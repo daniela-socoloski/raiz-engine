@@ -4,7 +4,7 @@
  *
  * Look: words stacked vertically, tight, mixing per line — Poppins bold-italic
  * with a white→light-gray gradient, Poppins regular (smaller), Playfair serif
- * bold-italic in ORANGE #ff5200, Poppins bold. Emphasis words appear solo; some
+ * bold-italic in ACCENT #09b5b7, Poppins bold. Emphasis words appear solo; some
  * get a hand-drawn green "pencil" ellipse. Words rise in one by one.
  *
  * Baked SFX (no Premiere): a click on every solo word, a scratch when a word is
@@ -37,7 +37,7 @@ const playfair = loadPlayfair('italic', {weights: ['700', '900']});
 loadPlayfair('normal', {weights: ['700', '900']});
 const PLAYFAIR = playfair.fontFamily;
 
-const ORANGE = '#ff5200';
+const ACCENT = '#09b5b7';
 const WHITE_GRAD: React.CSSProperties = {
   backgroundImage: 'linear-gradient(180deg, #ffffff 0%, #ffffff 46%, #cfcfcf 100%)',
   WebkitBackgroundClip: 'text',
@@ -49,7 +49,7 @@ const WHITE_GRAD: React.CSSProperties = {
 const LINE_STYLES: React.CSSProperties[] = [
   {fontFamily: POPPINS, fontWeight: 900, fontStyle: 'italic', ...WHITE_GRAD},
   {fontFamily: POPPINS, fontWeight: 400, fontStyle: 'normal', ...WHITE_GRAD},
-  {fontFamily: PLAYFAIR, fontWeight: 900, fontStyle: 'italic', color: ORANGE},
+  {fontFamily: PLAYFAIR, fontWeight: 900, fontStyle: 'italic', color: ACCENT},
   {fontFamily: POPPINS, fontWeight: 800, fontStyle: 'normal', ...WHITE_GRAD},
 ];
 const SHADOW = 'drop-shadow(0 5px 9px rgba(0,0,0,0.5))';

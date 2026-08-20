@@ -63,7 +63,7 @@ raiz-engine/
 │   │   ├── cena-raiz/                 # cópia da skill
 │   │   ├── cena-raiz-desktop/         # cópia do aplicativo
 │   │   ├── cena-raiz-desktop-clone/   # pasta vazia
-│   │   └── README-ADOBE-INTEGRATION-PLAN.md
+│   │   └── PLANO-EVOLUCAO-AUDIOVISUAL-CENA-RAIZ.md
 │   └── gh repos clones/               # referências externas; algumas têm Git próprio
 ├── marca-raiz-prisma/
 ├── raiz-Images/
@@ -128,6 +128,12 @@ O `Raiz Engine` será construído como núcleo compartilhado. Ele deve possuir o
 
 O desktop e a skill serão consumidores ou adapters do motor. Nenhum deles deve virar sozinho a fonte de verdade de todo o sistema.
 
+> **Duas ordens, duas responsabilidades.** As `Etapas 0–11` deste guia governam
+> uma transformação única e segura do repositório. As `Fases 0–7` da
+> [arquitetura do motor](ARQUITETURA-MOTOR-CRIATIVO-RAIZ.md#15-roadmap-canônico-do-produto)
+> governam a construção e o funcionamento do produto. A Etapa 10 implementa a
+> Fase 0 (instalação); a Etapa 11 abre a Fase 1 (Brand Intelligence).
+
 ## 4. Estrutura-alvo inicial
 
 A primeira organização não precisa mover todos os sistemas do ecossistema. Ela deve corrigir somente as fronteiras que estão confusas e abrir um lugar claro para o código próprio.
@@ -138,11 +144,29 @@ raiz-engine/
 │   └── cena-raiz-desktop/
 ├── skills/
 │   └── cena-raiz/
-├── packages/
-│   ├── core/
-│   └── contracts/
 ├── recipes/
 │   └── ads-produto/
+├── packages/
+│   ├── contracts/
+│   │   ├── brand/
+│   │   ├── audiovisual/
+│   │   ├── assets/
+│   │   ├── execution/
+│   │   └── memory/
+│   ├── core/
+│   │   ├── brand/
+│   │   ├── planning/
+│   │   ├── assets/
+│   │   ├── execution/
+│   │   ├── memory/
+│   │   └── evals/
+│   └── adapters/
+│       ├── ffmpeg/
+│       ├── remotion/
+│       └── adobe/
+├── operations/
+│   ├── bootstrap/
+│   └── distribution/
 ├── docs/
 │   ├── architecture/
 │   ├── decisions/
@@ -158,7 +182,16 @@ raiz-engine/
 └── PROVENANCE.md
 ```
 
-No primeiro ciclo, `packages/core/` e `packages/contracts/` podem conter somente READMEs, schemas iniciais e fixtures. Não é necessário decidir agora se virarão pacotes npm, Python ou um serviço. O repositório inteiro já é o `Raiz Engine`; `core/` é seu núcleo interno.
+No primeiro ciclo, `packages/core/`, `packages/contracts/` e
+`packages/adapters/` podem conter somente READMEs, schemas iniciais, fixtures e
+módulos extraídos de um consumidor real. Não é necessário decidir agora se
+virarão pacotes npm, Python ou um serviço. O repositório inteiro já é o
+`Raiz Engine`; `core/` é seu núcleo interno.
+
+Os diretórios não recebem prefixos `00-`, `01-` ou `02-`: eles representam
+responsabilidades estáveis. A sequência numerada fica no roadmap canônico. O
+`doctor` permanece dentro de `operations/bootstrap/`, junto da única fonte de
+instalação e versões.
 
 ## 4.1 Estado real de cada etapa
 
@@ -172,7 +205,7 @@ está, sem reordenar nem promover etapas.
 | 2 — Recuperação fora do repositório | **concluída e verificada**: backup completo relido (2.366 entradas) e backup separado do Git intermediário (525 objetos) |
 | 3 — Fronteira Git única | **concluída** com aprovação humana explícita |
 | 4 — Política de versionamento | **concluída** — `.gitignore` revisado item a item; varredura de credenciais sem ocorrências |
-| 5 — Baseline | **executada, aguardando aceitação após reconciliação documental.** Commit `231e746`, designação canônica `reconciled Raiz Engine baseline`. Push pendente, exige autorização separada |
+| 5 — Baseline | **executada, aguardando aceitação após reconciliação documental.** Commit `231e746`, designação canônica `reconciled Raiz Engine baseline`. O remoto privado já contém o baseline; novos pushes exigem autorização separada |
 | 6 — Reorganização estrutural | pendente |
 | 7 — Validar a consolidação | pendente |
 | 8 — Recuperar o baseline técnico | **executada antecipadamente** sob autorização: typecheck limpo, oito suítes executáveis |
@@ -304,8 +337,9 @@ Exceções precisam ser deliberadas; por exemplo, `.env.example`, manifests de r
 >
 > O commit foi reescrito duas vezes antes de qualquer push — por amend, para
 > corrigir o assunto, e pela migração para Git LFS. As duas reescritas ocorreram com
-> o remoto vazio, sem afetar clone ou fork. **Não reescrever de novo sem autorização.
-> O push continua pendente e exige autorização separada.**
+> o remoto vazio, sem afetar clone ou fork. **Não reescrever de novo sem autorização.**
+> O primeiro push ocorreu depois dessas reescritas. `origin/main` alcança
+> `5fcccf3`, incluindo o baseline; qualquer novo push exige autorização separada.
 
 O texto abaixo é a prescrição original da etapa, mantida como registro.
 
@@ -333,7 +367,7 @@ Somente depois do baseline, mover:
 |---|---|
 | `cena-raiz/cenaraiz/cena-raiz/` | `skills/cena-raiz/` |
 | `cena-raiz/cenaraiz/cena-raiz-desktop/` | `apps/cena-raiz-desktop/` |
-| `cena-raiz/cenaraiz/README-ADOBE-INTEGRATION-PLAN.md` | `docs/integrations/adobe.md` |
+| `cena-raiz/cenaraiz/PLANO-EVOLUCAO-AUDIOVISUAL-CENA-RAIZ.md` | `docs/architecture/cena-raiz-audiovisual-evolution.md` |
 | `SKILLS/ads-produto/` | `recipes/ads-produto/` |
 
 No Windows, `SKILLS/` e `skills/` representam o mesmo nome para o sistema de arquivos. Portanto, mover primeiro `SKILLS/ads-produto/` para `recipes/ads-produto/`, confirmar que a pasta antiga ficou vazia e somente depois criar `skills/cena-raiz/`.
@@ -422,27 +456,36 @@ instalador com regras e versões próprias.
 
 ### Etapa 11 — Começar o Raiz Engine
 
-O primeiro código novo do motor deve ser pequeno:
+Depois de a Fase 0 ser comprovada, o primeiro núcleo próprio deve começar pela
+Fase 1 do produto: compilar a inteligência existente para um contrato de runtime
+que todos os consumidores consigam usar.
+
+O primeiro código consolidado do motor deve ser pequeno:
 
 ```text
 packages/
 ├── contracts/
-│   └── audiovisual-direction-plan/
+│   └── brand/
+│       └── brand-runtime-profile/
 └── core/
-    └── direction/
+    └── brand/
+        └── compile-brand-runtime-profile/
 ```
 
 Primeiro marco:
 
 ```text
-ProjectStyleState
-→ AudiovisualDirectionPlan v1
-→ validação
-→ persistência
-→ compilador de compatibilidade
-→ edit-data.json atual
-→ render atual
+marca-raiz-prisma/inteligencias
++ marca-raiz-prisma/projetos
+→ compileBrandRuntimeProfile
+→ BrandRuntimeProfile validado
+→ revisão humana
+→ fixture dos três casos canônicos
 ```
+
+O esqueleto de `AudiovisualDirectionPlan` que já foi iniciado no desktop não deve
+ser duplicado. Depois da compilação da marca, ele será ligado ao
+`BrandRuntimeProfile`, ao `VideoBrief` e à `ContentAnalysis` nas Fases 2 e 3.
 
 Não começar por Adobe, múltiplos agentes, banco vetorial ou uma reescrita da timeline.
 

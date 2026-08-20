@@ -1,13 +1,13 @@
-/* cenaraiz preview — dark glassmorphism, brand: #ff7713 / #09b5b7 / #738b03 */
+/* cena-raiz preview — dark glassmorphism, brand: #8ca906 / #09b5b7 / #738b03 */
 :root {
-  --orange: #ff7713;
+  --accent: #8ca906;
   --teal: #09b5b7;
   --olive: #738b03;
   /* Accent painted by the text styles that carry one (realce/misto headlines,
      stacked captions). NOT --orange: that is app chrome, and the two drifting
      apart is the point — the user picks this one, the UI keeps its own. JS
      overrides it on #styleSetup from the pick. */
-  --hl-accent: #ff5200;
+  --hl-accent: #09b5b7;
   --bg0: #08090c;
   --bg1: #10141b;
   --glass: rgba(255, 255, 255, 0.045);
@@ -30,7 +30,7 @@ body {
   color: var(--text);
   background:
     radial-gradient(1200px 600px at 80% -10%, rgba(9, 181, 183, 0.10), transparent 60%),
-    radial-gradient(1000px 500px at -10% 110%, rgba(255, 119, 19, 0.09), transparent 60%),
+    radial-gradient(1000px 500px at -10% 110%, rgba(140, 169, 6, 0.09), transparent 60%),
     linear-gradient(160deg, var(--bg1), var(--bg0));
   min-height: 100vh;
   display: flex;
@@ -74,9 +74,9 @@ header {
   font-size: 12px;
   padding: 6px 12px;
   border-radius: 999px;
-  background: rgba(255, 119, 19, 0.14);
-  border: 1px solid rgba(255, 119, 19, 0.45);
-  color: #ffb377;
+  background: rgba(140, 169, 6, 0.14);
+  border: 1px solid rgba(140, 169, 6, 0.45);
+  color: #afd408;
 }
 .pill.saved {
   background: rgba(9, 181, 183, 0.14);
@@ -99,7 +99,7 @@ header {
 .btn:hover { filter: brightness(1.25); }
 .btn:active { transform: scale(0.97); }
 .btn.primary {
-  background: linear-gradient(135deg, var(--orange), #ff9440);
+  background: linear-gradient(135deg, var(--accent), #a8c40a);
   border-color: transparent;
   color: #fff;
 }
@@ -132,7 +132,7 @@ header {
   font-size: 14px;
   padding: 11px 24px 13px;
 }
-.tab.active .tab-num { color: var(--orange); }
+.tab.active .tab-num { color: var(--accent); }
 .tab:disabled { opacity: 0.35; cursor: not-allowed; }
 
 /* ---------- main ---------- */
@@ -209,7 +209,7 @@ input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   width: 14px; height: 14px;
   border-radius: 50%;
-  background: var(--orange);
+  background: var(--accent);
   cursor: pointer;
 }
 
@@ -233,7 +233,7 @@ input[type="range"]::-webkit-slider-thumb {
   border: 2px solid transparent;
   background-clip: padding-box;
 }
-.timeline-panel::-webkit-scrollbar-thumb:hover { background: rgba(255, 119, 19, 0.45); background-clip: padding-box; }
+.timeline-panel::-webkit-scrollbar-thumb:hover { background: rgba(140, 169, 6, 0.45); background-clip: padding-box; }
 .timeline-panel::-webkit-scrollbar-corner { background: transparent; }
 
 .timeline { position: relative; min-width: 100%; min-height: 100%; }
@@ -312,7 +312,7 @@ input[type="range"]::-webkit-slider-thumb {
 }
 .tl-chip svg { width: 16px; height: 16px; fill: currentColor; display: block; }
 .tl-chip.teal { color: var(--teal); border-color: rgba(9, 181, 183, 0.3); background: rgba(9, 181, 183, 0.09); }
-.tl-chip.orange { color: var(--orange); border-color: rgba(255, 119, 19, 0.3); background: rgba(255, 119, 19, 0.09); }
+.tl-chip.orange { color: var(--accent); border-color: rgba(140, 169, 6, 0.3); background: rgba(140, 169, 6, 0.09); }
 .tl-chip.olive { color: #a8c22b; border-color: rgba(168, 194, 43, 0.3); background: rgba(168, 194, 43, 0.09); }
 .tl-chip.notes { color: #ff5470; border-color: rgba(255, 84, 112, 0.32); background: rgba(255, 84, 112, 0.1); }
 
@@ -344,8 +344,8 @@ canvas { display: block; }
   transition: box-shadow 0.12s;
 }
 .clip:hover { box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.3); z-index: 3; }
-.clip.selected { box-shadow: 0 0 0 2px var(--orange); z-index: 4; }
-.clip.dirty { border: 1.5px dashed var(--orange); }
+.clip.selected { box-shadow: 0 0 0 2px var(--accent); z-index: 4; }
+.clip.dirty { border: 1.5px dashed var(--accent); }
 .clip.removed { opacity: 0.28; filter: grayscale(1); }
 .clip.removed::after {
   content: 'REMOVIDO';
@@ -389,8 +389,8 @@ canvas { display: block; }
 }
 .clip .handle.l { left: 0; border-left: 3px solid transparent; }
 .clip .handle.r { right: 0; border-right: 3px solid transparent; }
-.clip:hover .handle.l { border-left-color: var(--orange); }
-.clip:hover .handle.r { border-right-color: var(--orange); }
+.clip:hover .handle.l { border-left-color: var(--accent); }
+.clip:hover .handle.r { border-right-color: var(--accent); }
 
 /* caption + insert chips */
 .chip {
@@ -413,9 +413,9 @@ canvas { display: block; }
   pointer-events: none;
 }
 .chip.insert {
-  background: rgba(255, 119, 19, 0.16);
-  border: 1px solid rgba(255, 119, 19, 0.55);
-  color: #ffc08a;
+  background: rgba(140, 169, 6, 0.16);
+  border: 1px solid rgba(140, 169, 6, 0.55);
+  color: #b4d908;
   cursor: grab;
 }
 .chip.insert.hook { background: rgba(115, 139, 3, 0.2); border-color: rgba(168, 194, 43, 0.6); color: #d3e87a; }
@@ -436,7 +436,7 @@ canvas { display: block; }
   position: absolute;
   top: 0; bottom: 0;
   width: 0;
-  border-left: 2px solid var(--orange);
+  border-left: 2px solid var(--accent);
   z-index: 10;
   pointer-events: none;
 }
@@ -444,7 +444,7 @@ canvas { display: block; }
   position: absolute;
   top: 0; left: -7px;
   width: 12px; height: 14px;
-  background: var(--orange);
+  background: var(--accent);
   clip-path: polygon(0 0, 100% 0, 100% 55%, 50% 100%, 0 55%);
 }
 
@@ -463,7 +463,7 @@ kbd {
   position: fixed;
   z-index: 100;
   background: rgba(10, 12, 16, 0.92);
-  border: 1px solid rgba(255, 119, 19, 0.5);
+  border: 1px solid rgba(140, 169, 6, 0.5);
   border-radius: 8px;
   padding: 6px 10px;
   font-size: 11px;
@@ -472,7 +472,7 @@ kbd {
   pointer-events: none;
   backdrop-filter: blur(8px);
 }
-.tooltip .delta { color: var(--orange); }
+.tooltip .delta { color: var(--accent); }
 
 .toast {
   position: fixed;
@@ -650,7 +650,7 @@ kbd {
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: var(--swatch-fill, #ff5200);
+  background: var(--swatch-fill, #09b5b7);
   box-shadow: 0 0 0 1.5px rgba(0, 0, 0, 0.45), 0 0 0 2.5px rgba(255, 255, 255, 0.75);
 }
 .swatch.custom input[type='color'] {
@@ -673,7 +673,7 @@ kbd {
   border: 1px solid var(--stroke);
   transition: border-color 0.14s;
 }
-.hex-field:focus-within { border-color: rgba(255, 119, 19, 0.5); }
+.hex-field:focus-within { border-color: rgba(140, 169, 6, 0.5); }
 .hex-field.bad { border-color: rgba(255, 84, 112, 0.6); }
 .hex-hash { font-size: 12px; color: rgba(255, 255, 255, 0.35); }
 .hex-input {
@@ -703,7 +703,7 @@ kbd {
   transition: border-color 0.15s, background 0.15s;
 }
 .opt:hover { border-color: rgba(255, 255, 255, 0.22); }
-.opt.on { border-color: var(--orange); background: rgba(255, 119, 19, 0.07); }
+.opt.on { border-color: var(--accent); background: rgba(140, 169, 6, 0.07); }
 /* only shown where the catalog has a SINGLE option — it explains the lone card */
 .opt.ghost {
   border-style: dashed;
@@ -745,7 +745,7 @@ kbd {
   border: 1.5px solid rgba(255, 255, 255, 0.3);
   background: rgba(0, 0, 0, 0.35);
 }
-.opt.on .opt-mark { border-color: var(--orange); background: var(--orange); }
+.opt.on .opt-mark { border-color: var(--accent); background: var(--accent); }
 .opt.on .opt-mark::after {
   content: '';
   position: absolute;
@@ -954,7 +954,7 @@ kbd {
   resize: none;
   outline: none;
 }
-#setupNote:focus { border-color: rgba(255, 119, 19, 0.5); }
+#setupNote:focus { border-color: rgba(140, 169, 6, 0.5); }
 
 .setup-actions { display: flex; align-items: center; gap: 12px; }
 .setup-actions .btn { flex: 0 0 auto; }
@@ -1116,9 +1116,9 @@ button.tl-chip:disabled { cursor: default; }
   bottom: 0;
   background: repeating-linear-gradient(
     -45deg,
-    rgba(255, 119, 19, 0.42) 0 3px,
-    rgba(255, 119, 19, 0.12) 3px 6px
+    rgba(140, 169, 6, 0.42) 0 3px,
+    rgba(140, 169, 6, 0.12) 3px 6px
   );
-  border-right: 1px solid rgba(255, 119, 19, 0.75);
+  border-right: 1px solid rgba(140, 169, 6, 0.75);
 }
 .tl-chip.ghost { opacity: 0.55; }

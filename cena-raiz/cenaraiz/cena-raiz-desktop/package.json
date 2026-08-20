@@ -19,6 +19,7 @@
     "test:media": "node scripts/test-media-selection.mjs",
     "test:helpers": "node scripts/test-helpers.mjs",
     "test:jcut": "node scripts/test-jcut.mjs",
+    "test:direction-plan": "node scripts/test-direction-plan.mjs",
     "stage:python-whisperx": "node scripts/stage-python-whisperx.mjs",
     "prepare:forge-makers": "node scripts/prepare-forge-makers.mjs",
     "typecheck": "tsc --noEmit",

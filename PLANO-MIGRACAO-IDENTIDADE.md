@@ -486,7 +486,7 @@ PROVENANCE.md
 - no Windows, mover primeiro `SKILLS/ads-produto/` para liberar o nome `skills/`;
 - `cena-raiz/cenaraiz/cena-raiz/` → `skills/cena-raiz/`;
 - `cena-raiz/cenaraiz/cena-raiz-desktop/` → `apps/cena-raiz-desktop/`;
-- plano Adobe → `docs/integrations/adobe.md`;
+- plano de evolução audiovisual do Cena Raiz → `docs/architecture/cena-raiz-audiovisual-evolution.md`;
 - `SKILLS/ads-produto/` → `recipes/ads-produto/`;
 - atualizar apenas caminhos quebrados pela movimentação;
 - criar um commit exclusivamente estrutural;

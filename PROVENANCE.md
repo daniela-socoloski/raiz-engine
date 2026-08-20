@@ -86,8 +86,9 @@ para Git LFS. Nenhuma dessas revisões chegou a remoto algum: o repositório rem
 esteve vazio o tempo todo, e por isso a reescrita não afeta clone, fork ou
 histórico de terceiros.
 
-O `HEAD` válido é `231e746`. Referências a `9c5b9d8` em qualquer registro
-anterior descrevem um commit provisório que não existe mais.
+O commit-base válido é `231e746`. O `HEAD` avançou depois dele; referências a
+`9c5b9d8` em qualquer registro anterior descrevem um commit provisório que não
+existe mais.
 
 Seis fatos que definem esse commit:
 
@@ -104,8 +105,10 @@ Seis fatos que definem esse commit:
    em `docs/provenance/`.
 5. **A Etapa 5 foi executada e aguarda aceitação após a reconciliação
    documental.** O commit existe; a etapa não está formalmente aceita.
-6. **O push continua pendente** e exige autorização separada. O repositório remoto
-   segue vazio.
+6. **O primeiro push ocorreu somente depois das reescritas descritas acima.** O
+   remoto privado contém `231e746` e o commit documental `5fcccf3`. No snapshot
+   de 2026-08-20, o `HEAD` local `cce7889` está um commit à frente; novo push
+   continua exigindo autorização separada.
 
 ## Sobre este commit
 

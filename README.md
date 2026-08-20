@@ -14,7 +14,15 @@ mandar produzir.
 
 ## Fase atual
 
-**Etapa 5 — executada, aguardando aceitação após reconciliação documental.**
+O projeto possui duas linhas de avanço que não devem mais usar a mesma numeração:
+
+- **repositório:** Etapas 0–11 do guia de organização;
+- **produto:** Fases 0–7 do roadmap do Raiz Engine.
+
+**Gate do repositório:** Etapa 5 executada, aguardando aceitação após
+reconciliação documental.
+
+**Fase do produto:** Fase 0 — Install & Runtime Foundation, em construção.
 
 | | |
 |---|---|
@@ -23,8 +31,10 @@ mandar produzir.
 | Primeiro commit | `231e746` — **`reconciled Raiz Engine baseline`**, 854 arquivos. Executado localmente, **aguarda aceitação**; não é o estado como recebido |
 | Recuperação externa | backup completo e backup do Git intermediário, ambos verificados |
 | Git LFS | **obrigatório** — 505 caminhos, 501 objetos, 398 MB. Clone sem LFS traz ponteiros, não os assets |
-| Push para o remoto | **pendente**, exige autorização separada; o remoto segue vazio |
+| Publicação Git | o remoto privado já contém o baseline e `5fcccf3`; o `HEAD` local `cce7889` está um commit à frente de `origin/main` e qualquer novo push exige autorização separada |
 | Releases | **bloqueadas** até a publicação própria existir |
+| Fase 0 do produto | bootstrap `developer`, `doctor` e manifest iniciais existem; instalador `creator`, skills/runtimes e prova em VM ainda faltam |
+| Próxima capacidade central | Fase 1 — compilar `marca-raiz-prisma` em `BrandRuntimeProfile` revisável |
 
 O estado detalhado de cada etapa está em
 [GUIA-ORGANIZACAO-REPOSITORIO.md](GUIA-ORGANIZACAO-REPOSITORIO.md) § 4.1.
@@ -44,15 +54,33 @@ O estado detalhado de cada etapa está em
 Skill e desktop são as duas partes complementares da base adquirida. Serão
 consumidores ou adapters do motor, nunca a fonte de verdade dele.
 
+## Como o motor passa a funcionar
+
+```text
+0. instalar e comprovar o Raiz Engine
+1. entender e compilar a marca com marca-raiz-prisma
+2. receber o objetivo do vídeo e analisar o conteúdo
+3. planejar narrativa e direção audiovisual
+4. localizar e selecionar assets
+5. compilar e executar com FFmpeg, Remotion ou outro adapter
+6. revisar, entregar e registrar aprendizado
+7. ativar Adobe e outros engines profissionais quando necessários
+```
+
+`marca-raiz-prisma/` é a fonte da **Brand Intelligence**. Sua saída para os
+outros componentes será o `BrandRuntimeProfile`; o Cena Raiz não deve reler todo
+o método e todo o corpus a cada vídeo.
+
 ## Documentos normativos
 
 | Documento | Responsabilidade |
 |---|---|
 | [AGENTS.md](AGENTS.md) | constituição e roteamento para agentes |
-| [ARQUITETURA-MOTOR-CRIATIVO-RAIZ.md](ARQUITETURA-MOTOR-CRIATIVO-RAIZ.md) | arquitetura-alvo, camadas, contratos e roadmap |
-| [GUIA-ORGANIZACAO-REPOSITORIO.md](GUIA-ORGANIZACAO-REPOSITORIO.md) | **única fonte da ordem operacional** das Etapas 0–11 |
+| [ARQUITETURA-MOTOR-CRIATIVO-RAIZ.md](ARQUITETURA-MOTOR-CRIATIVO-RAIZ.md) | arquitetura-alvo, contratos e **única fonte da ordem das Fases 0–7 do produto** |
+| [GUIA-ORGANIZACAO-REPOSITORIO.md](GUIA-ORGANIZACAO-REPOSITORIO.md) | **única fonte da ordem operacional do repositório**, Etapas 0–11 |
 | [PLANO-MIGRACAO-IDENTIDADE.md](PLANO-MIGRACAO-IDENTIDADE.md) | **única fonte** da estratégia de rebranding |
 | [POLITICA-FONTE-UNICA-FUNCIONAL.md](POLITICA-FONTE-UNICA-FUNCIONAL.md) | uma implementação canônica por responsabilidade |
+| [cena-raiz/cenaraiz/PLANO-EVOLUCAO-AUDIOVISUAL-CENA-RAIZ.md](cena-raiz/cenaraiz/PLANO-EVOLUCAO-AUDIOVISUAL-CENA-RAIZ.md) | blueprint ativo de direção audiovisual, narrativa, motion, assets, execução, revisão e memória; Adobe é uma integração faseada |
 
 ## Registros operacionais
 

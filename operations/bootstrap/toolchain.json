@@ -1,0 +1,112 @@
+{
+  "$comment": "Manifesto canonico da cadeia de ferramentas do Raiz Engine. Fonte unica de versoes: o bootstrap e o doctor leem daqui, nunca de valores embutidos no codigo.",
+  "manifestVersion": 1,
+  "updated": "2026-08-20",
+
+  "platforms": {
+    "supported": ["win32-x64"],
+    "proven": "win32-x64",
+    "note": "Windows 11 x64 e a primeira plataforma comprovada. macOS e Linux permanecem DEFER."
+  },
+
+  "repository": {
+    "slug": "daniela-socoloski/raiz-engine",
+    "visibility": "private",
+    "defaultBranch": "main",
+    "note": "Repositorio privado. O clone exige autenticacao."
+  },
+
+  "profiles": {
+    "developer": {
+      "description": "Maquina que constroi e evolui o Raiz Engine com VS Code, Codex e Claude Code.",
+      "requires": ["git", "git-lfs", "gh", "node", "uv", "python"],
+      "optional": ["ffmpeg"],
+      "clonesCorpus": true,
+      "note": "clonesCorpus=true baixa os objetos LFS, cerca de 398 MB de casos de marca."
+    },
+    "creator": {
+      "description": "Maquina que apenas usa o Cena Raiz Desktop instalado. Nao exige ambiente de desenvolvimento.",
+      "requires": [],
+      "note": "Atendida pelo instalador CenaRaizSetup.exe, ainda nao construido. Perfil registrado, nao implementado."
+    }
+  },
+
+  "tools": {
+    "git": {
+      "min": "2.40.0",
+      "check": ["git", "--version"],
+      "parse": "git version (\\d+\\.\\d+\\.\\d+)",
+      "winget": "Git.Git",
+      "why": "Fronteira de versionamento e clone do monorepositorio."
+    },
+    "git-lfs": {
+      "min": "3.0.0",
+      "check": ["git", "lfs", "version"],
+      "parse": "git-lfs/(\\d+\\.\\d+\\.\\d+)",
+      "winget": "GitHub.GitLFS",
+      "why": "OBRIGATORIO. O corpus de marcas e versionado por LFS. Sem ele o clone traz ponteiros, nao os assets.",
+      "critical": true
+    },
+    "gh": {
+      "min": "2.40.0",
+      "check": ["gh", "--version"],
+      "parse": "gh version (\\d+\\.\\d+\\.\\d+)",
+      "winget": "GitHub.cli",
+      "why": "Autenticacao oficial e acesso ao repositorio privado."
+    },
+    "node": {
+      "min": "20.0.0",
+      "check": ["node", "--version"],
+      "parse": "v(\\d+\\.\\d+\\.\\d+)",
+      "winget": "OpenJS.NodeJS.LTS",
+      "why": "Aplicativo Electron, scripts de build e ferramentas do repositorio."
+    },
+    "uv": {
+      "min": "0.4.0",
+      "check": ["uv", "--version"],
+      "parse": "uv (\\d+\\.\\d+\\.\\d+)",
+      "winget": "astral-sh.uv",
+      "why": "Ambiente Python da skill e do WhisperX, resolvido pelos locks."
+    },
+    "python": {
+      "min": "3.10.0",
+      "max": "3.13.99",
+      "check": ["python", "--version"],
+      "parse": "Python (\\d+\\.\\d+\\.\\d+)",
+      "winget": "Python.Python.3.12",
+      "why": "Helpers da skill. O pyproject exige >=3.10,<3.14."
+    },
+    "ffmpeg": {
+      "min": "6.0",
+      "check": ["ffmpeg", "-version"],
+      "parse": "ffmpeg version (\\d+\\.\\d+)",
+      "winget": "Gyan.FFmpeg",
+      "optional": true,
+      "why": "Em desenvolvimento o app usa o FFmpeg do PATH. Empacotado, usa o runtime proprio."
+    }
+  },
+
+  "components": {
+    "desktop": {
+      "path": "cena-raiz/cenaraiz/cena-raiz-desktop",
+      "install": ["npm", "install"],
+      "verify": ["npm", "run", "typecheck"],
+      "tests": ["test:timeline", "test:media", "test:helpers", "test:jcut"],
+      "note": "Caminho muda para apps/cena-raiz-desktop na Etapa 6."
+    },
+    "skill": {
+      "path": "cena-raiz/cenaraiz/cena-raiz",
+      "install": ["uv", "sync"],
+      "verify": ["python", "-m", "unittest", "discover", "-s", "tests"],
+      "note": "Caminho muda para skills/cena-raiz na Etapa 6."
+    }
+  },
+
+  "pendingBeforeDistribution": [
+    "publicacao propria de runtimes e feed de update (hoje aponta para infraestrutura do fornecedor)",
+    "workflow em .github/workflows/ (hoje o GitHub nao o executa)",
+    "refresh token em safeStorage/DPAPI",
+    "assinatura de codigo",
+    "icone do app sem a cor do produto original"
+  ]
+}

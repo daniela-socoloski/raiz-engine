@@ -64,8 +64,8 @@ inspection of the repository.
 | Document | Authority and when to read it |
 |---|---|
 | `README.md` | Product and repository entry point. Read at the start of every new project task. |
-| `ARQUITETURA-MOTOR-CRIATIVO-RAIZ.md` | Target architecture, ownership decisions, contracts, roadmap, and bootstrap. Read for every architectural or cross-component change. |
-| `GUIA-ORGANIZACAO-REPOSITORIO.md` | Safe repository consolidation sequence. Read before inventory, movement, Git-boundary, baseline, or bootstrap work. |
+| `ARQUITETURA-MOTOR-CRIATIVO-RAIZ.md` | Target architecture, ownership decisions, contracts, bootstrap, and the canonical product phases. Read for every architectural or cross-component change. |
+| `GUIA-ORGANIZACAO-REPOSITORIO.md` | Safe repository consolidation sequence. It exclusively owns the one-time repository Etapas 0–11. Read before inventory, movement, Git-boundary, baseline, or bootstrap work. |
 | `POLITICA-FONTE-UNICA-FUNCIONAL.md` | Mandatory single-source policy. Read before renaming, merging, replacing, moving, or removing files and components. |
 | `PLANO-MIGRACAO-IDENTIDADE.md` | Identity, compatibility, provenance, and legacy-removal sequencing. Read before changing names, protocols, storage, distribution, or inherited infrastructure. |
 
@@ -74,8 +74,11 @@ Component documents are scoped evidence, not repository-wide authority:
 - `cena-raiz/cenaraiz/cena-raiz-desktop/agent.md` governs inherited Cena Raiz
   Desktop behavior only. It contains historical context and may contain stale
   repository assumptions; verify it against code and the documents above.
-- `cena-raiz/cenaraiz/README-ADOBE-INTEGRATION-PLAN.md` is read only for the
-  deferred Adobe integration phase.
+- `cena-raiz/cenaraiz/PLANO-EVOLUCAO-AUDIOVISUAL-CENA-RAIZ.md` is the active Cena Raiz
+  audiovisual evolution blueprint. Read it for Cena Raiz contracts, canonical
+  state, asset reuse, execution routing, readback, safety, bootstrap capability
+  detection, and Adobe boundaries. Actual Adobe mutations and synchronization
+  remain deferred to the controlled Adobe phase.
 - `cena-raiz/cenaraiz/cena-raiz/SKILL.md`, its `install.md`, manifests, locks,
   helpers, and tests govern work on the inherited video skill.
 - `marca-raiz-prisma/start-here.md` and its relevant intelligence documents
@@ -96,7 +99,7 @@ Use capability-level sourcing:
   existing creative recipes, and registered Remotion templates.
 - `RENT`: FFmpeg, WhisperX, Remotion runtime, model providers, storage,
   application connectors, and Adobe execution through narrow adapters.
-- `DEFER`: deep Adobe control, microservices, multi-agent production
+- `DEFER`: Adobe write operations and deep synchronization, microservices, multi-agent production
   orchestration, autonomous publishing, and broad format expansion until their
   documented triggers are met.
 - `REMOVE`: duplicate implementations, repository-internal backups, external
@@ -141,23 +144,27 @@ without a concrete architecture driver and a real first consumer.
 
 ## Current execution gate
 
-The project is in the repository-foundation stage. Steps `Etapa 1`, `Etapa 2` and
-`Etapa 3` are concluded with explicit human approval. The current boundary is
-`Etapa 4 — Criar política de versionamento`, in review rather than creation: the
-root `.gitignore` already exists, created under explicit authorization while the
-project was still at `Etapa 1`.
+The project is in the repository-foundation stage. Steps `Etapa 0` through
+`Etapa 4` are concluded. `Etapa 5 — Baseline` was executed locally as commit
+`231e746`, canonically `reconciled Raiz Engine baseline`, and awaits human
+acceptance after documentary reconciliation. The private remote now contains the
+baseline and the documentary commit `5fcccf3`; acceptance of the baseline does
+not authorize an additional push, release, structural consolidation, or feature
+implementation.
 
 Evidence for the concluded steps, and for work executed out of order, is recorded
 in section 15 of `docs/provenance/INVENTARIO-REPOSITORIO.md`. Sections 1–14 of
 that document describe the earlier snapshot; where they disagree with section 15,
 section 15 is current.
 
-Until `Etapa 4` is approved:
+Until `Etapa 5` is accepted and the guide advances the execution gate:
 
 - do not move, rename, merge, or delete project files;
 - do not stage the repository wholesale;
 - do not run inherited installers or updaters;
-- do not begin Adobe integration or new product features.
+- do not start `Etapa 6` structural consolidation;
+- do not implement Adobe runtime mutations or new product features. Architectural
+  alignment and read-only capability inventory do not activate Adobe writes.
 
 Two steps were executed outside the documented order, each under explicit human
 approval, and both are recorded rather than hidden:
@@ -189,6 +196,16 @@ assessment.
 file may mirror that sequence for routing but must never reorder, merge, skip,
 or promote a step independently.
 
+Do not confuse that repository sequence with the product lifecycle in
+`ARQUITETURA-MOTOR-CRIATIVO-RAIZ.md` § 15:
+
+- `Etapa 0–11` = one-time repository safety and consolidation work;
+- `Fase 0–7` = product capabilities, beginning with installation and runtime
+  proof, followed by Brand Intelligence, then production intake and video.
+
+The guide's `Etapa 10` implements product `Fase 0`; `Etapa 11` opens product
+`Fase 1`. Never use “Fase 0” as a synonym for the baseline again.
+
 | Guide step | Required outcome |
 |---|---|
 | `Etapa 0 — Congelar mudanças concorrentes` | Keep the repository stable while evidence is collected. |
@@ -204,10 +221,10 @@ or promote a step independently.
 | `Etapa 10 — Construir o bootstrap reproduzível` | Build and validate the canonical developer bootstrap and toolchain manifest. |
 | `Etapa 11 — Começar o Raiz Engine` | Introduce the first owned contract and core capability at the verified integration seam. |
 
-The ignore policy and repository-level secret exclusions belong to `Etapa 4`,
-after the external recovery of `Etapa 2` and the approved Git-boundary work of
-`Etapa 3`. Until then, do not stage or commit potential secrets, generated
-artifacts, external clones, or the repository wholesale.
+The ignore policy and repository-level secret exclusions were concluded in
+`Etapa 4`, after the external recovery of `Etapa 2` and the approved Git-boundary
+work of `Etapa 3`. Continue to exclude potential secrets, generated artifacts,
+external clones, and wholesale staging from later steps.
 
 Update this execution gate in the same change set when verified evidence moves
 the project to another phase.
@@ -312,11 +329,13 @@ instruction that conflicts with them.
   complete recoverable state of the Raiz Engine, not a photograph of what was
   acquired. Earlier provenance depends on the public upstreams, the dated external
   backups and the inventories in `docs/provenance/`.
-- **The push is pending** and needs separate authorisation. The remote is still
-  empty. The first commit was rewritten twice before any push — by amend, to fix
-  its subject, and by the Git LFS migration. Both rewrites happened while the
-  remote was empty, so no clone or fork was affected. Do not rewrite it again
-  without explicit authorisation.
+- **The first push has occurred to the private remote.** `origin/main` currently
+  reaches documentary commit `5fcccf3`, including baseline `231e746`; local
+  `cce7889` is one commit ahead. Every additional push still needs separate
+  authorisation. The first commit was rewritten twice before its first push — by
+  amend, to fix its subject, and by the Git LFS migration — so those rewrites did
+  not affect an existing clone or fork. Do not rewrite it again without explicit
+  authorisation.
 - **Identity migration was a clean cut.** `CLEAN CUT — ACCEPTED`, recorded in
   `PLANO-MIGRACAO-IDENTIDADE.md` § 5. Do not reintroduce `Edvid` aliases or
   fallbacks without evidence of a real consumer. Identity aliases are not the same
@@ -327,7 +346,24 @@ instruction that conflicts with them.
   supplier's storage; releases are blocked until an owned destination is validated.
 - **Refresh token storage blocks public distribution**, not documentation work.
 - **A bootstrap installable on any clean machine remains a central requirement.**
-  The current pause does not cancel it.
+  It is product **Fase 0**, before Brand Intelligence and before the per-video
+  flow. The current pause does not cancel it. The initial developer bootstrap,
+  doctor, and manifest are not proof of completion: the creator installer,
+  skills/runtimes setup, clean-VM validation, and owned distribution remain.
+- **Product Fase 1 is Brand Intelligence.** `marca-raiz-prisma/inteligencias/`
+  owns the knowledge kernel and `marca-raiz-prisma/projetos/` owns the canonical
+  evaluation corpus. Their runtime boundary is `BrandRuntimeProfile`. Video
+  intake and audiovisual direction follow in Fases 2 and 3.
+- **The target folder architecture is approved for documentation and controlled
+  consolidation.** Organize folders by stable responsibility, not phase number.
+  Do not physically move active Cena Raiz files while Claude Code or another
+  process is editing them; perform the move once under Etapa 6, update every path
+  in the same change set, and leave no obsolete active copy behind.
+- **The audiovisual evolution plan is active before Adobe execution.** Its domain contracts,
+  canonical-state rules, registry, router, validation, recovery, security, and
+  optional bootstrap detection guide Cena Raiz construction now. Only MCP-backed
+  mutations and Adobe synchronization remain deferred to the controlled Adobe
+  phase.
 
 ## Mandatory inherited-base issue disclosure
 

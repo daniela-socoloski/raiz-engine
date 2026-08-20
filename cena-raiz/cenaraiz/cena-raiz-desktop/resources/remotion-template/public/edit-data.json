@@ -15,7 +15,7 @@
     "enabled": false,
     "endSec": 4.0,
     "style": "card",
-    "accent": "#ff5200",
+    "accent": "#09b5b7",
     "lines": ["HEADLINE LINHA 1", "HEADLINE LINHA 2"],
     "logo": null,
     "sign": null,
@@ -27,7 +27,7 @@
     "maxWords": 3,
     "safeWidth": 720,
     "paddingBottom": 420,
-    "accent": "#ff5200"
+    "accent": "#09b5b7"
   },
   "inserts": [],
   "behind": [],
