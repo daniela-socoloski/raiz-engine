@@ -109,5 +109,27 @@ nao entram no Git; os scripts verificam fontes, assinaturas ou hashes antes de
 montar o aplicativo. Em desenvolvimento existe fallback explicito para o
 `PATH`; em um aplicativo empacotado esse fallback e desativado.
 
+### GnuPG no Windows (stage:yt-dlp e build:ffmpeg:torchcodec)
+
+Os dois scripts conferem a assinatura da release antes de extrair qualquer
+coisa, e no Windows precisam de um gpg de linhagem MSYS2 — os gpg do PATH
+(Gpg4win, Chocolatey) mutilam caminhos com letra de drive. A ordem de busca e:
+
+1. `CENA_RAIZ_MSYS2_GPG`, se definida — caminho explicito, tem prioridade;
+2. `C:\msys64\usr\bin\gpg.exe`, o MSYS2 que o workflow de CI instala;
+3. o gpg do Git for Windows (`<Git>\usr\bin\gpg.exe`), procurado nas
+   instalacoes padrao e ao lado do `git.exe` do `PATH`.
+
+Ou seja: numa maquina de desenvolvimento com Git for Windows instalado nao e
+preciso instalar MSYS2 so para rodar os `stage:*`. O MSYS2 continua necessario
+para `build:ffmpeg:torchcodec`, que compila o FFmpeg de verdade e precisa do
+`mingw-w64-x86_64-toolchain`.
+
+Rode os `stage:*` no PowerShell, nao no Git Bash: o GNU tar 1.35 que vem no Git
+le o `C:` de um caminho absoluto como nome de host remoto e falha com
+`Cannot connect to C: resolve failed`. No PowerShell o `tar` e o bsdtar do
+System32. E nunca rode um `stage:*` com o `npm start` ligado — o watcher tenta
+observar o `node.exe` enquanto ele e escrito e da `EBUSY`.
+
 O build macOS arm64 ja gera `.app`, DMG e ZIP. Runtimes nativos para macOS x64 e
 Windows x64 devem ser preparados e empacotados na respectiva plataforma.

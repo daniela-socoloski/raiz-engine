@@ -27,6 +27,12 @@ $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 $manifestPath = Join-Path $PSScriptRoot 'toolchain.json'
 
+# Somente o processo: enxerga ferramentas instaladas por winget depois que o
+# Codex/VS Code foi aberto, sem escrever em configuração alguma da máquina.
+$machinePath = [Environment]::GetEnvironmentVariable('Path', 'Machine')
+$userPath = [Environment]::GetEnvironmentVariable('Path', 'User')
+$env:Path = (@($machinePath, $userPath) | Where-Object { $_ }) -join [IO.Path]::PathSeparator
+
 function Write-Line { param($t, $c = 'Gray') if (-not $Quiet) { Write-Host $t -ForegroundColor $c } }
 function Write-Head { param($t) Write-Line "" ; Write-Line $t 'Cyan' }
 
@@ -47,6 +53,79 @@ if ($m.platforms.supported -contains $plat) {
   Write-Line "  OK       $plat" 'Green'
 } else {
   Write-Line "  AVISO    $plat nao esta na lista de plataformas comprovadas" 'Yellow'
+}
+
+if ($Profile -eq 'creator') {
+  Write-Head "Artefato creator"
+  $artifactDirectory = Join-Path $repoRoot "apps/cena-raiz-desktop/out/creator/$plat"
+  $setup = Join-Path $artifactDirectory 'CenaRaizSetup.exe'
+  $checksum = "$setup.sha256"
+  $report = Join-Path $artifactDirectory 'creator-build.json'
+  $smoke = Join-Path $artifactDirectory 'creator-smoke.json'
+  $creatorMissing = @()
+
+  foreach ($entry in @(
+    @{ Name = 'instalador'; Path = $setup },
+    @{ Name = 'checksum'; Path = $checksum },
+    @{ Name = 'relatorio'; Path = $report },
+    @{ Name = 'smoke'; Path = $smoke }
+  )) {
+    if (Test-Path -LiteralPath $entry.Path -PathType Leaf) {
+      Write-Line ("  OK       {0,-10} {1}" -f $entry.Name, $entry.Path) 'Green'
+    } else {
+      Write-Line ("  FALTA    {0,-10} {1}" -f $entry.Name, $entry.Path) 'Red'
+      $creatorMissing += $entry.Name
+    }
+  }
+
+  if ((Test-Path -LiteralPath $setup) -and (Test-Path -LiteralPath $checksum)) {
+    $expected = ((Get-Content -LiteralPath $checksum -Raw).Trim() -split '\s+')[0]
+    $actual = (Get-FileHash -LiteralPath $setup -Algorithm SHA256).Hash.ToLowerInvariant()
+    if ($expected -eq $actual) {
+      Write-Line "  OK       SHA-256 do instalador confere" 'Green'
+    } else {
+      Write-Line "  INVALIDO SHA-256 do instalador nao confere" 'Red'
+      $creatorMissing += 'integridade'
+    }
+  }
+
+  if (Test-Path -LiteralPath $report) {
+    try {
+      $buildReport = Get-Content -LiteralPath $report -Raw | ConvertFrom-Json
+      if ($buildReport.distributionUnit -ne 'directory' -or
+          $buildReport.selfContainedRuntimes -ne $true) {
+        throw 'relatorio nao descreve um pacote creator autonomo em diretorio'
+      }
+      foreach ($artifact in $buildReport.artifacts) {
+        $artifactPath = Join-Path $artifactDirectory $artifact.file
+        if (-not (Test-Path -LiteralPath $artifactPath -PathType Leaf)) {
+          Write-Line "  FALTA    artefato   $($artifact.file)" 'Red'
+          $creatorMissing += "artefato:$($artifact.file)"
+          continue
+        }
+        $artifactHash = (Get-FileHash -LiteralPath $artifactPath -Algorithm SHA256).Hash.ToLowerInvariant()
+        if ($artifactHash -ne $artifact.sha256) {
+          Write-Line "  INVALIDO artefato   $($artifact.file)" 'Red'
+          $creatorMissing += "hash:$($artifact.file)"
+        } else {
+          Write-Line "  OK       artefato   $($artifact.file)" 'Green'
+        }
+      }
+    } catch {
+      Write-Line "  INVALIDO relatorio creator: $($_.Exception.Message)" 'Red'
+      $creatorMissing += 'relatorio-invalido'
+    }
+  }
+
+  Write-Head "Veredito"
+  if ($creatorMissing.Count -eq 0) {
+    Write-Line "  Perfil creator construido e verificado localmente." 'Green'
+    Write-Line "  A prova em VM limpa e a assinatura ainda sao gates separados." 'Yellow'
+    exit 0
+  }
+  Write-Line "  Perfil creator incompleto: $($creatorMissing -join ', ')" 'Red'
+  Write-Line "  Rode operations/bootstrap/build-creator.ps1." 'DarkGray'
+  exit 1
 }
 
 # ---------------------------------------------------------------- ferramentas
@@ -183,6 +262,32 @@ foreach ($nome in $m.components.PSObject.Properties.Name) {
   } else {
     Write-Line ("  PENDENTE {0,-8} dependencias nao instaladas -> {1}" -f $nome, ($c.install -join ' ')) 'Yellow'
     $faltando += "dependencias:$nome"
+  }
+}
+
+# ---------------------------------------------------------------- skills de agentes
+Write-Head "Skills dos agentes"
+$codexHome = if ($env:CODEX_HOME) { $env:CODEX_HOME } else { Join-Path $env:USERPROFILE '.codex' }
+$agentTargets = @(
+  @{ Name = 'Claude Code'; Root = (Join-Path $env:USERPROFILE '.claude/skills') },
+  @{ Name = 'Codex'; Root = (Join-Path $codexHome 'skills') }
+)
+foreach ($target in $agentTargets) {
+  $skillRoot = Join-Path $target.Root 'cena-raiz'
+  $skillManifest = Join-Path $skillRoot 'SKILL.md'
+  $skillEnvironment = Join-Path $skillRoot '.venv'
+  $remotionManifest = Join-Path (Join-Path $target.Root 'remotion-best-practices') 'SKILL.md'
+  if ((Test-Path -LiteralPath $skillManifest) -and (Test-Path -LiteralPath $skillEnvironment)) {
+    Write-Line ("  OK       {0,-11} cena-raiz + ambiente Python" -f $target.Name) 'Green'
+  } else {
+    Write-Line ("  FALTA    {0,-11} {1}" -f $target.Name, $skillRoot) 'Red'
+    $faltando += "skill:$($target.Name)"
+  }
+  if (Test-Path -LiteralPath $remotionManifest) {
+    Write-Line ("  OK       {0,-11} remotion-best-practices" -f $target.Name) 'Green'
+  } else {
+    Write-Line ("  FALTA    {0,-11} remotion-best-practices" -f $target.Name) 'Red'
+    $faltando += "skill-remotion:$($target.Name)"
   }
 }
 

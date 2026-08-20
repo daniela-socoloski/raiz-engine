@@ -71,16 +71,19 @@ Se algum não responder, instale só ele e volte aqui. No Windows:
 Se você pular esta conferência não tem problema — o instalador do passo 3 refaz
 ela no fim e diz o que faltou.
 
-### 3. Instale a cena-raiz — um comando
+### 3. Instale a cena-raiz no checkout atual
 
-```bash
-uv run https://raw.githubusercontent.com/daniela-socoloski/raiz-engine/main/skills/cena-raiz/cenaraiz_install.py
+```powershell
+pwsh -File operations/bootstrap/raiz-bootstrap.ps1
 ```
 
-O mesmo comando, sem alterar nada, no PowerShell do Windows, no Terminal do Mac
-e no Linux.
+O repositório é privado. Portanto a antiga forma por uma URL anônima de
+`raw.githubusercontent.com` **não é uma entrada funcional**. O bootstrap chama o
+instalador com `--source` e usa o payload do checkout autenticado, sem baixar uma
+cópia paralela.
 
-Pronto. Não há passo 4.
+Uma futura instalação independente só poderá ser anunciada depois que houver um
+asset de release próprio, checksum/assinatura e teste real contra esse asset.
 
 ### O que o instalador faz
 
@@ -113,10 +116,12 @@ não são tocados.
 
 ## Atualizar
 
-Rode o mesmo comando da instalação. Ele substitui a versão antiga pela nova.
+Atualize o checkout autenticado e rode novamente o bootstrap. Ele substitui a
+instalação normal e preserva clones ou links de desenvolvimento.
 
-```bash
-uv run https://raw.githubusercontent.com/daniela-socoloski/raiz-engine/main/skills/cena-raiz/cenaraiz_install.py
+```powershell
+git pull --ff-only
+pwsh -File operations/bootstrap/raiz-bootstrap.ps1
 ```
 
 ---

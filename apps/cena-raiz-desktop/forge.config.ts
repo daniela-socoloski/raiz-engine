@@ -8,6 +8,7 @@ import { FuseV1Options, FuseVersion } from '@electron/fuses';
 import path from 'node:path';
 
 const macSigningIdentity = process.env.CENA_RAIZ_MAC_SIGN_IDENTITY?.trim();
+const bundleRuntimes = process.env.CENA_RAIZ_BUNDLE_RUNTIMES === '1';
 
 // Assinatura Windows via Azure Trusted Signing: o workflow do CI prepara o
 // signtool do SDK + o dlib do Trusted Signing e exporta estes dois envs; sem
@@ -35,13 +36,16 @@ const config: ForgeConfig = {
     appCategoryType: 'public.app-category.video',
     icon: path.resolve('src/brand/cena-raiz-icon'),
     asar: true,
-    // Instalador magro: as ferramentas (resources/runtimes, 1,8 GB) NAO vao
-    // no pacote — o aplicativo baixa o runtime pack sob demanda no primeiro
-    // boot (scripts/pack-runtimes.mjs gera; publish-runtimes.mjs publica).
+    // O primeiro perfil creator e autonomo: CENA_RAIZ_BUNDLE_RUNTIMES=1 leva
+    // as ferramentas dentro do instalador e permite validar uma maquina limpa
+    // antes de existir um canal proprio de downloads. Builds finos continuam
+    // possiveis somente quando um canal com checksum estiver configurado.
     extraResource: [
       'resources/runtime-manifest.json',
+      'resources/distribution-manifest.json',
       'resources/remotion-template',
       'resources/helpers',
+      ...(bundleRuntimes ? ['resources/runtimes'] : []),
     ],
     osxSign:
       process.platform === 'darwin'

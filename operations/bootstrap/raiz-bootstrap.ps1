@@ -45,6 +45,16 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
+# O processo do Codex/VS Code pode ter sido aberto antes de uma instalação via
+# winget. Releia apenas o PATH persistido; isso não altera a máquina e evita
+# exigir que o usuário encerre todo o trabalho para continuar o bootstrap.
+function Sync-ProcessPath {
+  $machinePath = [Environment]::GetEnvironmentVariable('Path', 'Machine')
+  $userPath = [Environment]::GetEnvironmentVariable('Path', 'User')
+  $env:Path = (@($machinePath, $userPath) | Where-Object { $_ }) -join [IO.Path]::PathSeparator
+}
+Sync-ProcessPath
+
 function Say  { param($t, $c = 'Gray')  Write-Host $t -ForegroundColor $c }
 function Head { param($t) Say ""; Say "── $t" 'Cyan' }
 function Ok   { param($t) Say "   OK       $t" 'Green' }
@@ -78,8 +88,9 @@ Say "  destino: $REPO_DIR"
 if ($Profile -eq 'creator') {
   Head "Perfil creator"
   Warn "Este perfil nao usa o bootstrap."
-  Say  "   A maquina do usuario final recebe o instalador CenaRaizSetup.exe," 'DarkGray'
-  Say  "   que ainda nao foi construido. Nao exige Git, VS Code nem Node." 'DarkGray'
+  Say  "   A maquina do usuario final recebe o diretorio creator completo," 'DarkGray'
+  Say  "   com Setup.exe, RELEASES e .nupkg. Nao exige Git, VS Code nem Node." 'DarkGray'
+  Say  "   Para construir: operations/bootstrap/build-creator.ps1" 'DarkGray'
   Say  "   Use -Profile developer para preparar uma maquina de desenvolvimento." 'DarkGray'
   exit 0
 }
@@ -143,34 +154,25 @@ foreach ($nome in $selectedTools) {
   if ($DryRun) { continue }
 
   winget install --id $t.winget --exact --silent --accept-source-agreements --accept-package-agreements | Out-Null
+  if ($LASTEXITCODE -ne 0) { Die "winget falhou ao instalar $nome" }
   $instalou = $true
+  Sync-ProcessPath
+  $installedVersion = Get-ToolVersion $t
+  if (-not $installedVersion -and $required) {
+    Die "$nome foi instalado, mas ainda nao pode ser executado pelo PATH persistido"
+  }
 }
 
 if ($instalou -and -not $DryRun) {
-  Warn "Ferramentas novas foram instaladas."
-  Say  "   Feche este terminal, abra outro e rode o bootstrap de novo." 'DarkGray'
-  Say  "   O PATH so e relido na abertura do terminal." 'DarkGray'
-  exit 0
-}
-
-# Python novo demais e falha silenciosa: uv sync escolhe outro interpretador ou falha.
-if (-not $DryRun -and (Get-Command python -ErrorAction SilentlyContinue)) {
-  $pv = (python --version 2>&1 | Out-String)
-  if ($pv -match '(\d+)\.(\d+)') {
-    $maj = [int]$Matches[1]; $min = [int]$Matches[2]
-    if ($maj -gt 3 -or ($maj -eq 3 -and $min -ge 14)) {
-      Warn "Python $maj.$min esta acima do suportado pela skill (>=3.10, <3.14)."
-      Say  "   O uv vai procurar um interpretador compativel; se nao houver, instale o 3.12." 'DarkGray'
-    }
-  }
+  Ok "ferramentas novas instaladas; PATH do processo foi atualizado"
 }
 
 # ---------------------------------------------------------------------------
 # 2. Autenticacao
 # ---------------------------------------------------------------------------
 Head "Autenticacao"
-$auth = (gh auth status 2>&1 | Out-String)
-if ($auth -match 'Logged in to') {
+gh auth status --hostname github.com *> $null
+if ($LASTEXITCODE -eq 0) {
   Ok "gh autenticado"
 } else {
   Do_ "autenticar no GitHub  (gh auth login)"
@@ -246,7 +248,24 @@ if (-not $comp) {
 }
 
 # ---------------------------------------------------------------------------
-# 6. Verificacao
+# 6. Skills dos agentes
+# ---------------------------------------------------------------------------
+Head "Skills dos agentes"
+$skillSource = Join-Path $REPO_DIR 'skills/cena-raiz'
+$skillInstaller = Join-Path $skillSource 'cenaraiz_install.py'
+if (-not (Test-Path $skillInstaller)) {
+  Warn "instalador da skill nao encontrado: $skillInstaller"
+} else {
+  Do_ "instalar/atualizar cena-raiz para Codex e Claude Code"
+  if (-not $DryRun) {
+    & uv run --python 3.12 python $skillInstaller --source $skillSource
+    if ($LASTEXITCODE -eq 0) { Ok "skills dos agentes prontas" }
+    else { Warn "instalacao das skills terminou com codigo $LASTEXITCODE" }
+  }
+}
+
+# ---------------------------------------------------------------------------
+# 7. Verificacao
 # ---------------------------------------------------------------------------
 Head "Verificacao"
 $doctor = Join-Path $REPO_DIR 'operations/bootstrap/raiz-doctor.ps1'

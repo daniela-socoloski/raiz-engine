@@ -16,6 +16,7 @@ import { Readable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { gpgPath, gpgUnavailableMessage, isWindowsHost, resolveGpg } from './gpg-host.mjs';
 
 const desktopRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const manifest = JSON.parse(
@@ -83,22 +84,11 @@ async function sha256(filePath) {
   return hash.digest('hex');
 }
 
-// No Windows os gpg de runtime MSYS que aparecem no PATH mutilam caminhos
-// com letra de drive ("/d/a/...C:\\Users\\..."). Usamos DETERMINISTICAMENTE
-// o gpg do MSYS2 (instalado pelo workflow; C:\msys64) com os caminhos
-// convertidos para a forma /c/... que ele entende.
-const isWindowsHost = process.platform === 'win32';
-const windowsGpg = process.env.CENA_RAIZ_MSYS2_GPG || 'C:\\msys64\\usr\\bin\\gpg.exe';
-
-function gpgPath(value) {
-  if (!isWindowsHost) return value;
-  return value
-    .replace(/^([A-Za-z]):[\\/]/u, (_match, drive) => `/${drive.toLowerCase()}/`)
-    .replaceAll('\\', '/');
-}
-
+// A escolha do gpg (MSYS2, Git for Windows ou CENA_RAIZ_MSYS2_GPG) e a
+// conversao dos caminhos para a forma /c/... vivem em ./gpg-host.mjs,
+// compartilhado com o stage-yt-dlp.
 function runGpg(homeDirectory, args, options = {}) {
-  const command = isWindowsHost ? windowsGpg : 'gpg';
+  const command = resolveGpg();
   const fixedArgs = args.map((argument) =>
     /^[A-Za-z]:[\\/]/u.test(argument) ? gpgPath(argument) : argument,
   );
@@ -109,9 +99,7 @@ function runGpg(homeDirectory, args, options = {}) {
 }
 
 function isGpgAvailable() {
-  const command = isWindowsHost ? windowsGpg : 'gpg';
-  const result = spawnSync(command, ['--version'], { stdio: 'ignore' });
-  return result.status === 0;
+  return resolveGpg() !== null;
 }
 
 async function verifySignature() {
@@ -154,10 +142,16 @@ async function verifySignature() {
 async function extractVerifiedSource() {
   const temporaryDirectory = await mkdtemp(path.join(tmpdir(), 'cena-raiz-ffmpeg-source-'));
   try {
+    // O arquivo entra pelo nome simples, com o cwd na pasta dele, em vez do
+    // caminho absoluto. Motivo: o GNU tar (o que vem no Git Bash) le o "C:" de
+    // C:\Users\... como nome de host remoto e falha com "Cannot connect to C:
+    // resolve failed". O --force-local resolveria no GNU tar, mas o bsdtar do
+    // Windows (System32\tar.exe) nao conhece essa opcao e passaria a falhar.
+    // Sem dois-pontos no argumento -f, os dois funcionam sem ramificacao.
     const extracted = spawnSync(
       'tar',
-      ['-xf', archivePath, '-C', temporaryDirectory],
-      { stdio: 'inherit' },
+      ['-xf', path.basename(archivePath), '-C', temporaryDirectory],
+      { stdio: 'inherit', cwd: path.dirname(archivePath) },
     );
     if (extracted.status !== 0) throw new Error(`Falha ao extrair ${archiveName}.`);
 
@@ -199,10 +193,11 @@ if (signatureVerified) {
   await extractVerifiedSource();
   console.log(`Assinatura valida. Fonte extraido em ${sourcePath}`);
 } else {
+  console.warn(gpgUnavailableMessage(`a fonte do FFmpeg ${version}`));
   console.warn(
-    'GnuPG nao esta instalado. O arquivo foi baixado, mas nao sera extraido nem compilado antes da verificacao.',
+    'O arquivo foi baixado, mas nao sera extraido nem compilado antes da verificacao.',
   );
-  console.warn('No macOS, instale com: brew install gnupg');
+  if (!isWindowsHost) console.warn('No macOS, instale com: brew install gnupg');
 }
 
 await writeFile(

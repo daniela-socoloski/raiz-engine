@@ -19,15 +19,15 @@
   "profiles": {
     "developer": {
       "description": "Maquina que constroi e evolui o Raiz Engine com VS Code, Codex e Claude Code.",
-      "requires": ["git", "git-lfs", "gh", "powershell", "node", "uv", "python"],
-      "optional": ["ffmpeg"],
+      "requires": ["git", "git-lfs", "gh", "powershell", "node", "uv", "python", "ffmpeg"],
+      "optional": [],
       "clonesCorpus": true,
       "note": "clonesCorpus=true baixa os objetos LFS, cerca de 398 MB de casos de marca."
     },
     "creator": {
       "description": "Maquina que apenas usa o Cena Raiz Desktop instalado. Nao exige ambiente de desenvolvimento.",
       "requires": [],
-      "note": "Atendida pelo instalador CenaRaizSetup.exe, ainda nao construido. Perfil registrado, nao implementado."
+      "note": "Atendida pelo diretorio out/creator/win32-x64: CenaRaizSetup.exe, RELEASES e o pacote .nupkg devem permanecer juntos. Construido e verificado localmente; prova em Windows limpo ainda pendente."
     }
   },
 
@@ -78,17 +78,16 @@
     "python": {
       "min": "3.10.0",
       "max": "3.13.99",
-      "check": ["python", "--version"],
+      "check": ["py", "-3.12", "--version"],
       "parse": "Python (\\d+\\.\\d+\\.\\d+)",
       "winget": "Python.Python.3.12",
-      "why": "Helpers da skill. O pyproject exige >=3.10,<3.14."
+      "why": "Helpers da skill. Verifica explicitamente o Python 3.12, mesmo quando outra versao e o padrao do sistema."
     },
     "ffmpeg": {
       "min": "6.0",
       "check": ["ffmpeg", "-version"],
       "parse": "ffmpeg version (\\d+\\.\\d+)",
       "winget": "Gyan.FFmpeg",
-      "optional": true,
       "why": "Em desenvolvimento o app usa o FFmpeg do PATH. Empacotado, usa o runtime proprio."
     }
   },
@@ -98,7 +97,7 @@
       "path": "apps/cena-raiz-desktop",
       "install": ["npm", "ci"],
       "verify": ["npm", "run", "typecheck"],
-      "tests": ["test:timeline", "test:media", "test:helpers", "test:jcut", "test:direction-plan", "test:motion-registry"],
+      "tests": ["test:timeline", "test:media", "test:helpers", "test:jcut", "test:direction-plan", "test:motion-registry", "test:member-auth-storage", "test:signing-env", "test:gpg-host"],
       "note": "Aplicativo desktop canonico apos a consolidacao estrutural."
     },
     "skill": {
@@ -110,10 +109,9 @@
   },
 
   "pendingBeforeDistribution": [
-    "resolver a dependencia de bash dos comandos make:signed, publish:update e publish:runtimes no Windows",
-    "publicacao propria de runtimes e feed de update (hoje aponta para infraestrutura do fornecedor)",
-    "workflow em .github/workflows/ (hoje o GitHub nao o executa)",
-    "refresh token em safeStorage/DPAPI",
+    "prova de instalacao, repeticao, reparo e falha parcial em Windows 11 x64 limpo",
+    "launcher oficial verificavel para a entrada de maquina limpa",
+    "publicacao propria de runtimes e feed de update; canais do aplicativo permanecem desativados ate existirem",
     "assinatura de codigo",
     "icone do app sem a cor do produto original"
   ]

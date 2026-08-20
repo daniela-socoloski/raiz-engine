@@ -18,6 +18,7 @@ import { Readable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { gpgPath, gpgUnavailableMessage, resolveGpg } from './gpg-host.mjs';
 
 const desktopRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const manifest = JSON.parse(
@@ -123,26 +124,13 @@ function checksumFor(checksums, filename) {
   throw new Error(`Checksum oficial ausente para ${filename}.`);
 }
 
-// No Windows os gpg de runtime MSYS do PATH mutilam caminhos com letra de
-// drive; usamos deterministicamente o gpg do MSYS2 (workflow instala o
-// pacote gnupg) com os caminhos convertidos para a forma /c/... — o mesmo
-// arranjo do fetch-ffmpeg-source.
-const isWindowsHost = process.platform === 'win32';
-const gpgCommand = isWindowsHost
-  ? process.env.CENA_RAIZ_MSYS2_GPG || 'C:\\msys64\\usr\\bin\\gpg.exe'
-  : 'gpg';
-
-function gpgPath(value) {
-  if (!isWindowsHost) return value;
-  return value
-    .replace(/^([A-Za-z]):[\\/]/u, (_match, drive) => `/${drive.toLowerCase()}/`)
-    .replaceAll('\\', '/');
-}
-
+// A escolha do gpg (MSYS2, Git for Windows ou CENA_RAIZ_MSYS2_GPG) e a
+// conversao dos caminhos para a forma /c/... vivem em ./gpg-host.mjs,
+// compartilhado com o fetch-ffmpeg-source.
 async function verifySignedChecksums() {
-  const gpgAvailable = spawnSync(gpgCommand, ['--version'], { stdio: 'ignore' }).status === 0;
-  if (!gpgAvailable) {
-    throw new Error('GnuPG ausente. Instale `gpg` para verificar a release do yt-dlp.');
+  const gpgCommand = resolveGpg();
+  if (!gpgCommand) {
+    throw new Error(gpgUnavailableMessage('a release do yt-dlp'));
   }
 
   const gpgHome = await mkdtemp(path.join(tmpdir(), 'cena-raiz-yt-dlp-gpg-'));

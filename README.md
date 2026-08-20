@@ -33,7 +33,7 @@ portão atual.
 | Git LFS | **obrigatório** — 505 caminhos, 501 objetos, 398 MB. Clone sem LFS traz ponteiros, não os assets |
 | Publicação Git | o remoto privado já contém o baseline e o histórico posterior; consultar `origin/main` para o tip atual e exigir autorização separada para cada novo push |
 | Releases | **bloqueadas** até a publicação própria existir |
-| Fase 0 do produto | bootstrap `developer`, `doctor` e manifest iniciais existem; instalador `creator`, skills/runtimes e prova em VM ainda faltam |
+| Fase 0 do produto | bootstrap `developer` passa localmente; skills são instaladas em Codex e Claude Code; o diretório `creator` autônomo foi gerado e abriu no smoke. Ainda faltam prova em Windows limpo, reparo, assinatura e canal próprio |
 | Consolidação local | `dd0c130` contém a Etapa 6 junto de outras mudanças sob um assunto estreito e impreciso; não foi enviado ao remoto e não deve ser reescrito ou publicado sem autorização |
 | Próxima capacidade central | Fase 1 — compilar `marca-raiz-prisma` em `BrandRuntimeProfile` revisável |
 

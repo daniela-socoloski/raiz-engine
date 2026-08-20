@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "owner": "daniela-socoloski/raiz-engine",
+  "channels": {
+    "runtimes": {
+      "baseUrl": "",
+      "state": "disabled-until-owned-publication"
+    },
+    "updates": {
+      "feedUrl": "",
+      "state": "disabled-until-owned-publication"
+    }
+  }
+}

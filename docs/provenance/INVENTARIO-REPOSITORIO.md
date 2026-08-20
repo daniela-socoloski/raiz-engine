@@ -822,14 +822,18 @@ reescrever nem publicar esse commit sem autorização humana separada.
 | manifests e locks | `package.json` + `package-lock.json` no desktop; `pyproject.toml` + `uv.lock` na skill |
 | links Markdown do projeto | todos resolvidos; documentação interna de runtimes baixados e ignorados não integra essa verificação |
 | typecheck | `npm run typecheck`, zero erros |
-| testes do desktop | seis comandos declarados, todos passando |
-| testes da skill | quatro testes do instalador, todos passando |
+| testes do desktop | nove comandos declarados, incluindo storage protegido, wrapper de signing env e resolução GPG, todos passando |
+| testes da skill | seis testes do instalador, incluindo o payload real do monorepositório, todos passando |
 | recipes shell | seis scripts passam em Git Bash 5.3 por caminho explícito |
 | integridade Git | `git fsck` sem erro; objetos pendentes históricos registrados |
 | integridade LFS | `git lfs fsck` OK |
 | segredos por nome e clones no índice | nenhuma ocorrência proibida |
-| bootstrap | entrada completa em `-DryRun` OK; `doctor` detecta corretamente que `.venv` da skill ainda não foi instalada |
+| bootstrap developer | entrada completa em `-DryRun` OK; dependências e skills de Codex/Claude materializadas; `doctor` termina verde na estação atual |
+| creator local | diretório Squirrel autônomo gerado com runtimes, hashes e instruções; smoke comprova renderer React montado |
+| workflow Windows | `.github/workflows/windows-creator.yml` é a única entrada ativa; compila e anexa o diretório sem publicar |
 
 **Estado do portão:** Etapas 6 e 7 concluídas localmente. Etapa 10/Fase 0 é o
-portão atual. O `uv sync` completo da skill, o perfil `creator`, a resolução de
-Bash para assinatura/publicação e a prova em VM limpa continuam pendentes.
+portão atual. Developer, skills, runtimes, creator local e substituição da
+dependência de Bash foram comprovados na estação atual. Prova de instalação,
+repetição, reparo e falha parcial em Windows limpo, assinatura, launcher oficial
+e canais próprios continuam pendentes.

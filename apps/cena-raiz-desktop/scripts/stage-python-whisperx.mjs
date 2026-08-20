@@ -108,6 +108,20 @@ async function sha256(filePath) {
   return hash.digest('hex');
 }
 
+// O primeiro import de torch/pyannote/torchcodec le centenas de MB de DLLs.
+// Com o disco saturado pelo proprio download (~2 GB), 120s nao bastam e o
+// staging morre com ETIMEDOUT mesmo com o ambiente intacto e correto — o que
+// parece defeito e e so lentidao. Default folgado, ajustavel por env.
+const PYTHON_PROBE_TIMEOUT_MS = (() => {
+  const raw = process.env.CENA_RAIZ_PYTHON_PROBE_TIMEOUT_MS;
+  if (raw === undefined) return 600_000;
+  const parsed = Number.parseInt(raw, 10);
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    throw new Error(`CENA_RAIZ_PYTHON_PROBE_TIMEOUT_MS invalido: ${raw}`);
+  }
+  return parsed;
+})();
+
 function run(command, args, options = {}) {
   const result = spawnSync(command, args, {
     cwd: options.cwd,
@@ -232,7 +246,7 @@ function versionProbe(pythonExecutable, options = {}) {
     {
       capture: true,
       env: runtimeEnvironment(options.env),
-      timeout: 120_000,
+      timeout: PYTHON_PROBE_TIMEOUT_MS,
     },
   ).trim();
   const lines = output.split(/\r?\n/u);
@@ -619,7 +633,7 @@ try {
       '-c',
       `from whisperx.audio import load_audio; print(load_audio(${JSON.stringify(smokeAudio)}).shape[0])`,
     ],
-    { capture: true, env: runtimeEnvironment(), timeout: 120_000 },
+    { capture: true, env: runtimeEnvironment(), timeout: PYTHON_PROBE_TIMEOUT_MS },
   ).trim();
   if (audioSamples !== '4000') {
     throw new Error(`Smoke test de audio WhisperX inesperado: ${audioSamples}`);
@@ -654,7 +668,7 @@ try {
           "print(json.dumps(sorted([{'name': d.metadata['Name'], 'version': d.version} for d in m.distributions()], key=lambda p: p['name'].lower())))",
         ].join('; '),
       ],
-      { capture: true, env: runtimeEnvironment(), timeout: 120_000 },
+      { capture: true, env: runtimeEnvironment(), timeout: PYTHON_PROBE_TIMEOUT_MS },
     ),
   );
 

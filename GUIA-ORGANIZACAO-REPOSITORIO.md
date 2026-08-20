@@ -225,7 +225,7 @@ está, sem reordenar nem promover etapas.
 | 7 — Validar a consolidação | **concluída localmente**; contagens, manifests, locks, links, fronteiras, segredos por nome, typecheck, testes, Git e LFS verificados |
 | 8 — Recuperar o baseline técnico | **executada antecipadamente** sob autorização: typecheck limpo e todos os testes declarados executáveis |
 | 9 — Migrar identidade | **executada antecipadamente** como `CLEAN CUT — ACCEPTED` |
-| 10 — Bootstrap reproduzível | **em construção antecipadamente sob autorização**: launcher Windows, bootstrap `developer`, `doctor` e manifest iniciais; perfil `creator` e prova em VM pendentes |
+| 10 — Bootstrap reproduzível | **em construção sob autorização**: developer, doctor, skills, runtimes, creator local e workflow raiz verificados; prova de instalação/reparo em Windows limpo, launcher assinado e distribuição própria pendentes |
 | 11 — Começar o Raiz Engine | **iniciada antecipadamente de forma parcial** no desktop com contratos de direção; o começo canônico pela compilação de Brand Intelligence permanece pendente |
 
 ## 5. Ordem segura de execução
@@ -469,17 +469,20 @@ versionada do produto:
 
 > **Estado atual:** iniciada antecipadamente sob autorização. A implementação em
 > `operations/bootstrap/` possui `install.ps1`, `raiz-bootstrap.ps1`,
-> `raiz-doctor.ps1` e `toolchain.json`. Isso ainda não conclui a etapa: faltam o
-> perfil `creator`, instalação das skills nos agentes, runtimes empacotados,
-> reparo completo, canal oficial do launcher e validação em VM limpa.
+> `raiz-doctor.ps1`, `toolchain.json` e `build-creator.ps1`. O perfil developer,
+> a instalação local das skills, o empacotamento dos runtimes e o diretório
+> creator foram verificados na máquina atual; o workflow executável vive somente
+> em `.github/workflows/windows-creator.yml`. Isso ainda não conclui a etapa:
+> faltam reparo completo, canal oficial assinado e validação em Windows limpo.
 
 1. inventariar o que `cenaraiz_install.py` realmente instala, preserva e valida;
 2. definir Windows 11 x64 como primeira plataforma comprovada;
 3. criar um único manifest para ferramentas, versões, checksums e perfis;
 4. criar o perfil `developer` para Git, `gh`, SSH, Node, `uv`/Python, FFmpeg,
    checkout, dependências e skills;
-5. separar o futuro perfil `creator`, destinado a executar o aplicativo sem o
-   ambiente completo de desenvolvimento;
+5. manter o perfil `creator` separado, destinado a executar o aplicativo sem o
+   ambiente completo de desenvolvimento; sua unidade é o diretório contendo
+   Setup, `RELEASES` e `.nupkg`, não o pequeno `Setup.exe` isolado;
 6. manter autenticação do GitHub interativa pelo `gh`, sem tokens em arquivos;
 7. criar verificação somente de leitura (`doctor`), instalação idempotente e
    reparo retomável;

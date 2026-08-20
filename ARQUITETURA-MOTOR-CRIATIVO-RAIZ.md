@@ -819,9 +819,13 @@ capacidades disponíveis.
 oficial, o `doctor` explica o estado final e nenhum caminho como
 `C:\\Users\\RAIZ` é requisito de funcionamento.
 
-**Estado atual:** `operations/bootstrap/` já contém um bootstrap `developer`, um
-`doctor` e um manifest iniciais. O perfil `creator`, a instalação de skills e
-runtimes, a validação em VM e a distribuição própria continuam pendentes; portanto
+**Estado atual:** o bootstrap `developer` e o `doctor` passam na máquina atual;
+as skills do Cena Raiz e do Remotion foram materializadas para Codex e Claude
+Code; os runtimes foram incorporados ao primeiro perfil `creator`; e um build
+Squirrel autônomo em diretório foi gerado, verificado por hash e aberto por um
+smoke determinístico. O workflow canônico está na raiz do monorepositório e não
+publica. Ainda faltam instalação, repetição, reparo e falha parcial em Windows
+limpo, além do launcher oficial assinado e dos canais próprios de update. Portanto
 a Fase 0 está **em construção**, não concluída.
 
 ### Fase 1 — Brand Intelligence
@@ -967,7 +971,7 @@ corromper originais ou impedir o uso do Raiz Engine em máquinas sem Adobe.
 
 | Fase | Estado verificável agora |
 |---|---|
-| 0 — instalação | **em construção**; bootstrap `developer` inicial existe, instalador `creator` e prova em VM não |
+| 0 — instalação | **em construção**; developer e creator passam localmente, workflow canônico existe; prova em Windows limpo, reparo, assinatura e canal próprio não |
 | 1 — Brand Intelligence | **próxima capacidade central**; corpus e contrato existem, compilador não |
 | 2 — intake e análise | **parcialmente existente** na base adquirida, ainda sem contrato canônico completo |
 | 3 — direção audiovisual | esqueleto de contrato iniciado antecipadamente; planner e integração com as Fases 1–2 pendentes |
@@ -1113,13 +1117,14 @@ capacidade nova possa ser reproduzida em outra máquina.
 
 A sequência atual, considerando o que já foi executado, é:
 
-1. concluir o bootstrap `developer` da
-   Fase 0;
-2. resolver a dependência de Bash dos comandos de assinatura/publicação ou
-   substituí-la por uma entrada Windows portátil;
-3. provar `bootstrap → doctor → typecheck → testes → aplicativo aberto` em uma
-   VM Windows 11 x64 limpa;
-4. construir o perfil `creator` e gerar o primeiro instalador local, sem publicar;
+1. reconciliar e verificar o código da Fase 0, regenerando o diretório creator
+   sempre que seu conteúdo empacotado mudar;
+2. publicar o código somente sob autorização separada e executar o workflow
+   canônico num runner Windows limpo;
+3. instalar o **diretório completo** `out/creator/win32-x64/` numa VM Windows 11
+   x64 limpa e provar instalação, repetição, reparo e falha parcial;
+4. criar o launcher oficial assinado e os canais próprios de runtime, update e
+   rollback, sem reativar a infraestrutura herdada;
 5. começar a Fase 1 pelo compilador
    `marca-raiz-prisma → BrandRuntimeProfile` e validá-lo no corpus canônico;
 6. somente então ligar `VideoBrief` e `ContentAnalysis` ao

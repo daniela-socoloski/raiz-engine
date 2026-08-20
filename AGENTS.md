@@ -162,7 +162,7 @@ While `Etapa 10` and product `Fase 0` remain incomplete:
 - do not restore `cena-raiz/cenaraiz/`, `SKILLS/`, or another active copy of a
   consolidated component;
 - do not run release, updater, signing, or publication commands until the owned
-  distribution path and the Windows Bash dependency are resolved;
+  distribution path, credentials, and explicit external-action authorization exist;
 - do not implement Adobe runtime mutations or product capabilities outside the
   explicitly authorized Fase 0 bootstrap and architectural alignment. Those
   authorizations do not activate Adobe writes.
@@ -176,9 +176,12 @@ approval, and both are recorded rather than hidden:
   fallback layer the plan prescribes, after verifying that no build was ever
   distributed and no persisted state existed to honour. The plan must record this
   so a later agent does not reintroduce the compatibility layer.
-- `Etapa 10` — an initial Windows developer bootstrap, doctor, and toolchain
-  manifest were started under explicit owner authorization. They are not accepted
-  as complete until clean-machine and creator-profile criteria pass.
+- `Etapa 10` — the Windows developer bootstrap, doctor, toolchain manifest,
+  local agent-skill installation, and a self-contained creator artifact directory
+  have been implemented and verified on the current machine. A canonical root
+  workflow now rebuilds and smokes the creator profile without publishing. The
+  step remains incomplete until a clean Windows machine proves install, repeat,
+  repair, and partial-failure behavior and the owned signed distribution entry exists.
 - `Etapa 11` — an `AudiovisualDirectionPlan` skeleton was started in the desktop
   before the canonical Brand Intelligence compiler. Preserve it, do not duplicate
   it, and connect it only after product Fases 1 and 2 produce real inputs.
@@ -225,7 +228,7 @@ The guide's `Etapa 10` implements product `Fase 0`; `Etapa 11` opens product
 | `Etapa 7 — Validar a consolidação` | **Concluded locally.** Counts, manifests, locks, links, boundaries, secret-name scan, type-check, tests, Git integrity, and LFS integrity were verified. |
 | `Etapa 8 — Recuperar o baseline técnico` | Restore type-check, tests, and development startup before feature work. |
 | `Etapa 9 — Migrar identidade` | Migrate visible identity and internal compatibility in verified stages. |
-| `Etapa 10 — Construir o bootstrap reproduzível` | **Current gate.** Finish and prove the canonical developer bootstrap, then build the creator installer and validate both on a clean Windows VM. |
+| `Etapa 10 — Construir o bootstrap reproduzível` | **Current gate.** Developer and local creator paths are implemented; prove the complete artifact directory on a clean Windows VM, then establish the owned signed launcher/update channel. |
 | `Etapa 11 — Começar o Raiz Engine` | Introduce the first owned contract and core capability at the verified integration seam. |
 
 The ignore policy and repository-level secret exclusions were concluded in
@@ -349,14 +352,19 @@ instruction that conflicts with them.
   thing as temporary infrastructure dependencies.
 - **Inherited problems must be declared**, never silently fixed — see the section
   below.
-- **Own publication remains pending.** Publishing still targets the previous
-  supplier's storage; releases are blocked until an owned destination is validated.
-- **Refresh token storage blocks public distribution**, not documentation work.
+- **Own publication remains pending.** The inherited publication scripts still
+  target the previous supplier's storage and are blocked. Active application
+  channels are empty rather than falling back to that storage; releases remain
+  blocked until an owned destination is validated.
+- **Refresh token storage is remediated in code.** Electron `safeStorage`/DPAPI,
+  legacy migration, deletion, and fail-closed behavior are tested; packaged
+  clean-machine validation is still required.
 - **A bootstrap installable on any clean machine remains a central requirement.**
   It is product **Fase 0**, before Brand Intelligence and before the per-video
-  flow. The current pause does not cancel it. The initial developer bootstrap,
-  doctor, and manifest are not proof of completion: the creator installer,
-  skills/runtimes setup, clean-VM validation, and owned distribution remain.
+  flow. Developer bootstrap, doctor, agent skills, bundled runtimes, the local
+  creator directory, and the root Windows workflow are implemented evidence, but
+  not proof of completion: clean-machine installation/repair, a signed official
+  launcher, and owned distribution remain.
 - **Product Fase 1 is Brand Intelligence.** `marca-raiz-prisma/inteligencias/`
   owns the knowledge kernel and `marca-raiz-prisma/projetos/` owns the canonical
   evaluation corpus. Their runtime boundary is `BrandRuntimeProfile`. Video

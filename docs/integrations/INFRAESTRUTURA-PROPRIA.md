@@ -55,8 +55,11 @@ Falta o servidor entregar dois caminhos por HTTPS:
 produto anterior.
 
 **Comportamento executável atual:** `npm run publish:runtimes` e
-`npm run publish:update` publicam no R2 do fornecedor; o aplicativo mantém
-fallback para os endpoints dele.
+`npm run publish:update` ainda implementam o adapter R2 herdado e, por isso,
+permanecem bloqueados. O aplicativo já não possui fallback para os endpoints do
+fornecedor: `resources/distribution-manifest.json` mantém runtime e update
+desativados até um canal próprio ser preenchido. O creator local incorpora os
+runtimes e não precisa desse download.
 
 **Destino arquitetural documentado:** infraestrutura própria, hoje descrita como
 VPS/Coolify, **sem adapter de publicação implementado nem validado**.
@@ -70,10 +73,10 @@ VPS/Coolify, **sem adapter de publicação implementado nem validado**.
 - incapacidade de reconstruir a distribuição apenas com infraestrutura própria.
 
 **Decisão:** não executar publicação agora; não declarar VPS/Coolify concluído; não
-remover o fluxo herdado antes de existir substituto funcional; **bloquear releases**
-enquanto o destino próprio não estiver validado. Futuramente construir um adapter
-canônico de publicação, validar upload, checksum, download, update e rollback, migrar
-consumidores e só então remover o fallback herdado.
+executar o fluxo herdado; **bloquear releases** enquanto o destino próprio não
+estiver validado. Futuramente construir um adapter canônico de publicação,
+validar upload, checksum, download, update e rollback e só então remover os
+scripts R2 herdados.
 
 **Condição para liberar distribuição:** armazenamento próprio operacional; HTTPS
 válido; credenciais próprias; scripts apontando exclusivamente ao destino aprovado;
@@ -278,13 +281,12 @@ Nada do que foi construído depende deles: o app usa apenas a publishable key.
 
 ## Pendências de segurança antes de distribuir
 
-**Refresh token em arquivo simples.** Classificação: `INTRODUCED-SECURITY-DEBT`.
-Bloqueia distribuição pública, não o trabalho documental atual.
-O aplicativo persiste o refresh token de sessão
-num JSON dentro de `userData`. Em máquina compartilhada ou comprometida, é legível
-por qualquer processo do mesmo usuário. Antes de distribuir, deve passar para
-armazenamento protegido do sistema — `safeStorage` do Electron, que usa DPAPI no
-Windows.
+**Refresh token protegido.** Classificação: `SECURITY-DEBT-REMEDIATED-IN-CODE`.
+O aplicativo agora cifra a sessão com `safeStorage` do Electron, que usa DPAPI
+no Windows, migra o JSON legado uma única vez e falha fechado quando o
+armazenamento seguro do sistema não está disponível. O teste automatizado cobre
+round trip, migração, exclusão e indisponibilidade. A validação do comportamento
+empacotado em uma VM Windows limpa continua sendo parte do gate da Fase 0.
 
 **Dois caminhos de autenticação convivendo.** Classificação:
 `WORKING-MACHINE-CONFIGURATION` · `BOOTSTRAP-DECISION-PENDING`.
@@ -311,6 +313,10 @@ pelo menor privilégio, mantendo apenas o que o cliente exige.
 
 # Ordem sugerida
 
-1. **Servir os arquivos no VPS** — encerra o único risco aberto
-2. **Ícone** — trabalho de design, sem dependência técnica
-3. **Assinatura Azure** — comece cedo, a verificação demora
+1. **Provar o diretório creator em Windows limpo** — instalação, repetição,
+   reparo e falha parcial, sem depender de ferramentas do desenvolvedor
+2. **Implementar e provar o canal próprio** — VPS/Coolify ou outro destino
+   explicitamente aprovado, com checksum, update e rollback
+3. **Assinar e definir o launcher oficial** — começar cedo, pois a validação de
+   identidade pode demorar
+4. **Substituir o ícone** — concluir a identidade visual antes da distribuição

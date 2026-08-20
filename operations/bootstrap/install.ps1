@@ -31,6 +31,13 @@ $ErrorActionPreference = 'Stop'
 $repoSlug = 'daniela-socoloski/raiz-engine'
 $repoDir = Join-Path $Path 'raiz-engine'
 
+function Sync-ProcessPath {
+  $machinePath = [Environment]::GetEnvironmentVariable('Path', 'Machine')
+  $userPath = [Environment]::GetEnvironmentVariable('Path', 'User')
+  $env:Path = (@($machinePath, $userPath) | Where-Object { $_ }) -join [IO.Path]::PathSeparator
+}
+Sync-ProcessPath
+
 function Write-Step { param($text) Write-Host "   ->       $text" -ForegroundColor White }
 function Write-Ok { param($text) Write-Host "   OK       $text" -ForegroundColor Green }
 function Write-Warn { param($text) Write-Host "   AVISO    $text" -ForegroundColor Yellow }
@@ -69,11 +76,14 @@ foreach ($tool in $seedTools) {
   winget install --id $tool.id --exact --silent --accept-source-agreements --accept-package-agreements | Out-Null
   if ($LASTEXITCODE -ne 0) { Stop-Install "falha ao instalar $($tool.name)" }
   $installedSeed = $true
+  Sync-ProcessPath
+  if (-not [bool](& $tool.test)) {
+    Stop-Install "$($tool.name) foi instalado, mas nao pode ser executado pelo PATH persistido"
+  }
 }
 
 if ($installedSeed -and -not $DryRun) {
-  Write-Warn 'o seed foi instalado; feche este terminal, abra outro e execute install.ps1 novamente'
-  exit 0
+  Write-Ok 'seed instalado; PATH do processo foi atualizado'
 }
 if ($missingSeedInDryRun) {
   Write-Warn 'a simulacao termina aqui porque o seed ausente so existira depois da instalacao e reabertura do terminal'

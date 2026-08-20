@@ -745,8 +745,9 @@ backend novo:
 
 - **Mesmo login da área de membros**: Supabase Auth direto
   (`/auth/v1/token`, grant password/refresh) com a **anon key** pública. A
-  senha nunca é persistida; o refresh token (rotativo) fica em
-  `userData/member-auth.json` (0600).
+  senha nunca é persistida; o refresh token (rotativo) fica cifrado em
+  `userData/member-auth.json` por `safeStorage`/DPAPI. O leitor migra o JSON
+  legado e falha fechado se o storage seguro estiver indisponível.
 - **Direito de uso**: leitura das próprias matrículas via política RLS
   existente `enrollments_select_own_or_admin` —
   `enrollments?select=status,expires_at,course:courses(slug,title)`; vale
@@ -1001,6 +1002,13 @@ Fase 2:
 
 ## 14. Windows
 
+> **Escopo histórico e estado atual.** Os relatos de workflows e publicação R2
+> abaixo preservam evidência da base adquirida. Eles não são instruções atuais.
+> No monorepositório Raiz Engine, o único workflow ativo é
+> `/.github/workflows/windows-creator.yml`; ele constrói e testa sem publicar.
+> Os canais herdados estão desativados no aplicativo e os scripts R2 não podem
+> ser executados até existir um adapter próprio aprovado.
+
 Infra completa e PRIMEIRA BUILD VERDE no CI em 2026-08-19 (run
 32266364640 do workflow windows-build, 6 iterações): todos os stages
 win32-x64, FFmpeg 7.1.5 compilado via MSYS2, WhisperX com torchcodec
@@ -1036,15 +1044,15 @@ Lições das 8 iterações (vao doer de novo se esquecidas):
   o smoke exige as DLLs NO pack. Codex (rust) rodava mesmo assim — só
   exigia vcruntime, que costuma existir; o sintoma era só no Python.
 
-Como construir (os dois caminhos rodam os MESMOS npm scripts):
-- CI: workflow `windows-build` (.github/workflows/windows-build.yml),
-  disparo manual. Sem "publish" só compila e anexa artefatos (instalador
-  Squirrel + runtime pack) para teste; com "publish" envia runtime pack e
-  release ao R2. Exige secrets CENA_RAIZ_CF_ACCOUNT_ID, CENA_RAIZ_CF_API_TOKEN,
-  CENA_RAIZ_R2_BUCKET e CENA_RAIZ_UPDATE_BASE_URL (mesmos nomes do signing.env).
-- Local (máquina Windows): `npm ci && npm run make` — a cadeia roda os
-  stage:* na plataforma corrente; depois `npm run pack:runtimes` e, com o
-  signing.env carregado no ambiente, os publish:*.
+Como construir no Raiz Engine atual:
+
+- CI: `/.github/workflows/windows-creator.yml`, disparo manual, sem parâmetros
+  de publicação. Executa tipos, testes, build autônomo, smoke e anexa o
+  diretório creator.
+- Local: `pwsh -File operations/bootstrap/build-creator.ps1`. Use `-Prepared`
+  somente quando os runtimes já tiverem sido preparados e verificados.
+- Unidade instalável: `out/creator/win32-x64/` inteiro. O `CenaRaizSetup.exe`
+  pequeno depende do `RELEASES` e do `.nupkg` adjacentes.
 
 O que cada peça faz no win32-x64:
 - Runtimes: node/uv/yt-dlp/codex-app-server já tinham alvo win32 pinado
@@ -1078,21 +1086,23 @@ O que cada peça faz no win32-x64:
   spawns usam binários absolutos ou `node script.js` (sem npx/.cmd);
   PATH usa path.delimiter; a extração do pack usa bsdtar (Windows 10+).
 
-Smoke contínuo: o workflow windows-smoke baixa o runtime pack PUBLICADO
-do R2 num runner limpo e roda os comandos do agente (ferramentas, imports
-do WhisperX, prefetch do modelo e transcrição real pela CLI) — é o
-replicador do ambiente do aluno; rodar sempre que houver suspeita de
-pacote quebrado no Windows. Verde em 2026-08-19.
+O antigo `windows-smoke` que baixava do R2 é somente evidência histórica. O smoke
+atual abre o aplicativo empacotado com todos os runtimes incorporados e exige um
+relatório de uma superfície React real. Ele não substitui o teste de instalação
+em VM nem ainda executa uma transcrição completa dentro do app instalado.
 
 Validação pendente na primeira rodada real (nesta ordem):
-1. Workflow sem publish → instalar o Setup.exe numa máquina/VM Windows.
-2. Boot: download do runtime pack win32 + extração + checkRuntimes verde.
+1. Baixar/manter junto o diretório creator produzido pelo workflow e instalar
+   numa máquina/VM Windows limpa.
+2. Boot: confirmar uso dos runtimes incorporados e `checkRuntimes` verde, sem
+   download herdado.
 3. Corte limpo de ponta a ponta (WhisperX + torchcodec com as DLLs 7.1).
 4. Fase 2 (npm install do Remotion + render com chrome-headless win).
 5. Sandbox do Codex no Windows: conferir se o app-server aceita
    workspace-write ou se os comandos passam a pedir aprovação — se pedir,
    decidir o ajuste de fricção.
-6. Atualização OTA: instalar versão N, publicar N+1, conferir o ciclo.
+6. Depois de existir canal próprio: instalar versão N, publicar N+1 sob
+   autorização e conferir update, rollback e integridade.
 
 Dependências do Fill:
 - Adicionar os 4 secrets no repositório (gh secret set …).
@@ -1370,7 +1380,7 @@ Dependências do Fill:
   também no gate de login (pós-0.8.2).
 - 0.8.0: gate de login dos usuários — conta própria do Raiz Engine
   (Supabase Auth com anon key), matrícula ativa do IA Edit Pro via RLS
-  existente, refresh token em userData, tolerância offline de 7 dias, telas
+  existente, refresh token protegido por safeStorage em userData, tolerância offline de 7 dias, telas
   de login/sem-matrícula e conta do aluno na rail. Inerte até preencher a
   URL e a anon key do projeto (seção 13c).
 - 0.7.9: OTA estilo ChatGPT implementado (autoUpdater Squirrel.Mac + feed

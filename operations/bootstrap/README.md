@@ -14,11 +14,13 @@ Esta pasta é a única fonte funcional da instalação de desenvolvimento e do
 | Perfil | Para quem | Como |
 |---|---|---|
 | `developer` | quem constrói e evolui o Raiz Engine | `install.ps1` → `raiz-bootstrap.ps1` |
-| `creator` | quem apenas usa o aplicativo | `CenaRaizSetup.exe` — **ainda não construído** |
+| `creator` | quem apenas usa o aplicativo | diretório `out/creator/win32-x64/` com Setup, `RELEASES` e `.nupkg` |
 
-O perfil `creator` está **registrado, não implementado**. O bootstrap reconhece o
-parâmetro e explica que a máquina do usuário final não passa por aqui: ela recebe
-um instalador que não exige Git, VS Code nem Node.
+O perfil `creator` está implementado e verificado localmente. O `Setup.exe` tem
+aproximadamente 0,5 MB porque é somente o bootstrap do Squirrel: ele **não** é o
+produto inteiro. A unidade distribuível é o diretório completo, cujo `.nupkg`
+contém aplicativo e runtimes. A máquina do usuário final não exige Git, VS Code,
+Node, Python nem FFmpeg no PATH.
 
 ## Uso
 
@@ -40,6 +42,15 @@ pwsh -File operations/bootstrap/raiz-bootstrap.ps1 -SkipCorpus
 
 # só verificar, nunca alterar
 pwsh -File operations/bootstrap/raiz-doctor.ps1
+
+# construir o creator completo, sem publicar
+pwsh -File operations/bootstrap/build-creator.ps1
+
+# repetir apenas a embalagem quando os runtimes já foram preparados
+pwsh -File operations/bootstrap/build-creator.ps1 -Prepared
+
+# verificar o diretório creator existente
+pwsh -File operations/bootstrap/raiz-doctor.ps1 -Profile creator
 ```
 
 ## O que o bootstrap faz
@@ -54,6 +65,7 @@ Windows limpo
 → git lfs pull            (o corpus, se não for -SkipCorpus)
 → npm ci                  (desktop, reproduzido pelo `package-lock.json`)
 → uv sync --frozen        (skill, reproduzida pelo `uv.lock`)
+→ instala cena-raiz + Remotion em Codex e Claude Code a partir do checkout
 → raiz doctor
 ```
 
@@ -95,8 +107,9 @@ Alterar uma versão suportada significa editar o manifesto, não os scripts.
 arquivos de poucas linhas com o nome certo — não as imagens. Ferramenta que abrir
 esse ponteiro esperando um JPEG falha de forma confusa.
 
-**Python novo demais.** A skill exige `>=3.10, <3.14`. Python 3.14 no PATH faz o
-`uv sync` procurar outro interpretador ou falhar. O doctor avisa antes.
+**Python novo demais.** A skill exige `>=3.10, <3.14`. O manifest verifica
+explicitamente `py -3.12`, então um Python 3.14 padrão pode coexistir sem virar
+falso bloqueio; o ambiente da skill continua fixado pelo `uv.lock`.
 
 **Atalho da Microsoft Store.** No Windows, `python` pode resolver para um stub que
 abre a loja e bloqueia. O doctor identifica e diz como desativar.
@@ -107,15 +120,19 @@ Os caminhos canônicos dos componentes são `apps/cena-raiz-desktop/` e
 `skills/cena-raiz/`. O bootstrap e o `doctor` leem os dois exclusivamente de
 `toolchain.json`.
 
-O bootstrap ainda não cobre: instalação das skills no Codex e Claude Code,
-preparação dos runtimes empacotados, build do instalador `creator`, reparo
-automático completo, nem validação em VM limpa. Estão na sequência da Fase 0,
-depois da consolidação estrutural.
+O bootstrap cobre dependências, corpus opcional, desktop, skill e instalação das
+skills em Codex e Claude Code. O build creator prepara e incorpora os runtimes,
+gera o diretório Squirrel, valida hashes e abre o aplicativo empacotado por um
+hook de QA sem capturar conteúdo sensível.
 
-Os comandos `make:signed`, `publish:update` e `publish:runtimes` ainda chamam
-`bash` pelo nome. Nesta máquina o Git Bash existe em
-`C:\Program Files\Git\bin\bash.exe`, mas não está no `PATH` do PowerShell; esses
-comandos permanecem bloqueados até a Fase 0 resolver a entrada de forma portátil.
+Os comandos `make:signed`, `publish:update` e `publish:runtimes` usam o wrapper
+Node `scripts/with-signing-env.mjs`; Bash deixou de ser dependência no Windows.
+Isso não os autoriza: assinatura e publicação continuam bloqueadas até existirem
+credenciais, destino próprio verificado e autorização humana específica.
+
+Ainda não estão comprovados o instalador em Windows limpo, repetição, reparo,
+falha parcial, assinatura, launcher oficial, canal próprio de update e rollback.
+Esses são os gates restantes da Fase 0.
 
 O repositório é privado. Portanto, uma URL `raw.githubusercontent.com` anônima
 não é uma entrada funcional para máquina limpa. O `install.ps1` existe e pode ser
@@ -124,12 +141,18 @@ com checksum ou assinatura. Não anunciar um comando remoto antes disso.
 
 ### Evidência local de 2026-08-20
 
-- scripts e manifest passam no parser;
+- scripts, manifest e workflow raiz passam no parser;
 - `raiz-bootstrap.ps1 -DryRun` reutiliza o checkout atual, sem criar
   `raiz-engine/raiz-engine`;
-- `raiz-doctor.ps1` detecta as ferramentas desta estação;
-- dependências ausentes de qualquer componente do perfil agora tornam o veredito
-  incompleto, em vez de produzir falso “Ambiente pronto”.
+- `raiz-doctor.ps1 -Profile developer` termina com “Ambiente pronto” nesta estação;
+- cena-raiz e `remotion-best-practices` estão instaladas para Codex e Claude Code;
+- o creator autônomo contém oito entradas obrigatórias de runtime;
+- o smoke confirma uma superfície React real (`member-gate` ou `studio-shell`),
+  raiz montada e viewport válida; uma captura preta não conta como sucesso;
+- `out/creator/win32-x64/` contém Setup, `RELEASES`, `.nupkg`, checksums,
+  relatório de build, instruções e relatório de smoke;
+- `.github/workflows/windows-creator.yml` reconstrói e anexa exatamente esse
+  diretório, sem release e sem publicação externa.
 
 ## Adobe e MCPs locais
 

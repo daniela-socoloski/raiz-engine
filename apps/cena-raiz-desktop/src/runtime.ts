@@ -33,6 +33,9 @@ type RuntimeContext = {
   // Tem prioridade sobre os resources: o instalador magro nao embarca as
   // ferramentas, e no desenvolvimento os resources continuam valendo.
   toolsRoot?: string | null;
+  // Entradas do PATH usadas apenas pelo fallback de desenvolvimento. Fica no
+  // contexto para os testes nao precisarem mexer no ambiente do processo.
+  pathEntries?: string[] | null;
 };
 
 const expectedVersions: Record<RuntimeName, string> = {
@@ -55,6 +58,49 @@ function isExecutable(filePath: string): boolean {
   } catch {
     return process.platform === 'win32';
   }
+}
+
+function pathDirectories(context: RuntimeContext): string[] {
+  const entries =
+    context.pathEntries ??
+    (process.env.PATH ?? process.env.Path ?? '').split(path.delimiter);
+  return entries
+    .map((entry) => entry.trim().replace(/^"|"$/gu, ''))
+    .filter((entry) => entry.length > 0);
+}
+
+function findOnPath(fileName: string, context: RuntimeContext): string | null {
+  for (const directory of pathDirectories(context)) {
+    const candidate = path.join(directory, fileName);
+    if (existsSync(candidate)) return candidate;
+  }
+  return null;
+}
+
+// O Node 20.12+ (e o Node 22 embutido no Electron) recusa spawnar .cmd/.bat
+// sem shell por causa do CVE-2024-27980, entao "npm.cmd" daria sempre
+// spawn EINVAL. Resolvemos o npm do sistema no MESMO formato do npm
+// empacotado — node.exe mais npm-cli.js — que e um executavel de verdade e
+// dispensa shell (e as aspas do cmd.exe que viriam junto).
+function systemNpmResolution(context: RuntimeContext): RuntimeResolution | null {
+  const nodeExecutable = findOnPath('node.exe', context);
+  if (!nodeExecutable) return null;
+  const directories = [path.dirname(nodeExecutable)];
+  const npmShim = findOnPath('npm.cmd', context);
+  if (npmShim) directories.push(path.dirname(npmShim));
+  for (const directory of directories) {
+    const npmCli = path.join(directory, 'node_modules', 'npm', 'bin', 'npm-cli.js');
+    if (existsSync(npmCli)) {
+      return {
+        name: 'npm',
+        command: nodeExecutable,
+        argsPrefix: [npmCli],
+        expectedVersion: expectedVersions.npm,
+        source: 'system',
+      };
+    }
+  }
+  return null;
 }
 
 function candidateRoots(context: RuntimeContext): string[] {
@@ -215,10 +261,22 @@ export function resolveRuntime(
   // Production never silently depends on software installed by the user. The
   // PATH fallback exists only while developing the desktop shell.
   if (!context.isPackaged) {
-    const command = context.platform === 'win32' && name === 'npm' ? 'npm.cmd' : name;
+    if (context.platform === 'win32' && name === 'npm') {
+      // Sem node.exe e npm-cli.js no PATH nao ha como spawnar npm sem shell;
+      // 'missing' produz um erro por runtime em vez de um EINVAL opaco.
+      return (
+        systemNpmResolution(context) ?? {
+          name,
+          command: null,
+          argsPrefix: [],
+          expectedVersion: expectedVersions[name],
+          source: 'missing',
+        }
+      );
+    }
     return {
       name,
-      command,
+      command: name,
       argsPrefix: [],
       expectedVersion: expectedVersions[name],
       source: 'system',

@@ -140,14 +140,13 @@ baseline técnico:
 - variáveis de ambiente observadas já usam `CENA_RAIZ_*`;
 - a skill já usa `name: cena-raiz`, o projeto Python `cenaraiz`, o módulo
   `cenaraiz_install.py` e a CLI `cenaraiz-install`;
-- `tests/test_installer.py`, porém, importa `CENA_RAIZ_install`, que não
-  corresponde ao módulo existente;
-- README, `install.md` e o instalador apontam para `fillrochaa/cena-raiz` e para
-  variantes de arquivo que ainda não foram publicadas ou confirmadas;
-- `install.md` ainda usa o marcador histórico `<EDVID>`;
-- autenticação, assinatura e atualização ainda carregam referências reais à
-  Creator Factory;
-- o bundle ID atual é o híbrido `com.creatorfactory.cena-raiz`.
+- `tests/test_installer.py` já importa o módulo canônico e cobre o payload real;
+- README, `install.md` e o instalador usam o checkout privado autenticado; a
+  futura entrada independente ainda aguarda asset próprio verificável;
+- autenticação usa o Supabase próprio e storage protegido; assinatura e canal
+  de atualização próprios continuam pendentes;
+- o bundle ID foi migrado para `com.danielasocoloski.cena-raiz` antes da
+  primeira distribuição pública.
 
 O scan inicial encontrou pelo menos 127 ocorrências de formas sintaticamente
 inválidas no desktop. Um processo concorrente corrigiu as formas conhecidas em
@@ -308,7 +307,11 @@ Antes da remoção, decidir:
 
 ### Bundle ID
 
-`com.creatorfactory.cena-raiz` não deve ser alterado até existir uma decisão de distribuição e assinatura. Mudar bundle ID cria outro aplicativo para macOS e Windows e pode romper atualização automática.
+O bundle ID foi alterado, sob autorização, de `com.creatorfactory.cena-raiz` para
+`com.danielasocoloski.cena-raiz` antes de existir instalação distribuída que
+precisasse de migração. Não reintroduzir o identificador anterior. Mudanças
+futuras voltam a exigir plano de migração porque criarão outro aplicativo para o
+sistema operacional.
 
 ### Instalador e upstream
 
@@ -340,11 +343,12 @@ https://github.com/daniela-socoloski/raiz-engine
 git@github.com:daniela-socoloski/raiz-engine.git
 ```
 
-Na consulta de 2026-08-20, o repositório existe, é público e Daniela possui
-permissão administrativa, mas ainda tem tamanho zero: não há commit, branch
-materializada, workflow ou release. Consequentemente, nenhum instalador pode
-usar `raw.githubusercontent.com/daniela-socoloski/raiz-engine/main/...` como URL
-funcional até o baseline correspondente ser publicado.
+O repositório próprio já possui baseline e é privado. O checkout developer usa
+`gh` autenticado. Consequentemente, nenhum instalador deve usar
+`raw.githubusercontent.com/daniela-socoloski/raiz-engine/main/...` como URL
+anônima: o bootstrap atual instala a skill a partir do checkout local, e o canal
+independente só poderá apontar para um asset de release realmente publicado e
+verificado.
 
 Todo recurso **pertencente ao produto** que hoje depende de `fillrochaa`,
 Creator Factory, do bucket R2 anterior ou do antigo repositório
@@ -400,12 +404,13 @@ A implementação multiplataforma deve seguir uma única regra:
 5. testar empacotamento e extração em Windows 11 com caminho absoluto, espaços,
    acentos e unidade diferente.
 
-Os pontos ativos a corrigir incluem `src/main.ts`, `pack-runtimes.mjs`,
-`stage-node.mjs`, `stage-uv.mjs`, `stage-codex-app-server.mjs`,
-`stage-yt-dlp.mjs`, `fetch-ffmpeg-win.mjs`, `fetch-ffmpeg-source.mjs` e os dois
-`windows-smoke.yml`. A correção deve entrar por um helper canônico de
-archive/extraction quando a consolidação estrutural permitir, não por variações
-locais da mesma regra.
+Essa lista nasceu do snapshot anterior à consolidação. No estado atual,
+`fetch-ffmpeg-source.mjs` já usa nome relativo com `cwd` controlado, e os dois
+`windows-smoke.yml` internos deixaram de ser implementações ativas. Os demais
+adaptadores de arquivo devem ser testados à medida que forem executados; qualquer
+falha precisa ser registrada em `docs/provenance/COMPONENTES-HERDADOS.md`, e a
+correção deve entrar por um helper canônico de archive/extraction, não por
+variações locais da mesma regra.
 
 ### Licenças
 
@@ -435,7 +440,7 @@ PROVENANCE.md
 | `edvid-*` em temporários | `cena-raiz-*` | novo nome; não migrar temporários antigos |
 | `@cena-raiz/desktop` | manter | já está correto |
 | `productName: cena-raiz` | revisar só apresentação | ID técnico pode permanecer |
-| `com.creatorfactory.cena-raiz` | decisão aberta | não alterar ainda |
+| `com.creatorfactory.cena-raiz` | `com.danielasocoloski.cena-raiz` | corte limpo executado antes da distribuição |
 | `fillrochaa/*` em execução/instalação | `daniela-socoloski/raiz-engine` e releases próprias | mudar somente depois do artefato de destino existir |
 | `fillrochaa/*` em proveniência | manter como fonte comercial imediata | não usar como endpoint ativo |
 | bucket R2 anterior | release do Raiz Engine ou storage pertencente a Daniela | publicar, verificar checksum e só então trocar |
@@ -673,8 +678,8 @@ A identidade visível e a API interna já foram migradas por corte limpo. O pró
 marco é concluir o pacote instalável e a distribuição próprios sem reintroduzir
 infraestrutura do fornecedor anterior:
 
-1. validar a consolidação estrutural;
-2. concluir o perfil `developer` do bootstrap;
-3. gerar o primeiro instalador `creator` local;
+1. manter a consolidação estrutural validada;
+2. provar o bootstrap `developer` num Windows limpo;
+3. instalar e reparar o diretório `creator` autônomo numa VM limpa;
 4. substituir feed e runtimes herdados somente depois de o destino próprio estar
    publicado, assinado e testado.
