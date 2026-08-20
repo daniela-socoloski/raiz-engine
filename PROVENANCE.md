@@ -14,8 +14,8 @@ comercialização:
 
 | Upstream | Componente local | Papel |
 |---|---|---|
-| `fillrochaa/edvid` | `cena-raiz/cenaraiz/cena-raiz/` | skill audiovisual: método, helpers, templates, instalador |
-| `fillrochaa/edvid-desktop` | `cena-raiz/cenaraiz/cena-raiz-desktop/` | aplicativo Electron: interface, timeline, runtimes, render |
+| `fillrochaa/edvid` | `skills/cena-raiz/` | skill audiovisual: método, helpers, templates, instalador |
+| `fillrochaa/edvid-desktop` | `apps/cena-raiz-desktop/` | aplicativo Electron: interface, timeline, runtimes, render |
 
 Não são duplicatas nem projetos opcionais: são as duas metades do mesmo produto.
 
@@ -103,8 +103,9 @@ Seis fatos que definem esse commit:
 4. **A proveniência anterior depende de três fontes externas a este histórico:**
    os upstreams públicos, os backups datados fora do repositório e os inventários
    em `docs/provenance/`.
-5. **A Etapa 5 foi executada e aguarda aceitação após a reconciliação
-   documental.** O commit existe; a etapa não está formalmente aceita.
+5. **A Etapa 5 foi aceita para consolidação em 2026-08-20.** A autorização
+   explícita para recriar a arquitetura e mover os arquivos encerrou esse gate;
+   não autorizou commit, push ou release.
 6. **O primeiro push ocorreu somente depois das reescritas descritas acima.** O
    remoto privado contém `231e746` e trabalho posterior. O tip corrente deve ser
    consultado em `origin/main`, pois continua avançando; novo push exige
@@ -133,6 +134,22 @@ eles divergem da cópia local conforme a tabela acima.
 dele**, não a fotografia do que foi adquirido. Quem precisar do original deve ir
 aos upstreams; quem precisar do estado intermediário, aos backups externos
 datados.
+
+## Consolidação estrutural
+
+Em 2026-08-20, a proprietária autorizou a reorganização física do monorepositório.
+Os componentes foram movidos sem criar cópias ativas:
+
+| Caminho anterior | Caminho canônico |
+|---|---|
+| `cena-raiz/cenaraiz/cena-raiz/` | `skills/cena-raiz/` |
+| `cena-raiz/cenaraiz/cena-raiz-desktop/` | `apps/cena-raiz-desktop/` |
+| `SKILLS/ads-produto/` | `recipes/ads-produto/` |
+| `cena-raiz/cenaraiz/PLANO-EVOLUCAO-AUDIOVISUAL-CENA-RAIZ.md` | `docs/architecture/cena-raiz-audiovisual-evolution.md` |
+
+`cena-raiz-desktop-clone/` e a árvore intermediária vazia foram removidas depois
+da verificação. `cena-raiz/` permanece apenas como contêiner local ignorado dos
+clones externos de referência. As licenças MIT acompanharam os componentes.
 
 ## Git LFS — dependência obrigatória
 
