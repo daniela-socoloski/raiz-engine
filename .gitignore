@@ -1,0 +1,132 @@
+# Raiz Engine — repository ignore policy
+#
+# Scope: repository root. Component-specific rules may be added in nested
+# .gitignore files, but must not weaken the secret rules below.
+#
+# Rationale for the secret section: on 2026-08-20 a GitHub App private key was
+# found in the repository root while no ignore policy existed and the remote was
+# public. Secrets come first for that reason.
+
+# ---------------------------------------------------------------------------
+# Secrets and credentials — never commit
+# ---------------------------------------------------------------------------
+*.pem
+*.key
+*.p12
+*.pfx
+*.keystore
+*.jks
+.env
+.env.*
+signing.env
+credentials.json
+gha-creds-*.json
+*.credentials
+secrets/
+
+# Keep templates: they carry no values and document required configuration.
+!.env.example
+!.env.*.example
+!signing.env.example
+
+# ---------------------------------------------------------------------------
+# Dependencies
+# ---------------------------------------------------------------------------
+node_modules/
+.pnp/
+.pnp.js
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+.uv/
+pip-wheel-metadata/
+*.egg-info/
+
+# ---------------------------------------------------------------------------
+# Build output and bundler caches
+# ---------------------------------------------------------------------------
+dist/
+build/
+out/
+.vite/
+.turbo/
+.parcel-cache/
+*.tsbuildinfo
+
+# ---------------------------------------------------------------------------
+# Test and coverage
+# ---------------------------------------------------------------------------
+coverage/
+.nyc_output/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ---------------------------------------------------------------------------
+# Staged runtimes and model caches
+#
+# Node, uv, yt-dlp, FFmpeg, WhisperX and Codex are fetched by the desktop
+# `stage:*` scripts. The runtime manifest is versioned; the payloads are not.
+# ---------------------------------------------------------------------------
+resources/runtimes/
+**/resources/runtimes/
+**/python/whisperx/.venv/
+*.onnx
+*.pt
+*.bin
+*.safetensors
+.cache/
+.huggingface/
+.torch/
+whisper-models/
+
+# Exception: runtime manifests describe versions and checksums and belong in Git.
+!**/runtime-manifest.json
+
+# ---------------------------------------------------------------------------
+# Generated media and render output
+#
+# Approved source assets are versioned deliberately. Generated renders,
+# previews, proxies and exports are reproducible and are not.
+# ---------------------------------------------------------------------------
+renders/
+previews/
+proxies/
+exports/
+**/out/renders/
+*.tmp.mp4
+*.partial
+
+# ---------------------------------------------------------------------------
+# External references
+#
+# Third-party clones kept for consultation only. They are not product code and
+# must not enter the monorepository. See docs/provenance/COMPONENTES-HERDADOS.md
+# ---------------------------------------------------------------------------
+cena-raiz/gh repos clones/
+
+# ---------------------------------------------------------------------------
+# Editor, OS and local tooling
+# ---------------------------------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+*~
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.shared.json
+
+# ---------------------------------------------------------------------------
+# Logs and local scratch
+# ---------------------------------------------------------------------------
+*.log
+npm-debug.log*
+yarn-error.log*
+logs/
+.scratch/
+tmp/

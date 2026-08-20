@@ -1,0 +1,14 @@
+marca-raiz-prisma/projetos/**/*.pdf filter=lfs diff=lfs merge=lfs -text
+marca-raiz-prisma/projetos/**/*.jpg filter=lfs diff=lfs merge=lfs -text
+marca-raiz-prisma/projetos/**/*.jpeg filter=lfs diff=lfs merge=lfs -text
+marca-raiz-prisma/projetos/**/*.png filter=lfs diff=lfs merge=lfs -text
+marca-raiz-prisma/projetos/**/*.webp filter=lfs diff=lfs merge=lfs -text
+marca-raiz-prisma/projetos/**/*.mp4 filter=lfs diff=lfs merge=lfs -text
+marca-raiz-prisma/projetos/**/*.woff filter=lfs diff=lfs merge=lfs -text
+marca-raiz-prisma/projetos/**/*.woff2 filter=lfs diff=lfs merge=lfs -text
+marca-raiz-prisma/projetos/**/*.otf filter=lfs diff=lfs merge=lfs -text
+marca-raiz-prisma/projetos/**/*.ttf filter=lfs diff=lfs merge=lfs -text
+ASSETS/**/*.jpg filter=lfs diff=lfs merge=lfs -text
+ASSETS/**/*.jpeg filter=lfs diff=lfs merge=lfs -text
+ASSETS/**/*.png filter=lfs diff=lfs merge=lfs -text
+ASSETS/**/*.webp filter=lfs diff=lfs merge=lfs -text

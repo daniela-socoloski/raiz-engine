@@ -1,0 +1,13 @@
+{
+  "profile": "pleasing",
+  "source_url": "https://www.instagram.com/pleasing/",
+  "status": "bloqueado",
+  "requested_limit": 50,
+  "collected_count": 0,
+  "reason": "400 Bad Request - \"fail\" status, message \"Asset asset://laser.provider/ig_business_category_subvertical has been deleted. You cannot use this schema\" when accessing https://www.instagram.com/api/v1/users/web_profile_info/?username=pleasing",
+  "next_steps": [
+    "rodar novamente com --login USUARIO_INSTAGRAM",
+    "usar Chrome/browser logado para capturar o grid e posts abertos",
+    "pedir prints do grid com 50 posts, 10 captions, 5 highlights e 3 Reels"
+  ]
+}

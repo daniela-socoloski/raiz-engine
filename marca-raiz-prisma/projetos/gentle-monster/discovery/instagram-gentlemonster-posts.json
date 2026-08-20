@@ -1,0 +1,13 @@
+{
+  "profile": "gentlemonster",
+  "source_url": "https://www.instagram.com/gentlemonster/",
+  "status": "bloqueado",
+  "requested_limit": 50,
+  "collected_count": 0,
+  "reason": "JSON Query to api/v1/users/web_profile_info/: 401 Unauthorized - \"fail\" status, message \"Please wait a few minutes before you try again.\" when accessing https://www.instagram.com/api/v1/users/web_profile_info/?username=gentlemonster",
+  "next_steps": [
+    "rodar novamente com --login USUARIO_INSTAGRAM",
+    "usar Chrome/browser logado para capturar o grid e posts abertos",
+    "pedir prints do grid com 50 posts, 10 captions, 5 highlights e 3 Reels"
+  ]
+}
