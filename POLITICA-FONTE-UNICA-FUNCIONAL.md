@@ -60,13 +60,7 @@ Nenhum arquivo pode permanecer como `UNKNOWN` ao final de uma fase que alterou s
 
 ## 4. Regra para o Cena Raiz Desktop
 
-O caminho atual é:
-
-```text
-cena-raiz/cenaraiz/cena-raiz-desktop
-```
-
-Depois da consolidação, seu caminho canônico será:
+O caminho canônico atual, depois da consolidação, é:
 
 ```text
 apps/cena-raiz-desktop

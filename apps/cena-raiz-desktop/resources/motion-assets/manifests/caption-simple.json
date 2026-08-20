@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "1.0",
+  "assetId": "caption-simple",
+  "version": "1.0.0",
+  "name": "Legenda simples",
+  "engine": "remotion",
+  "source": {
+    "project": "remotion-template",
+    "component": "src/SimpleCaptions.tsx"
+  },
+  "capabilities": [
+    "caption"
+  ],
+  "brandTags": [],
+  "aspectRatios": [
+    "9:16",
+    "16:9",
+    "1:1"
+  ],
+  "duration": {
+    "mode": "stretchable",
+    "defaultFrames": 90,
+    "minFrames": 15,
+    "maxFrames": 900
+  },
+  "parameters": {
+    "text": {
+      "type": "string",
+      "required": true,
+      "maxLength": 280
+    },
+    "accent": {
+      "type": "color",
+      "required": false
+    }
+  },
+  "preview": {
+    "thumbnail": "motion-assets/previews/caption-simple.png"
+  },
+  "compatibility": {
+    "requiredFonts": [
+      "Poppins"
+    ]
+  },
+  "fingerprint": "sha256:d80b4db2fb00a17d",
+  "notes": "linha unica, leitura direta, sem ornamento"
+}

@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "1.0",
+  "assetId": "graphics-custom",
+  "version": "1.0.0",
+  "name": "Graficos customizados",
+  "engine": "remotion",
+  "source": {
+    "project": "remotion-template",
+    "component": "src/CustomGraphics.tsx"
+  },
+  "capabilities": [
+    "graphic",
+    "clarify",
+    "compare"
+  ],
+  "brandTags": [],
+  "aspectRatios": [
+    "9:16",
+    "16:9",
+    "1:1"
+  ],
+  "duration": {
+    "mode": "stretchable",
+    "defaultFrames": 120,
+    "minFrames": 30,
+    "maxFrames": 600
+  },
+  "parameters": {
+    "title": {
+      "type": "string",
+      "required": true,
+      "maxLength": 80
+    },
+    "style": {
+      "type": "enum",
+      "required": false,
+      "values": [
+        "card",
+        "window",
+        "plain"
+      ]
+    },
+    "accent": {
+      "type": "color",
+      "required": false
+    }
+  },
+  "preview": {
+    "thumbnail": "motion-assets/previews/graphics-custom.png"
+  },
+  "compatibility": {
+    "requiredFonts": [
+      "Poppins"
+    ]
+  },
+  "fingerprint": "sha256:da30a5eccb79c5c4",
+  "notes": "blocos graficos para explicar ou comparar"
+}

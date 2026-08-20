@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "1.0",
+  "assetId": "sfx-whoosh",
+  "version": "1.0.0",
+  "name": "Whoosh",
+  "engine": "media",
+  "source": {
+    "project": "remotion-template",
+    "file": "public/sfx/whoosh.mp3"
+  },
+  "capabilities": [
+    "transition"
+  ],
+  "brandTags": [],
+  "aspectRatios": [
+    "9:16",
+    "16:9",
+    "1:1"
+  ],
+  "duration": {
+    "mode": "fixed",
+    "defaultFrames": 12
+  },
+  "parameters": {
+    "gain": {
+      "type": "number",
+      "required": false,
+      "min": 0,
+      "max": 2
+    }
+  },
+  "preview": {
+    "thumbnail": "motion-assets/previews/sfx-whoosh.png"
+  },
+  "compatibility": {},
+  "fingerprint": "sha256:d675c002878b904b",
+  "notes": "elemento de sound design ja presente no template"
+}

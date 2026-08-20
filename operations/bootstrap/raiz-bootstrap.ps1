@@ -18,15 +18,15 @@
 .PARAMETER Path
   Onde clonar o repositorio. Padrao: a pasta atual.
 
+.PARAMETER GitProtocol
+  Protocolo configurado pelo fluxo oficial do gh. Padrao: ssh.
+
 .PARAMETER SkipCorpus
   Nao baixa os objetos Git LFS (cerca de 398 MB de casos de marca).
   Util para quem so vai compilar o aplicativo.
 
 .PARAMETER DryRun
   Mostra o que faria, sem instalar nem clonar nada.
-
-.EXAMPLE
-  irm https://raw.githubusercontent.com/daniela-socoloski/raiz-engine/main/operations/bootstrap/raiz-bootstrap.ps1 | iex
 
 .EXAMPLE
   pwsh -File operations/bootstrap/raiz-bootstrap.ps1 -SkipCorpus
@@ -36,14 +36,14 @@
 param(
   [ValidateSet('developer', 'creator')]
   [string]$Profile = 'developer',
+  [ValidateSet('ssh', 'https')]
+  [string]$GitProtocol = 'ssh',
   [string]$Path = (Get-Location).Path,
   [switch]$SkipCorpus,
   [switch]$DryRun
 )
 
 $ErrorActionPreference = 'Stop'
-$SLUG = 'daniela-socoloski/raiz-engine'
-$REPO_DIR = Join-Path $Path 'raiz-engine'
 
 function Say  { param($t, $c = 'Gray')  Write-Host $t -ForegroundColor $c }
 function Head { param($t) Say ""; Say "── $t" 'Cyan' }
@@ -51,6 +51,24 @@ function Ok   { param($t) Say "   OK       $t" 'Green' }
 function Do_  { param($t) Say "   ->       $t" 'White' }
 function Warn { param($t) Say "   AVISO    $t" 'Yellow' }
 function Die  { param($t) Say "   ERRO     $t" 'Red'; exit 1 }
+
+$manifestPath = Join-Path $PSScriptRoot 'toolchain.json'
+if (-not (Test-Path $manifestPath)) {
+  Die "manifesto canonico nao encontrado ao lado do bootstrap: $manifestPath"
+}
+$m = Get-Content $manifestPath -Raw | ConvertFrom-Json
+$SLUG = $m.repository.slug
+
+# Executado de dentro de um checkout, o bootstrap prepara esse checkout. O
+# parametro -Path e usado somente quando a pessoa pede explicitamente outro
+# diretorio de clone. Isso impede raiz-engine/raiz-engine por acidente.
+$scriptRepoRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
+$insideCheckout = (Test-Path (Join-Path $scriptRepoRoot '.git'))
+if (-not $PSBoundParameters.ContainsKey('Path') -and $insideCheckout) {
+  $REPO_DIR = $scriptRepoRoot
+} else {
+  $REPO_DIR = Join-Path $Path 'raiz-engine'
+}
 
 Say ""
 Say "  Raiz Engine — bootstrap" 'White'
@@ -75,30 +93,56 @@ if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
   Die "winget nao encontrado. Instale o App Installer pela Microsoft Store e rode de novo."
 }
 
-# id winget, comando de verificacao, se e obrigatoria
-$TOOLS = @(
-  @{ nome = 'Git';         id = 'Git.Git';            cmd = 'git';     req = $true },
-  @{ nome = 'Git LFS';     id = 'GitHub.GitLFS';      cmd = 'git-lfs'; req = $true
-     porque = 'O corpus de marcas e versionado por LFS. Sem ele o clone traz ponteiros, nao os assets.' },
-  @{ nome = 'GitHub CLI';  id = 'GitHub.cli';         cmd = 'gh';      req = $true },
-  @{ nome = 'Node LTS';    id = 'OpenJS.NodeJS.LTS';  cmd = 'node';    req = $true },
-  @{ nome = 'uv';          id = 'astral-sh.uv';       cmd = 'uv';      req = $true },
-  @{ nome = 'Python 3.12'; id = 'Python.Python.3.12'; cmd = 'python';  req = $true
-     porque = 'A skill exige >=3.10 e <3.14. Python 3.14 ou mais novo nao serve.' },
-  @{ nome = 'FFmpeg';      id = 'Gyan.FFmpeg';        cmd = 'ffmpeg';  req = $false }
-)
+function Get-ToolVersion {
+  param($tool)
+
+  $check = @($tool.check)
+  $exe = [string]$check[0]
+  [string[]]$toolArgs = @()
+  if ($check.Count -gt 1) {
+    $toolArgs = @($check[1..($check.Count - 1)] | ForEach-Object { [string]$_ })
+  }
+  $found = Get-Command $exe -ErrorAction SilentlyContinue
+  if (-not $found) { return $null }
+  if ($found.Source -and $found.Source -like '*\WindowsApps\*' -and
+      -not (Test-Path $found.Source -PathType Leaf)) { return $null }
+
+  $out = (& $exe @toolArgs 2>&1 | Out-String)
+  if ($LASTEXITCODE -ne 0) { return $null }
+  if ($tool.parse -and $out -match $tool.parse) { return $Matches[1] }
+  if ($out -match '(\d+\.\d+(?:\.\d+)?)') { return $Matches[1] }
+  return 'desconhecida'
+}
+
+$requiredTools = @($m.profiles.$Profile.requires)
+$optionalTools = @($m.profiles.$Profile.optional)
+$selectedTools = @($requiredTools + $optionalTools | Select-Object -Unique)
 
 $instalou = $false
-foreach ($t in $TOOLS) {
-  $tem = Get-Command $t.cmd -ErrorAction SilentlyContinue
-  if ($tem) { Ok "$($t.nome) ja instalado"; continue }
-  if (-not $t.req) { Say "   ausente  $($t.nome) — opcional, pulando" 'DarkGray'; continue }
+foreach ($nome in $selectedTools) {
+  $t = $m.tools.$nome
+  $required = $requiredTools -contains $nome
+  $version = Get-ToolVersion $t
+  $outsideRange = $false
+  if ($version -and $version -ne 'desconhecida') {
+    try {
+      if ($t.min -and ([version]$version -lt [version]$t.min)) { $outsideRange = $true }
+      if ($t.max -and ([version]$version -gt [version]$t.max)) { $outsideRange = $true }
+    } catch { $outsideRange = $false }
+  }
 
-  Do_ "instalar $($t.nome)  (winget install $($t.id))"
-  if ($t.porque) { Say "            $($t.porque)" 'DarkGray' }
+  if ($version -and -not $outsideRange) { Ok "$nome $version ja instalado"; continue }
+  if (-not $required -and -not $version) {
+    Say "   ausente  $nome — opcional, pulando" 'DarkGray'
+    continue
+  }
+
+  $acao = if ($version) { "corrigir versao de $nome ($version)" } else { "instalar $nome" }
+  Do_ "$acao  (winget install $($t.winget))"
+  if ($t.why) { Say "            $($t.why)" 'DarkGray' }
   if ($DryRun) { continue }
 
-  winget install --id $t.id --exact --silent --accept-source-agreements --accept-package-agreements | Out-Null
+  winget install --id $t.winget --exact --silent --accept-source-agreements --accept-package-agreements | Out-Null
   $instalou = $true
 }
 
@@ -125,14 +169,14 @@ if (-not $DryRun -and (Get-Command python -ErrorAction SilentlyContinue)) {
 # 2. Autenticacao
 # ---------------------------------------------------------------------------
 Head "Autenticacao"
-$auth = if ($DryRun) { '' } else { (gh auth status 2>&1 | Out-String) }
+$auth = (gh auth status 2>&1 | Out-String)
 if ($auth -match 'Logged in to') {
   Ok "gh autenticado"
 } else {
   Do_ "autenticar no GitHub  (gh auth login)"
   Say "            O repositorio e privado: sem autenticacao o clone falha." 'DarkGray'
   if (-not $DryRun) {
-    gh auth login --hostname github.com --git-protocol https --web
+    gh auth login --hostname github.com --git-protocol $GitProtocol --web
     if ($LASTEXITCODE -ne 0) { Die "autenticacao nao concluida" }
   }
 }
@@ -179,7 +223,7 @@ if ($SkipCorpus) {
 # 5. Dependencias
 # ---------------------------------------------------------------------------
 Head "Dependencias"
-# Procura o manifesto no clone; em simulacao, cai para o proprio diretorio do script.
+# Procura o manifesto no checkout; em simulacao, cai para o proprio diretorio do script.
 $manifest = Join-Path $REPO_DIR 'operations/bootstrap/toolchain.json'
 if (-not (Test-Path $manifest)) { $manifest = Join-Path $PSScriptRoot 'toolchain.json' }
 $comp = if (Test-Path $manifest) { (Get-Content $manifest -Raw | ConvertFrom-Json).components } else { $null }

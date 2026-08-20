@@ -7,7 +7,7 @@
 // Sem ele, a regra "reutilizar antes de gerar" nao tem como ser cumprida: o
 // sistema nao sabe o que ja tem.
 //
-// Fonte: PLANO-EVOLUCAO-AUDIOVISUAL-CENA-RAIZ.md secao 6.4.
+// Source: docs/architecture/cena-raiz-audiovisual-evolution.md section 6.4.
 
 export type MotionEngine = 'remotion' | 'after-effects' | 'mogrt' | 'lottie' | 'media';
 

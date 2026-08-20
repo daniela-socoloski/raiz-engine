@@ -1,0 +1,48 @@
+{
+  "schemaVersion": "1.0",
+  "assetId": "caption-scatter",
+  "version": "1.0.0",
+  "name": "Legenda espalhada",
+  "engine": "remotion",
+  "source": {
+    "project": "remotion-template",
+    "component": "src/ScatterCaptions.tsx"
+  },
+  "capabilities": [
+    "caption",
+    "energy"
+  ],
+  "brandTags": [],
+  "aspectRatios": [
+    "9:16",
+    "16:9",
+    "1:1"
+  ],
+  "duration": {
+    "mode": "stretchable",
+    "defaultFrames": 90,
+    "minFrames": 15,
+    "maxFrames": 900
+  },
+  "parameters": {
+    "text": {
+      "type": "string",
+      "required": true,
+      "maxLength": 280
+    },
+    "accent": {
+      "type": "color",
+      "required": false
+    }
+  },
+  "preview": {
+    "thumbnail": "motion-assets/previews/caption-scatter.png"
+  },
+  "compatibility": {
+    "requiredFonts": [
+      "Poppins"
+    ]
+  },
+  "fingerprint": "sha256:3f6bc6fcaf30c131",
+  "notes": "palavras distribuidas na tela, ritmo alto"
+}

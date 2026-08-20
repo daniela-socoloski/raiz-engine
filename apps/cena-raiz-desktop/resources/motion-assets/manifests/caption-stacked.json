@@ -1,0 +1,48 @@
+{
+  "schemaVersion": "1.0",
+  "assetId": "caption-stacked",
+  "version": "1.0.0",
+  "name": "Legenda empilhada",
+  "engine": "remotion",
+  "source": {
+    "project": "remotion-template",
+    "component": "src/StackedCaptions.tsx"
+  },
+  "capabilities": [
+    "caption",
+    "emphasis"
+  ],
+  "brandTags": [],
+  "aspectRatios": [
+    "9:16",
+    "16:9",
+    "1:1"
+  ],
+  "duration": {
+    "mode": "stretchable",
+    "defaultFrames": 90,
+    "minFrames": 15,
+    "maxFrames": 900
+  },
+  "parameters": {
+    "text": {
+      "type": "string",
+      "required": true,
+      "maxLength": 280
+    },
+    "accent": {
+      "type": "color",
+      "required": false
+    }
+  },
+  "preview": {
+    "thumbnail": "motion-assets/previews/caption-stacked.png"
+  },
+  "compatibility": {
+    "requiredFonts": [
+      "Poppins"
+    ]
+  },
+  "fingerprint": "sha256:d39ec3f396b82c70",
+  "notes": "palavras-chave em destaque, uma linha por vez"
+}

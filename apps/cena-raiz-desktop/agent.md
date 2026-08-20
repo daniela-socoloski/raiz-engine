@@ -21,7 +21,7 @@ Existem três contextos diferentes que não devem ser misturados:
  
 
 2. **Skill cena-raiz**
-   - Clone de desenvolvimento: `\Users\RAIZ\root\sistema-marca-raiz\cena-raiz\cenaraiz\cena-raiz-desktop-clone`
+   - Componente canônico no monorepositório: `apps/cena-raiz-desktop/`
    - Contém o método de edição, helpers de vídeo e templates compartilhados.
    - Não colocar código do Desktop neste repositório. Essa separação já foi um
      problema anteriormente e foi corrigida.

@@ -45,14 +45,15 @@ Na origem, o produto era dividido em dois repositórios. As duas linhas abaixo
 são as partes complementares da base adquirida, não duas
 implementações duplicadas nem referências opcionais:
 
-| Origem da base adquirida | Cópia local atual | Responsabilidade |
+| Origem da base adquirida | Componente canônico atual | Responsabilidade |
 |---|---|---|
-| [`fillrochaa/edvid`](https://github.com/fillrochaa/edvid) | `cena-raiz/cenaraiz/cena-raiz/` | skill, workflows, helpers Python e instalador para agentes |
-| [`fillrochaa/edvid-desktop`](https://github.com/fillrochaa/edvid-desktop) | `cena-raiz/cenaraiz/cena-raiz-desktop/` | aplicativo Electron, chat, timeline, preview, runtimes e render |
+| [`fillrochaa/edvid`](https://github.com/fillrochaa/edvid) | `skills/cena-raiz/` | skill, workflows, helpers Python e instalador para agentes |
+| [`fillrochaa/edvid-desktop`](https://github.com/fillrochaa/edvid-desktop) | `apps/cena-raiz-desktop/` | aplicativo Electron, chat, timeline, preview, runtimes e render |
 
 Os READMEs originais declaram que a skill e o aplicativo eram desenvolvidos separadamente. As cópias locais, porém, não conservam os diretórios `.git` nem os históricos desses dois repositórios.
 
-O estado local verificado é:
+O estado abaixo era o snapshot anterior à consolidação e permanece apenas como
+registro histórico:
 
 ```text
 raiz-engine/
@@ -72,15 +73,29 @@ raiz-engine/
 └── ASSETS/
 ```
 
-Conclusões:
+Depois da consolidação de 2026-08-20, o estado funcional é:
 
-- existiam dois repositórios de origem, mas hoje existem duas cópias de código dentro de um repositório intermediário vazio;
+```text
+raiz-engine/
+├── apps/cena-raiz-desktop/
+├── skills/cena-raiz/
+├── recipes/ads-produto/
+├── docs/architecture/cena-raiz-audiovisual-evolution.md
+└── cena-raiz/gh repos clones/    # referências externas ignoradas
+```
+
+Conclusões reconciliadas:
+
+- existiam dois repositórios de origem, agora consolidados em fronteiras
+  complementares do monorepositório;
 - a raiz local já foi renomeada para `raiz-engine/` sem manter uma segunda cópia ativa;
 - o `.git` válido para o produto é o da raiz `raiz-engine/`;
 - `cena-raiz/.git` não contém commits nem remoto, mas deve ser preservado fora do projeto antes de ser retirado;
 - `gh repos clones/` contém referências externas e não faz parte automaticamente do produto;
-- `cena-raiz-desktop-clone/` está vazia e não é uma terceira implementação;
-- o `Raiz Engine` ainda não existe como módulo independente.
+- `cena-raiz-desktop-clone/` estava vazia e foi removida na consolidação;
+- `cena-raiz/` contém somente referências externas ignoradas, não código ativo;
+- o `Raiz Engine` é o monorepositório; o núcleo compartilhado evolui dentro de
+  `packages/` quando existir um primeiro consumidor validado.
 
 ## 3. Responsabilidade de cada componente
 
@@ -205,13 +220,13 @@ está, sem reordenar nem promover etapas.
 | 2 — Recuperação fora do repositório | **concluída e verificada**: backup completo relido (2.366 entradas) e backup separado do Git intermediário (525 objetos) |
 | 3 — Fronteira Git única | **concluída** com aprovação humana explícita |
 | 4 — Política de versionamento | **concluída** — `.gitignore` revisado item a item; varredura de credenciais sem ocorrências |
-| 5 — Baseline | **executada, aguardando aceitação após reconciliação documental.** Commit `231e746`, designação canônica `reconciled Raiz Engine baseline`. O remoto privado já contém o baseline; novos pushes exigem autorização separada |
-| 6 — Reorganização estrutural | pendente |
-| 7 — Validar a consolidação | pendente |
+| 5 — Baseline | **concluída e aceita para consolidação.** Commit `231e746`, designação canônica `reconciled Raiz Engine baseline`. O remoto privado já contém o baseline; novos pushes exigem autorização separada |
+| 6 — Reorganização estrutural | **executada no worktree em 2026-08-20**; caminhos ativos antigos removidos |
+| 7 — Validar a consolidação | **em execução**; contagens preservadas, manifests, links, typecheck e testes em validação |
 | 8 — Recuperar o baseline técnico | **executada antecipadamente** sob autorização: typecheck limpo, oito suítes executáveis |
 | 9 — Migrar identidade | **executada antecipadamente** como `CLEAN CUT — ACCEPTED` |
-| 10 — Bootstrap reproduzível | pendente; requisito central |
-| 11 — Começar o Raiz Engine | pendente |
+| 10 — Bootstrap reproduzível | **em construção antecipadamente sob autorização**: launcher Windows, bootstrap `developer`, `doctor` e manifest iniciais; perfil `creator` e prova em VM pendentes |
+| 11 — Começar o Raiz Engine | **iniciada antecipadamente de forma parcial** no desktop com contratos de direção; o começo canônico pela compilação de Brand Intelligence permanece pendente |
 
 ## 5. Ordem segura de execução
 
@@ -322,7 +337,7 @@ Exceções precisam ser deliberadas; por exemplo, `.env.example`, manifests de r
 
 ### Etapa 5 — Baseline
 
-> **Executada localmente em 2026-08-20. Aguarda aceitação humana.**
+> **Executada e aceita para consolidação em 2026-08-20.**
 >
 > Commit `231e746`, designação canônica **`reconciled Raiz Engine baseline`**. 854 arquivos.
 >
@@ -338,8 +353,9 @@ Exceções precisam ser deliberadas; por exemplo, `.env.example`, manifests de r
 > O commit foi reescrito duas vezes antes de qualquer push — por amend, para
 > corrigir o assunto, e pela migração para Git LFS. As duas reescritas ocorreram com
 > o remoto vazio, sem afetar clone ou fork. **Não reescrever de novo sem autorização.**
-> O primeiro push ocorreu depois dessas reescritas. `origin/main` alcança
-> `5fcccf3`, incluindo o baseline; qualquer novo push exige autorização separada.
+> O primeiro push ocorreu depois dessas reescritas. O remoto privado contém o
+> baseline e trabalho posterior; consultar `origin/main` para o tip atual. Qualquer
+> novo push exige autorização separada.
 
 O texto abaixo é a prescrição original da etapa, mantida como registro.
 
@@ -361,16 +377,21 @@ Esse commit não afirma autoria sobre o código herdado. Ele cria o ponto de com
 
 ### Etapa 6 — Reorganizar em um commit separado
 
-Somente depois do baseline, mover:
+> **Executada no worktree em 2026-08-20 sob autorização explícita da proprietária.**
 
-| Origem atual | Destino |
+Movimentos realizados:
+
+| Origem anterior | Destino canônico |
 |---|---|
 | `cena-raiz/cenaraiz/cena-raiz/` | `skills/cena-raiz/` |
 | `cena-raiz/cenaraiz/cena-raiz-desktop/` | `apps/cena-raiz-desktop/` |
 | `cena-raiz/cenaraiz/PLANO-EVOLUCAO-AUDIOVISUAL-CENA-RAIZ.md` | `docs/architecture/cena-raiz-audiovisual-evolution.md` |
 | `SKILLS/ads-produto/` | `recipes/ads-produto/` |
 
-No Windows, `SKILLS/` e `skills/` representam o mesmo nome para o sistema de arquivos. Portanto, mover primeiro `SKILLS/ads-produto/` para `recipes/ads-produto/`, confirmar que a pasta antiga ficou vazia e somente depois criar `skills/cena-raiz/`.
+No Windows, `SKILLS/` e `skills/` representam o mesmo nome para o sistema de
+arquivos. A recipe foi movida primeiro para `recipes/ads-produto/`; a pasta
+restante passou por um nome intermediário e terminou como `skills/`, sem manter
+uma segunda árvore.
 
 Regras:
 
@@ -381,7 +402,9 @@ Regras:
 - manter `cena-raiz-desktop-clone/` fora do destino e removê-la somente depois de confirmar que está vazia e dispensável;
 - atualizar apenas caminhos quebrados pela movimentação.
 
-Depois de validada a movimentação, não manter as pastas antigas como cópias. O commit anterior e a proveniência serão os meios de recuperação e consulta.
+As pastas ativas antigas não foram mantidas como cópias. O commit anterior e a
+proveniência são os meios de recuperação e consulta. `cena-raiz/` permanece
+somente porque contém clones externos ignorados.
 
 Mensagem sugerida:
 
@@ -437,6 +460,12 @@ Depois do baseline técnico:
 Antes de o motor ganhar novas dependências, transformar instalação em capacidade
 versionada do produto:
 
+> **Estado atual:** iniciada antecipadamente sob autorização. A implementação em
+> `operations/bootstrap/` possui `install.ps1`, `raiz-bootstrap.ps1`,
+> `raiz-doctor.ps1` e `toolchain.json`. Isso ainda não conclui a etapa: faltam o
+> perfil `creator`, instalação das skills nos agentes, runtimes empacotados,
+> reparo completo, canal oficial do launcher e validação em VM limpa.
+
 1. inventariar o que `cenaraiz_install.py` realmente instala, preserva e valida;
 2. definir Windows 11 x64 como primeira plataforma comprovada;
 3. criar um único manifest para ferramentas, versões, checksums e perfis;
@@ -459,6 +488,11 @@ instalador com regras e versões próprias.
 Depois de a Fase 0 ser comprovada, o primeiro núcleo próprio deve começar pela
 Fase 1 do produto: compilar a inteligência existente para um contrato de runtime
 que todos os consumidores consigam usar.
+
+> **Estado atual:** um esqueleto de contratos de direção foi iniciado
+> antecipadamente dentro do Cena Raiz Desktop. Ele deve ser preservado e depois
+> extraído ou integrado; não substitui o compilador da Fase 1 e não autoriza uma
+> segunda implementação paralela.
 
 O primeiro código consolidado do motor deve ser pequeno:
 
@@ -525,28 +559,11 @@ Testes obrigatórios:
 Condição de parada:
 ```
 
-## 7. Primeiro pedido para executar agora
+## 7. Pedido inicial — concluído
 
-O primeiro pedido deve produzir inventário, não movimentação:
-
-```text
-Leia GUIA-ORGANIZACAO-REPOSITORIO.md,
-POLITICA-FONTE-UNICA-FUNCIONAL.md,
-ARQUITETURA-MOTOR-CRIATIVO-RAIZ.md e
-PLANO-MIGRACAO-IDENTIDADE.md.
-
-Execute somente a Etapa 1 do guia de organização.
-
-Faça um inventário de leitura do repositório raiz-engine: fronteiras Git,
-remotos, manifests, locks, licenças, arquivos grandes, outputs, caches, possíveis
-segredos, referências externas e duplicações entre a skill Cena Raiz e o Cena
-Raiz Desktop.
-
-Crie docs/provenance/INVENTARIO-REPOSITORIO.md e
-docs/provenance/COMPONENTES-HERDADOS.md. Não mova, renomeie, exclua, instale,
-publique ou execute atualizadores. Entregue também um plano exato de movimentação
-e pare para aprovação.
-```
+O pedido inicial de inventário somente de leitura foi concluído e seus resultados
+estão em `docs/provenance/`. Ele não deve ser reutilizado como instrução atual por
+agentes futuros. O gate operacional vigente está na seção 4.1 deste guia.
 
 ## 8. Definição de pronto da organização
 

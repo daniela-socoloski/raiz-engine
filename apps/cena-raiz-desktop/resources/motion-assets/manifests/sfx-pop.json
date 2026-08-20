@@ -1,0 +1,39 @@
+{
+  "schemaVersion": "1.0",
+  "assetId": "sfx-pop",
+  "version": "1.0.0",
+  "name": "Pop",
+  "engine": "media",
+  "source": {
+    "project": "remotion-template",
+    "file": "public/sfx/pop.mp3"
+  },
+  "capabilities": [
+    "emphasis",
+    "accent"
+  ],
+  "brandTags": [],
+  "aspectRatios": [
+    "9:16",
+    "16:9",
+    "1:1"
+  ],
+  "duration": {
+    "mode": "fixed",
+    "defaultFrames": 6
+  },
+  "parameters": {
+    "gain": {
+      "type": "number",
+      "required": false,
+      "min": 0,
+      "max": 2
+    }
+  },
+  "preview": {
+    "thumbnail": "motion-assets/previews/sfx-pop.png"
+  },
+  "compatibility": {},
+  "fingerprint": "sha256:f2d7084228a5fd5c",
+  "notes": "elemento de sound design ja presente no template"
+}

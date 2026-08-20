@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "1.0",
+  "assetId": "headline-pencil-outline",
+  "version": "1.0.0",
+  "name": "Headline contorno a lapis",
+  "engine": "remotion",
+  "source": {
+    "project": "remotion-template",
+    "component": "src/PencilOutline.tsx"
+  },
+  "capabilities": [
+    "headline",
+    "emphasis"
+  ],
+  "brandTags": [],
+  "aspectRatios": [
+    "9:16",
+    "1:1"
+  ],
+  "duration": {
+    "mode": "stretchable",
+    "defaultFrames": 60,
+    "minFrames": 20,
+    "maxFrames": 300
+  },
+  "parameters": {
+    "text": {
+      "type": "string",
+      "required": true,
+      "maxLength": 120
+    },
+    "accent": {
+      "type": "color",
+      "required": false
+    }
+  },
+  "preview": {
+    "thumbnail": "motion-assets/previews/headline-pencil-outline.png"
+  },
+  "compatibility": {
+    "requiredFonts": [
+      "Poppins"
+    ]
+  },
+  "fingerprint": "sha256:ab03e07262a1a8f8",
+  "notes": "contorno desenhado ao redor da palavra-chave"
+}

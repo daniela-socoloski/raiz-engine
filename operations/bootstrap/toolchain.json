@@ -19,7 +19,7 @@
   "profiles": {
     "developer": {
       "description": "Maquina que constroi e evolui o Raiz Engine com VS Code, Codex e Claude Code.",
-      "requires": ["git", "git-lfs", "gh", "node", "uv", "python"],
+      "requires": ["git", "git-lfs", "gh", "powershell", "node", "uv", "python"],
       "optional": ["ffmpeg"],
       "clonesCorpus": true,
       "note": "clonesCorpus=true baixa os objetos LFS, cerca de 398 MB de casos de marca."
@@ -53,6 +53,13 @@
       "parse": "gh version (\\d+\\.\\d+\\.\\d+)",
       "winget": "GitHub.cli",
       "why": "Autenticacao oficial e acesso ao repositorio privado."
+    },
+    "powershell": {
+      "min": "7.4.0",
+      "check": ["pwsh", "--version"],
+      "parse": "PowerShell (\\d+\\.\\d+\\.\\d+)",
+      "winget": "Microsoft.PowerShell",
+      "why": "Runtime do bootstrap canonico depois que o launcher minimo parte do Windows PowerShell 5.1."
     },
     "node": {
       "min": "20.0.0",
@@ -88,17 +95,17 @@
 
   "components": {
     "desktop": {
-      "path": "cena-raiz/cenaraiz/cena-raiz-desktop",
+      "path": "apps/cena-raiz-desktop",
       "install": ["npm", "install"],
       "verify": ["npm", "run", "typecheck"],
       "tests": ["test:timeline", "test:media", "test:helpers", "test:jcut"],
-      "note": "Caminho muda para apps/cena-raiz-desktop na Etapa 6."
+      "note": "Aplicativo desktop canonico apos a consolidacao estrutural."
     },
     "skill": {
-      "path": "cena-raiz/cenaraiz/cena-raiz",
+      "path": "skills/cena-raiz",
       "install": ["uv", "sync"],
       "verify": ["python", "-m", "unittest", "discover", "-s", "tests"],
-      "note": "Caminho muda para skills/cena-raiz na Etapa 6."
+      "note": "Skill audiovisual canonica apos a consolidacao estrutural."
     }
   },
 

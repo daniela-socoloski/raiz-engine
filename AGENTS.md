@@ -71,22 +71,22 @@ inspection of the repository.
 
 Component documents are scoped evidence, not repository-wide authority:
 
-- `cena-raiz/cenaraiz/cena-raiz-desktop/agent.md` governs inherited Cena Raiz
+- `apps/cena-raiz-desktop/agent.md` governs inherited Cena Raiz
   Desktop behavior only. It contains historical context and may contain stale
   repository assumptions; verify it against code and the documents above.
-- `cena-raiz/cenaraiz/PLANO-EVOLUCAO-AUDIOVISUAL-CENA-RAIZ.md` is the active Cena Raiz
+- `docs/architecture/cena-raiz-audiovisual-evolution.md` is the active Cena Raiz
   audiovisual evolution blueprint. Read it for Cena Raiz contracts, canonical
   state, asset reuse, execution routing, readback, safety, bootstrap capability
   detection, and Adobe boundaries. Actual Adobe mutations and synchronization
   remain deferred to the controlled Adobe phase.
-- `cena-raiz/cenaraiz/cena-raiz/SKILL.md`, its `install.md`, manifests, locks,
+- `skills/cena-raiz/SKILL.md`, its `install.md`, manifests, locks,
   helpers, and tests govern work on the inherited video skill.
 - `marca-raiz-prisma/start-here.md` and its relevant intelligence documents
   govern Brand Intelligence compilation work.
 - `raiz-Images/COMECE-AQUI.md` governs Raiz Images work.
 - `slide-raiz/00-README.md` governs Slide Raiz work.
-- `SKILLS/ads-produto/SKILL.md` governs the inherited advertising recipe until
-  it is consolidated into the canonical `recipes/` boundary.
+- `recipes/ads-produto/SKILL.md` governs the inherited advertising recipe in the
+  canonical `recipes/` boundary.
 
 ## Architectural verdict
 
@@ -145,26 +145,26 @@ without a concrete architecture driver and a real first consumer.
 ## Current execution gate
 
 The project is in the repository-foundation stage. Steps `Etapa 0` through
-`Etapa 4` are concluded. `Etapa 5 — Baseline` was executed locally as commit
-`231e746`, canonically `reconciled Raiz Engine baseline`, and awaits human
-acceptance after documentary reconciliation. The private remote now contains the
-baseline and the documentary commit `5fcccf3`; acceptance of the baseline does
-not authorize an additional push, release, structural consolidation, or feature
-implementation.
+`Etapa 5` are concluded. The owner accepted the baseline for structural
+consolidation by explicitly authorizing the repository recreation and file moves
+on 2026-08-20. `Etapa 6` has been executed in the worktree; `Etapa 7` validation
+is the current gate. The private remote contains the baseline and later work;
+verify `origin/main` instead of copying its changing tip into normative text.
 
 Evidence for the concluded steps, and for work executed out of order, is recorded
 in section 15 of `docs/provenance/INVENTARIO-REPOSITORIO.md`. Sections 1–14 of
 that document describe the earlier snapshot; where they disagree with section 15,
 section 15 is current.
 
-Until `Etapa 5` is accepted and the guide advances the execution gate:
+Until `Etapa 7` validates the consolidation:
 
-- do not move, rename, merge, or delete project files;
 - do not stage the repository wholesale;
 - do not run inherited installers or updaters;
-- do not start `Etapa 6` structural consolidation;
-- do not implement Adobe runtime mutations or new product features. Architectural
-  alignment and read-only capability inventory do not activate Adobe writes.
+- do not restore `cena-raiz/cenaraiz/`, `SKILLS/`, or another active copy of a
+  consolidated component;
+- do not implement Adobe runtime mutations or product capabilities outside the
+  explicitly authorized Fase 0 bootstrap and architectural alignment. Those
+  authorizations do not activate Adobe writes.
 
 Two steps were executed outside the documented order, each under explicit human
 approval, and both are recorded rather than hidden:
@@ -175,6 +175,12 @@ approval, and both are recorded rather than hidden:
   fallback layer the plan prescribes, after verifying that no build was ever
   distributed and no persisted state existed to honour. The plan must record this
   so a later agent does not reintroduce the compatibility layer.
+- `Etapa 10` — an initial Windows developer bootstrap, doctor, and toolchain
+  manifest were started under explicit owner authorization. They are not accepted
+  as complete until clean-machine and creator-profile criteria pass.
+- `Etapa 11` — an `AudiovisualDirectionPlan` skeleton was started in the desktop
+  before the canonical Brand Intelligence compiler. Preserve it, do not duplicate
+  it, and connect it only after product Fases 1 and 2 produce real inputs.
 
 Not versioned, by declared requirement: tokens, passwords, private keys, provider
 credentials, `node_modules`, Python environments, caches, renders, and
@@ -213,9 +219,9 @@ The guide's `Etapa 10` implements product `Fase 0`; `Etapa 11` opens product
 | `Etapa 2 — Criar recuperação fora do repositório` | Create and verify recoverable external backup before changing Git boundaries. |
 | `Etapa 3 — Adotar o nome local e uma única fronteira Git` | Establish the repository root as the single owned Git boundary after backup and explicit approval. |
 | `Etapa 4 — Criar política de versionamento` | Create or review root `.gitignore`, protect secrets and generated files, scan credentials, and review staging policy. |
-| `Etapa 5 — Baseline` | **Executed locally**, awaiting human acceptance. Commit `231e746`, canonically `reconciled Raiz Engine baseline`. Never call it the inherited state. Original wording: record the approved inherited state with provenance and applicable licenses. |
-| `Etapa 6 — Reorganizar em um commit separado` | Consolidate components structurally without behavior changes or rebranding. |
-| `Etapa 7 — Validar a consolidação` | Prove files, manifests, locks, links, boundaries, and staging remained correct. |
+| `Etapa 5 — Baseline` | **Accepted for consolidation.** Commit `231e746`, canonically `reconciled Raiz Engine baseline`. Never call it the inherited state. |
+| `Etapa 6 — Reorganizar em um commit separado` | **Executed in the worktree.** Canonical roots are `apps/`, `skills/`, `recipes/`, and `docs/architecture/`; old active roots were removed. |
+| `Etapa 7 — Validar a consolidação` | **Current gate.** Prove files, manifests, locks, links, boundaries, and staging remained correct. |
 | `Etapa 8 — Recuperar o baseline técnico` | Restore type-check, tests, and development startup before feature work. |
 | `Etapa 9 — Migrar identidade` | Migrate visible identity and internal compatibility in verified stages. |
 | `Etapa 10 — Construir o bootstrap reproduzível` | Build and validate the canonical developer bootstrap and toolchain manifest. |
@@ -322,20 +328,20 @@ instruction that conflicts with them.
 - **`marca-raiz-prisma/projetos/` is versioned.** `KEEP — canonical brand-case
   corpus`. Not private client material, not excluded by size. Baseline is expected
   to be around 394 MB and that is correct.
-- **`Etapa 4` is concluded**; `Etapa 5` was executed locally and **awaits human
-  acceptance**. The first commit is `231e746`, canonically named
+- **`Etapa 4` and `Etapa 5` are concluded.** The owner accepted the baseline for
+  structural consolidation on 2026-08-20. The first commit is `231e746`, canonically named
   **`reconciled Raiz Engine baseline`**. Never call it the inherited state: no complete snapshot of
   the as-received code exists, and steps 8 and 9 ran before it. It is the first
   complete recoverable state of the Raiz Engine, not a photograph of what was
   acquired. Earlier provenance depends on the public upstreams, the dated external
   backups and the inventories in `docs/provenance/`.
-- **The first push has occurred to the private remote.** `origin/main` currently
-  reaches documentary commit `5fcccf3`, including baseline `231e746`; local
-  `cce7889` is one commit ahead. Every additional push still needs separate
-  authorisation. The first commit was rewritten twice before its first push — by
-  amend, to fix its subject, and by the Git LFS migration — so those rewrites did
-  not affect an existing clone or fork. Do not rewrite it again without explicit
-  authorisation.
+- **The first push has occurred to the private remote.** The remote contains
+  baseline `231e746` and later work. Query `origin/main` when the exact current
+  tip matters; do not freeze that moving hash in normative status text. Every
+  additional push still needs separate authorisation. The first commit was
+  rewritten twice before its first push — by amend, to fix its subject, and by
+  the Git LFS migration — so those rewrites did not affect an existing clone or
+  fork. Do not rewrite it again without explicit authorisation.
 - **Identity migration was a clean cut.** `CLEAN CUT — ACCEPTED`, recorded in
   `PLANO-MIGRACAO-IDENTIDADE.md` § 5. Do not reintroduce `Edvid` aliases or
   fallbacks without evidence of a real consumer. Identity aliases are not the same
@@ -355,10 +361,11 @@ instruction that conflicts with them.
   evaluation corpus. Their runtime boundary is `BrandRuntimeProfile`. Video
   intake and audiovisual direction follow in Fases 2 and 3.
 - **The target folder architecture is approved for documentation and controlled
-  consolidation.** Organize folders by stable responsibility, not phase number.
-  Do not physically move active Cena Raiz files while Claude Code or another
-  process is editing them; perform the move once under Etapa 6, update every path
-  in the same change set, and leave no obsolete active copy behind.
+  consolidation.** `apps/cena-raiz-desktop/`, `skills/cena-raiz/`,
+  `recipes/ads-produto/`, and
+  `docs/architecture/cena-raiz-audiovisual-evolution.md` are canonical. Organize
+  folders by stable responsibility, not phase number. Do not recreate obsolete
+  active copies; `cena-raiz/` contains only ignored external reference clones.
 - **The audiovisual evolution plan is active before Adobe execution.** Its domain contracts,
   canonical-state rules, registry, router, validation, recovery, security, and
   optional bootstrap detection guide Cena Raiz construction now. Only MCP-backed

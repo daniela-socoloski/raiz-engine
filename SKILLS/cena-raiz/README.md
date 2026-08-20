@@ -74,7 +74,7 @@ ela no fim e diz o que faltou.
 ### 3. Instale a cena-raiz — um comando
 
 ```bash
-uv run https://raw.githubusercontent.com/daniela-socoloski/raiz-engine/main/skills/cena-raiz/cena-raiz_install.py
+uv run https://raw.githubusercontent.com/daniela-socoloski/raiz-engine/main/skills/cena-raiz/cenaraiz_install.py
 ```
 
 O mesmo comando, sem alterar nada, no PowerShell do Windows, no Terminal do Mac
@@ -116,7 +116,7 @@ não são tocados.
 Rode o mesmo comando da instalação. Ele substitui a versão antiga pela nova.
 
 ```bash
-uv run https://raw.githubusercontent.com/daniela-socoloski/raiz-engine/main/skills/cena-raiz/cena-raiz_install.py
+uv run https://raw.githubusercontent.com/daniela-socoloski/raiz-engine/main/skills/cena-raiz/cenaraiz_install.py
 ```
 
 ---

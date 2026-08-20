@@ -2,7 +2,7 @@
 
 Status: Active Cena Raiz audiovisual evolution blueprint
 Target repository: `daniela-socoloski/raiz-engine` monorepository
-Current implementation roots: `cena-raiz/cenaraiz/cena-raiz-desktop` and `cena-raiz/cenaraiz/cena-raiz`
+Current implementation roots: `apps/cena-raiz-desktop` and `skills/cena-raiz`
 Primary runtime: Electron modular monolith
 External execution engines: Adobe Premiere Pro MCP, Adobe After Effects MCP, Remotion, FFmpeg
 
@@ -1161,7 +1161,7 @@ to enable Adobe writes.
 Use this instruction:
 
 ```text
-Read PLANO-EVOLUCAO-AUDIOVISUAL-CENA-RAIZ.md, AGENTS.md, ARQUITETURA-MOTOR-CRIATIVO-RAIZ.md, and the current repository execution gate completely.
+Read docs/architecture/cena-raiz-audiovisual-evolution.md, AGENTS.md, ARQUITETURA-MOTOR-CRIATIVO-RAIZ.md, and the current repository execution gate completely.
 
 Work only in the raiz-engine monorepository and inside the explicitly authorized file scope. Preserve the Cena Raiz desktop, Cena Raiz skill, and unrelated worktree changes.
 

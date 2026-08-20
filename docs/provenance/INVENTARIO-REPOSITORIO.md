@@ -728,9 +728,9 @@ Seis fatos que definem esse commit:
 5. **A Etapa 5 foi executada localmente e aguarda aceitação humana.** O commit
    existe; a etapa não está formalmente aceita.
 6. **O primeiro push ocorreu somente depois das reescritas descritas acima.** O
-   remoto privado contém `231e746` e o commit documental `5fcccf3`. No snapshot
-   de 2026-08-20, o `HEAD` local `cce7889` está um commit à frente; novo push
-   continua exigindo autorização separada.
+   remoto privado contém `231e746` e trabalho posterior. O tip corrente deve ser
+   consultado em `origin/main`, pois continua avançando; novo push exige
+   autorização separada.
 
 ## 15.9 Git LFS — dependência obrigatória
 

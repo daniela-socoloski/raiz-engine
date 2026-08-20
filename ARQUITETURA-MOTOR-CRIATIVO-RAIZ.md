@@ -45,9 +45,9 @@ Este documento é a referência arquitetural inicial. Contratos e decisões conf
 - [Guia de organização do repositório](GUIA-ORGANIZACAO-REPOSITORIO.md) — primeira leitura operacional. Define como preservar as duas bases herdadas, consolidar o monorepositório e criar o baseline antes de mudar código.
 - [Plano de migração de identidade](PLANO-MIGRACAO-IDENTIDADE.md) — nomenclatura, compatibilidade e retirada gradual do legado depois da consolidação estrutural.
 - [Política de fonte única funcional](POLITICA-FONTE-UNICA-FUNCIONAL.md) — regra obrigatória para atualizar a implementação canônica e remover arquivos, nomes e duplicatas obsoletos depois da migração validada.
-- [Plano de evolução audiovisual do Cena Raiz](cena-raiz/cenaraiz/PLANO-EVOLUCAO-AUDIOVISUAL-CENA-RAIZ.md) — blueprint ativo de direção audiovisual, narrativa, motion, assets, timeline, execução, revisão e memória. Adobe é apenas uma das integrações de execução; suas mutações reais por MCP e sincronização são ativadas somente na Fase 7.
-- [Cena Raiz Desktop](cena-raiz/cenaraiz/cena-raiz-desktop/README.md) — estado operacional do aplicativo.
-- [Cena Raiz skill](cena-raiz/cenaraiz/cena-raiz/README.md) — origem do fluxo de edição por agente e dos helpers.
+- [Plano de evolução audiovisual do Cena Raiz](docs/architecture/cena-raiz-audiovisual-evolution.md) — blueprint ativo de direção audiovisual, narrativa, motion, assets, timeline, execução, revisão e memória. Adobe é apenas uma das integrações de execução; suas mutações reais por MCP e sincronização são ativadas somente na Fase 7.
+- [Cena Raiz Desktop](apps/cena-raiz-desktop/README.md) — estado operacional do aplicativo.
+- [Cena Raiz skill](skills/cena-raiz/README.md) — origem do fluxo de edição por agente e dos helpers.
 - [Marca Raiz Prisma](marca-raiz-prisma/start-here.md) — entrada atual da inteligência de marca.
 - [Raiz Images](raiz-Images/COMECE-AQUI.md) — direção e execução de imagens.
 - [Slide Raiz](slide-raiz/00-README.md) — inteligência editorial e narrativa de carrosséis.
@@ -118,7 +118,11 @@ O código local deriva de dois projetos: a skill pública `fillrochaa/edvid` e o
 
 Daniela também informa que o vendedor chegou ao produto por adaptações e incorporações de bases anteriores. Assim, `Edvid` identifica a fonte comercial imediata da cópia recebida, mas não deve ser tratado automaticamente como origem exclusiva de cada componente. O instrumento comercial da aquisição não foi incluído nem inspecionado neste levantamento; a autorização é registrada como declaração da proprietária. O trabalho pode remover a identidade Edvid do produto ativo, enquanto licenças, copyright e proveniência eventualmente aplicáveis são avaliados por componente e concentrados nos registros próprios.
 
-O arquivo local `cena-raiz/cenaraiz/cena-raiz/cenaraiz_install.py` já foi parcialmente adaptado e aponta para `fillrochaa/cena-raiz`, enquanto o README ainda registra `fillrochaa/edvid`. Essa divergência deve ser tratada como evidência de adaptação incompleta, não como nova origem confirmada. Os arquivos locais consultados usam licença MIT.
+O instalador hoje canônico em `skills/cena-raiz/cenaraiz_install.py` já havia sido
+parcialmente adaptado quando ainda estava no caminho herdado e apontava para
+`fillrochaa/cena-raiz`, enquanto o README registrava `fillrochaa/edvid`. Essa
+divergência é evidência histórica de adaptação incompleta, não uma nova origem
+confirmada. Os arquivos locais consultados usam licença MIT.
 
 Mudar a identidade do produto e adaptar seus nomes faz parte desta evolução. A interface, os módulos, os contratos, os identificadores e a distribuição podem assumir a arquitetura e a nomenclatura do Sistema Marca Raiz. Preservar a origem não significa conservar para sempre o nome antigo dentro do produto.
 
@@ -589,16 +593,19 @@ chama `core`, sem repetir `raiz-engine/raiz-engine`.
 `doctor` pertence a `operations/bootstrap/`, junto da única fonte de instalação.
 Separá-lo em outra árvore criaria duas autoridades sobre a saúde da máquina.
 
-Mapeamento estrutural inicial:
+Consolidação estrutural executada em 2026-08-20:
 
-| Origem atual | Destino depois do baseline |
+| Origem anterior | Caminho canônico atual |
 |---|---|
 | `cena-raiz/cenaraiz/cena-raiz/` | `skills/cena-raiz/` |
 | `cena-raiz/cenaraiz/cena-raiz-desktop/` | `apps/cena-raiz-desktop/` |
 | `cena-raiz/cenaraiz/PLANO-EVOLUCAO-AUDIOVISUAL-CENA-RAIZ.md` | `docs/architecture/cena-raiz-audiovisual-evolution.md` |
 | `SKILLS/ads-produto/` | `recipes/ads-produto/` |
 
-Movimentação estrutural e rebranding devem ocorrer em commits diferentes.
+Os caminhos anteriores não permanecem como cópias ativas. O diretório
+`cena-raiz/` que resta contém somente clones externos ignorados; não é uma
+implementação do produto. Movimentação estrutural e rebranding continuam sendo
+responsabilidades distintas no histórico.
 
 ## 13. Instalação reproduzível e bootstrap do zero
 
@@ -1091,27 +1098,20 @@ capacidade nova possa ser reproduzida em outra máquina.
 
 A sequência atual, considerando o que já foi executado, é:
 
-1. formalizar a aceitação do `reconciled Raiz Engine baseline` sem confundi-la
-   com autorização de push;
-2. encerrar ou congelar as edições concorrentes e executar as Etapas 6 e 7 do
-   guia: consolidar a estrutura e validar que não ficaram cópias ativas;
-3. reconciliar os caminhos do manifest e concluir o bootstrap `developer` da
+1. concluir a Etapa 7 validando a consolidação já executada, sem confundi-la com
+   autorização de commit ou push;
+2. concluir o bootstrap `developer` da
    Fase 0;
-4. provar `bootstrap → doctor → typecheck → testes → aplicativo aberto` em uma
+3. provar `bootstrap → doctor → typecheck → testes → aplicativo aberto` em uma
    VM Windows 11 x64 limpa;
-5. construir o perfil `creator` e gerar o primeiro instalador local, sem publicar;
-6. começar a Fase 1 pelo compilador
+4. construir o perfil `creator` e gerar o primeiro instalador local, sem publicar;
+5. começar a Fase 1 pelo compilador
    `marca-raiz-prisma → BrandRuntimeProfile` e validá-lo no corpus canônico;
-7. somente então ligar `VideoBrief` e `ContentAnalysis` ao
+6. somente então ligar `VideoBrief` e `ContentAnalysis` ao
    `AudiovisualDirectionPlan` já iniciado;
-8. persistir e aprovar o plano antes de compilá-lo para o render atual;
-9. adicionar Asset Intelligence, router próprio, memória e adapters profissionais
+7. persistir e aprovar o plano antes de compilá-lo para o render atual;
+8. adicionar Asset Intelligence, router próprio, memória e adapters profissionais
    nas fases seguintes.
-
-Enquanto Claude Code ou outro agente estiver modificando `cena-raiz/cenaraiz/`,
-a nova arquitetura pode ser documentada, mas a movimentação física desses arquivos
-deve esperar o worktree ficar congelado. Essa espera evita perder trabalho; ela
-não muda o destino aprovado da estrutura.
 
 ## 23. Definição de pronto do Motor Criativo Raiz
 

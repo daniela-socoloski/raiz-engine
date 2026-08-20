@@ -1,0 +1,39 @@
+{
+  "schemaVersion": "1.0",
+  "assetId": "sfx-tictac",
+  "version": "1.0.0",
+  "name": "Tic-tac",
+  "engine": "media",
+  "source": {
+    "project": "remotion-template",
+    "file": "public/sfx/tictac.mp3"
+  },
+  "capabilities": [
+    "tension",
+    "accent"
+  ],
+  "brandTags": [],
+  "aspectRatios": [
+    "9:16",
+    "16:9",
+    "1:1"
+  ],
+  "duration": {
+    "mode": "fixed",
+    "defaultFrames": 30
+  },
+  "parameters": {
+    "gain": {
+      "type": "number",
+      "required": false,
+      "min": 0,
+      "max": 2
+    }
+  },
+  "preview": {
+    "thumbnail": "motion-assets/previews/sfx-tictac.png"
+  },
+  "compatibility": {},
+  "fingerprint": "sha256:72fab40ab250a8ac",
+  "notes": "elemento de sound design ja presente no template"
+}

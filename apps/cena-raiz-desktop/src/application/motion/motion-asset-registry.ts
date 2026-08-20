@@ -10,7 +10,7 @@
 // Assim o registry e testavel sem fixture de sistema de arquivos, e o adapter
 // de disco fica na camada de infraestrutura.
 //
-// Fonte: PLANO-EVOLUCAO-AUDIOVISUAL-CENA-RAIZ.md secoes 6.4 e 19 (WP3).
+// Source: docs/architecture/cena-raiz-audiovisual-evolution.md sections 6.4 and 19 (WP3).
 
 import {
   MOTION_ASSET_SCHEMA_VERSION,

@@ -11,7 +11,7 @@ editing, read `SKILL.md`. Always read `helpers/` — that's where the scripts li
 > **The user installs, you verify.** `README.md` gives them one command:
 >
 > ```
-> uv run https://raw.githubusercontent.com/daniela-socoloski/raiz-engine/main/skills/cena-raiz/cena-raiz_install.py
+> uv run https://raw.githubusercontent.com/daniela-socoloski/raiz-engine/main/skills/cena-raiz/cenaraiz_install.py
 > ```
 >
 > That is the supported install and it is the user's action, not yours. If

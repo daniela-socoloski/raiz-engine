@@ -173,6 +173,7 @@ foreach ($nome in $m.components.PSObject.Properties.Name) {
   $p = Join-Path $repoRoot $c.path
   if (-not (Test-Path $p)) {
     Write-Line ("  FALTA    {0,-8} {1}" -f $nome, $c.path) 'Red'
+    $faltando += "componente:$nome"
     continue
   }
   $deps = if ($nome -eq 'desktop') { Test-Path (Join-Path $p 'node_modules') }
@@ -181,6 +182,7 @@ foreach ($nome in $m.components.PSObject.Properties.Name) {
     Write-Line ("  OK       {0,-8} dependencias instaladas" -f $nome) 'Green'
   } else {
     Write-Line ("  PENDENTE {0,-8} dependencias nao instaladas -> {1}" -f $nome, ($c.install -join ' ')) 'Yellow'
+    $faltando += "dependencias:$nome"
   }
 }
 

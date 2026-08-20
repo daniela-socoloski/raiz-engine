@@ -8,7 +8,7 @@ use the same servers, bridges, safety sequence, and verification rules.
 
 The verified machine paths, portable variables, upstream sources, revisions,
 licenses, and client-registration state live in
-`../../PLANO-EVOLUCAO-AUDIOVISUAL-CENA-RAIZ.md` section 8.2. Do not duplicate or
+`../../../docs/architecture/cena-raiz-audiovisual-evolution.md` section 8.2. Do not duplicate or
 silently override that inventory here. If verified local evidence changes,
 update section 8.2 in the same change set.
 

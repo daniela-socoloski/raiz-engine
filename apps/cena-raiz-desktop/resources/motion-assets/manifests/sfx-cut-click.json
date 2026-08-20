@@ -1,0 +1,39 @@
+{
+  "schemaVersion": "1.0",
+  "assetId": "sfx-cut-click",
+  "version": "1.0.0",
+  "name": "Clique de corte",
+  "engine": "media",
+  "source": {
+    "project": "remotion-template",
+    "file": "public/sfx/cut-click.mp3"
+  },
+  "capabilities": [
+    "transition",
+    "cut"
+  ],
+  "brandTags": [],
+  "aspectRatios": [
+    "9:16",
+    "16:9",
+    "1:1"
+  ],
+  "duration": {
+    "mode": "fixed",
+    "defaultFrames": 5
+  },
+  "parameters": {
+    "gain": {
+      "type": "number",
+      "required": false,
+      "min": 0,
+      "max": 2
+    }
+  },
+  "preview": {
+    "thumbnail": "motion-assets/previews/sfx-cut-click.png"
+  },
+  "compatibility": {},
+  "fingerprint": "sha256:35d081da09fe74bd",
+  "notes": "elemento de sound design ja presente no template"
+}

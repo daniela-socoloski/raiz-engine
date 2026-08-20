@@ -22,8 +22,8 @@ foi publicada e entregue em duas partes complementares:
 
 | Upstream | Parte do produto adquirido | Destino no Sistema Marca Raiz |
 |---|---|---|
-| `fillrochaa/edvid` | skill, método de edição, helpers, templates e instalador para agentes | **Cena Raiz**, em `skills/cena-raiz/` depois da consolidação |
-| `fillrochaa/edvid-desktop` | aplicativo Electron, interface, timeline, runtimes, render e distribuição | **Cena Raiz Desktop**, em `apps/cena-raiz-desktop/` depois da consolidação |
+| `fillrochaa/edvid` | skill, método de edição, helpers, templates e instalador para agentes | **Cena Raiz**, em `skills/cena-raiz/` |
+| `fillrochaa/edvid-desktop` | aplicativo Electron, interface, timeline, runtimes, render e distribuição | **Cena Raiz Desktop**, em `apps/cena-raiz-desktop/` |
 
 Portanto, não são dois aplicativos concorrentes nem referências opcionais. São
 duas fronteiras técnicas do mesmo produto-base comprado, e ambas devem ser
@@ -114,20 +114,20 @@ EDL, estruturas de projeto e formatos de render, não devem ser renomeados apena
 por branding. Eles mudam somente quando existir uma razão de domínio e uma
 migração própria.
 
-## 3. Diagnóstico atual
+## 3. Diagnóstico reconciliado
 
-Antes do problema de nomenclatura existe um problema de fronteira do repositório:
+O problema de fronteira do repositório foi resolvido pela consolidação de
+2026-08-20:
 
 - o remoto foi renomeado para `daniela-socoloski/raiz-engine` e o `origin` local já foi atualizado;
 - a raiz local canônica já se chama `raiz-engine/` e não existe uma segunda cópia ativa com o nome anterior;
-- `cena-raiz/` possui outro `.git`, vazio e sem remoto;
-- as duas bases de origem foram copiadas para dentro desse repositório intermediário sem seus históricos próprios;
-- `cena-raiz/cenaraiz/cena-raiz/` deriva da skill `fillrochaa/edvid`;
-- `cena-raiz/cenaraiz/cena-raiz-desktop/` deriva do aplicativo `fillrochaa/edvid-desktop`;
-- `cena-raiz/cenaraiz/cena-raiz-desktop-clone/` está vazia;
+- `skills/cena-raiz/` deriva da skill `fillrochaa/edvid`;
+- `apps/cena-raiz-desktop/` deriva do aplicativo `fillrochaa/edvid-desktop`;
+- o repositório intermediário e a pasta vazia `cena-raiz-desktop-clone/` foram removidos;
 - `cena-raiz/gh repos clones/` contém referências externas que não devem entrar no produto automaticamente.
 
-Consequentemente, a consolidação descrita no guia de organização deve ocorrer antes de novas substituições de nomes.
+Os caminhos anteriores ficam preservados apenas no histórico e na proveniência;
+não existem como implementações ativas.
 
 O rebranding local já começou, mas está incompleto e ainda não foi aceito como
 baseline técnico:
@@ -483,18 +483,25 @@ PROVENANCE.md
 
 ### Fase 0E — Consolidação do monorepositório
 
-- no Windows, mover primeiro `SKILLS/ads-produto/` para liberar o nome `skills/`;
-- `cena-raiz/cenaraiz/cena-raiz/` → `skills/cena-raiz/`;
-- `cena-raiz/cenaraiz/cena-raiz-desktop/` → `apps/cena-raiz-desktop/`;
-- plano de evolução audiovisual do Cena Raiz → `docs/architecture/cena-raiz-audiovisual-evolution.md`;
-- `SKILLS/ads-produto/` → `recipes/ads-produto/`;
-- atualizar apenas caminhos quebrados pela movimentação;
-- criar um commit exclusivamente estrutural;
-- validar que manifests, locks, licenças e contagens de arquivos foram preservados.
+> **Executada no worktree em 2026-08-20.**
+
+- `SKILLS/ads-produto/` foi movida primeiro para liberar o nome `skills/`;
+- a skill foi movida para `skills/cena-raiz/`;
+- o desktop foi movido para `apps/cena-raiz-desktop/`;
+- o plano audiovisual foi movido para
+  `docs/architecture/cena-raiz-audiovisual-evolution.md`;
+- a recipe foi consolidada em `recipes/ads-produto/`;
+- a pasta clone vazia e a árvore intermediária foram removidas;
+- manifests, links, licenças e contagens são validados na Etapa 7;
+- commit e push continuam ações separadas, não autorizadas pela movimentação.
 
 ### Fase 1A — Reparar a substituição mecânica
 
-Objetivo: recuperar TypeScript sintaticamente válido sem mudar contratos persistidos.
+> **Executada como `CLEAN CUT — ACCEPTED`.** A prescrição abaixo foi reconciliada
+> com a decisão da seção 5; não criar aliases de identidade sem consumidor real.
+
+Objetivo cumprido: recuperar TypeScript válido e migrar os identificadores ativos
+para a nomenclatura canônica.
 
 Primeiros alvos:
 
@@ -510,8 +517,8 @@ Regras:
 
 - `cena-raizIcon` → `cenaRaizIcon`;
 - `cena-raizLogo` → `cenaRaizLogo`;
-- `window.cena-raizDesktop` → usar temporariamente `window.edvidDesktop` até a Fase 2, ou migrar com alias completo;
-- `process.env.cena-raiz_*` → voltar temporariamente ao env funcional conhecido ou introduzir fallback validado;
+- `window.cena-raizDesktop` → `window.cenaRaizDesktop`, sem alias;
+- `process.env.cena-raiz_*` → `process.env.CENA_RAIZ_*`, sem fallback de identidade;
 - não renomear bundle ID, canais IPC, storage ou protocolos nesta fase;
 - terminar com `npm run typecheck` verde.
 
@@ -658,10 +665,12 @@ Pare para aprovação antes de qualquer mudança estrutural.
 
 ## 12. Próxima decisão
 
-Depois que as Fases 0A–0E organizarem o repositório e a Fase 1A devolver um código novamente válido, decidir qual será o primeiro marco de identidade visível:
+A identidade visível e a API interna já foram migradas por corte limpo. O próximo
+marco é concluir o pacote instalável e a distribuição próprios sem reintroduzir
+infraestrutura do fornecedor anterior:
 
-1. somente a interface Cena Raiz;
-2. interface mais API interna;
-3. pacote completo com instalador e distribuição próprios.
-
-A recomendação é começar pela opção 1, preservar compatibilidade interna e avançar até a opção 3 conforme a infraestrutura própria estiver pronta.
+1. validar a consolidação estrutural;
+2. concluir o perfil `developer` do bootstrap;
+3. gerar o primeiro instalador `creator` local;
+4. substituir feed e runtimes herdados somente depois de o destino próprio estar
+   publicado, assinado e testado.
