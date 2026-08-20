@@ -65,7 +65,7 @@
     "@vitejs/plugin-react": "^4.7.0",
     "electron": "43.4.0",
     "typescript": "^5.9.3",
-    "vite": "^5.4.21"
+    "vite": "^8.2.2"
   },
   "allowScripts": {
     "electron-winstaller@5.4.4": true,
