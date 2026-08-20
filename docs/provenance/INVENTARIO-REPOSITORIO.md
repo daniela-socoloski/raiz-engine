@@ -19,7 +19,7 @@ Ele é evidência para as etapas do
 [Guia de Organização do Repositório](../../GUIA-ORGANIZACAO-REPOSITORIO.md),
 não uma autorização para mover, excluir, instalar, publicar ou versionar arquivos.
 
-### Etapas concluídas desde o snapshot
+## Etapas concluídas desde o snapshot
 
 As seções 1–14 dizem que ainda não é permitido avançar para a Etapa 2. **Isso ficou
 desatualizado.** Estado verificado:
