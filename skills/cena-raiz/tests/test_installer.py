@@ -98,6 +98,61 @@ class InstallerPayloadTests(unittest.TestCase):
                 "router",
             )
 
+    def test_remotion_source_prefers_the_vendored_copy(self) -> None:
+        """Sem isso, cada máquina nova volta a depender de download na hora."""
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            skills = root / "skills"
+            vendored = skills / "remotion-best-practices"
+            vendored.mkdir(parents=True)
+            (vendored / "SKILL.md").write_text("router", encoding="utf-8")
+            (vendored / "PROVENANCE.md").write_text("vendor", encoding="utf-8")
+
+            resolved = cenaraiz_install.resolve_remotion_source(
+                skills / "cena-raiz", root / "tmp")
+
+            self.assertEqual(resolved, vendored)
+
+    def test_remotion_source_ignores_a_sibling_without_the_vendor_marker(self) -> None:
+        """Uma instalação anterior no mesmo diretório não é fonte confiável:
+        seria congelar o usuário numa versão velha em vez de buscar o upstream."""
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            skills = root / "skills"
+            antiga = skills / "remotion-best-practices"
+            antiga.mkdir(parents=True)
+            (antiga / "SKILL.md").write_text("stale", encoding="utf-8")
+
+            chamadas = []
+            original = cenaraiz_install.fetch_repo
+            cenaraiz_install.fetch_repo = (
+                lambda repo, ref, into, label: chamadas.append(repo) or None)
+            try:
+                resolved = cenaraiz_install.resolve_remotion_source(
+                    skills / "cena-raiz", root / "tmp")
+            finally:
+                cenaraiz_install.fetch_repo = original
+
+            self.assertIsNone(resolved)
+            self.assertEqual(chamadas, [cenaraiz_install.REMOTION_REPO])
+
+    def test_resolve_skill_source_accepts_monorepo_root(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = self.make_source(root)
+            monorepo_skill = root / "monorepo" / "skills" / "cena-raiz"
+            monorepo_skill.parent.mkdir(parents=True)
+            source.rename(monorepo_skill)
+
+            self.assertEqual(
+                cenaraiz_install.resolve_skill_source(root / "monorepo"),
+                monorepo_skill,
+            )
+
+    def test_real_skill_directory_matches_the_published_payload(self) -> None:
+        real_skill = Path(cenaraiz_install.__file__).resolve().parent
+        self.assertEqual(cenaraiz_install.resolve_skill_source(real_skill), real_skill)
+
 
 if __name__ == "__main__":
     unittest.main()

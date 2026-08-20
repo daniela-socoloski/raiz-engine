@@ -1,6 +1,8 @@
-"""One-command installer for the cena-raiz skill.
+"""Installer for the cena-raiz skill.
 
-    uv run https://raw.githubusercontent.com/daniela-socoloski/raiz-engine/main/skills/cena-raiz/cenaraiz_install.py
+During Raiz Engine Phase 0 the supported entry is the authenticated monorepo
+bootstrap, which invokes this script with ``--source``. The repository is private,
+so an anonymous raw GitHub URL is not a functional clean-machine entry.
 
 `uv run <url>` and not `uvx --from <package>`: uvx would resolve and install the
 whole cena-raiz dependency tree — torch, pandas, numpy — merely to run a script that
@@ -14,7 +16,7 @@ shell snippets:
     OS difference (home directory, path separators, no chmod, no symlinks) is
     handled here in Python instead of in two or three shell variants that drift
     apart.
-  - No clone step and no symlink/junction, so nothing needs admin rights.
+  - No extra clone step and no symlink/junction, so nothing needs admin rights.
   - It finds the agent by itself — Claude Code, Codex, or anything else with a
     skills directory — instead of asking the user which one they run.
   - It verifies ffmpeg and Node afterwards and prints the exact install command
@@ -52,17 +54,10 @@ REMOTION_NAME = "remotion-best-practices"
 # one as a fallback so an older --ref still installs.
 REMOTION_SUBDIRS = ("skills/remotion-best-practices", "skills/remotion")
 
-# Every agent that reads Agent-Skills-style directories. Add a line to support
-# another one; the rest of the installer needs no change.
+# Canonical agent hosts supported by the Raiz Engine distribution.
 AGENT_DIRS: list[tuple[str, Path]] = [
     ("Claude Code", Path.home() / ".claude" / "skills"),
     ("ChatGPT Codex", Path(os.environ.get("CODEX_HOME", Path.home() / ".codex")) / "skills"),
-    # Antigravity / Gemini. Path taken from its own bundled documentation
-    # (builtin/skills/agy-customizations): skills live at `skills/<name>/SKILL.md`
-    # and the machine-local configuration root is `~/.gemini/config/`. Same
-    # frontmatter contract as Claude Code — name + description — and the same
-    # optional `references/` convention, so cena-raiz installs there unchanged.
-    ("Google Gemini", Path.home() / ".gemini" / "config" / "skills"),
 ]
 
 # Only these entries belong in an agent's skill directory. The repository may
@@ -150,6 +145,44 @@ def _validate_CENA_RAIZ_payload(src: Path) -> None:
     if missing:
         raise FileNotFoundError(
             "payload da skill incompleto: " + ", ".join(sorted(missing)))
+
+
+def resolve_skill_source(source: Path) -> Path:
+    """Accept either the skill directory or the Raiz Engine monorepo root."""
+    candidates = (source, source / "skills" / SKILL_NAME)
+    for candidate in candidates:
+        try:
+            _validate_CENA_RAIZ_payload(candidate)
+            return candidate
+        except FileNotFoundError:
+            continue
+    raise FileNotFoundError(
+        f"nao encontrei o payload {SKILL_NAME} em {source} nem em "
+        f"{source / 'skills' / SKILL_NAME}")
+
+
+def resolve_remotion_source(src: Path, tmp: Path) -> Path | None:
+    """Onde pegar a skill do Remotion — cópia vendorizada primeiro, rede depois.
+
+    O motivo de existir: baixar no momento da instalação faz cada máquina nova
+    repetir a mesma falha (rede bloqueada, rate limit do GitHub, upstream
+    renomeado). O raiz-engine carrega a cópia em `skills/remotion-best-practices`,
+    então um clone — ou o próprio tarball já baixado pelo caminho `uv run <url>` —
+    instala a Fase 2 sem um segundo download.
+
+    Só aceita a irmã que tenha PROVENANCE.md: esse arquivo marca a cópia
+    vendorizada e a distingue de uma instalação anterior, possivelmente velha,
+    que por acaso esteja no mesmo diretório de skills do agente.
+    """
+    vendored = src.parent / REMOTION_NAME
+    if (vendored / "SKILL.md").is_file() and (vendored / "PROVENANCE.md").is_file():
+        log(f"  usando skill do Remotion vendorizada: {vendored}")
+        return vendored
+
+    rsrc = fetch_repo(REMOTION_REPO, "main", tmp, "remotion")
+    if rsrc is None:
+        return None
+    return next((rsrc / s for s in REMOTION_SUBDIRS if (rsrc / s).is_dir()), None)
 
 
 def _copy_CENA_RAIZ_payload(src: Path, dest: Path) -> None:
@@ -331,11 +364,13 @@ def hint(tool: str) -> str:
             "git": "sudo apt install git"}[tool]
 
 
-def main() -> None:
+def main() -> int:
     ap = argparse.ArgumentParser(
         prog="cena-raiz-install",
         description="Instala a skill cena-raiz no seu agente (Claude Code, Codex, …).")
     ap.add_argument("--ref", default="main", help="branch ou tag (padrão: main)")
+    ap.add_argument("--source", default=None,
+                    help="checkout local da skill ou raiz do monorepo; nao baixa o remoto")
     ap.add_argument("--target", default=None,
                     help="pasta de skills específica, em vez de detectar")
     ap.add_argument("--force", action="store_true",
@@ -356,9 +391,22 @@ def main() -> None:
     # depois dela todo destino tem um SKILL.md e a pergunta não existe mais.
     ja_existia = any((d / SKILL_NAME / 'SKILL.md').exists() for _, d in targets)
     with tempfile.TemporaryDirectory() as tmp:
-        src = fetch_repo(REPO, args.ref, Path(tmp), "cena-raiz")
-        if src is None:
-            sys.exit(1)
+        if args.source:
+            try:
+                src = resolve_skill_source(Path(args.source).expanduser().resolve())
+                log(f"  usando payload local: {src}")
+            except FileNotFoundError as error:
+                log(f"  ! {error}")
+                return 1
+        else:
+            checkout = fetch_repo(REPO, args.ref, Path(tmp), "cena-raiz")
+            if checkout is None:
+                return 1
+            try:
+                src = resolve_skill_source(checkout)
+            except FileNotFoundError as error:
+                log(f"  ! {error}")
+                return 1
         # One agent failing must not cost the others. A locked directory under
         # ~/.codex used to abort the run AFTER Claude Code was already written,
         # so the user got a traceback, no dependency install, no Remotion skill,
@@ -381,9 +429,7 @@ def main() -> None:
                 log(f"  ! falhou para {name}: {e}")
 
         if not args.no_remotion:
-            rsrc = fetch_repo(REMOTION_REPO, "main", Path(tmp), "remotion")
-            sub = next((rsrc / s for s in REMOTION_SUBDIRS if (rsrc / s).is_dir()),
-                       None) if rsrc else None
+            sub = resolve_remotion_source(src, Path(tmp))
             if sub and sub.is_dir():
                 for _, skills_dir in targets:
                     log(f"  instalando skill do Remotion (Fase 2): {skills_dir / REMOTION_NAME}")
@@ -392,7 +438,7 @@ def main() -> None:
                     except Exception as e:
                         log(f"  ! Remotion falhou em {skills_dir}: {e}")
             else:
-                log("  ! skill do Remotion não instalada (a Fase 1 não depende dela)")
+                log("  ! não encontrei a skill do Remotion nem local nem na rede")
 
     # Every destination needs its own .venv — helpers run as `uv run python …`
     # from whichever copy the agent loaded. Syncing only the first one left the
@@ -418,6 +464,20 @@ def main() -> None:
         else:
             missing.append(tool)
             log(f"  x {tool:10} — {why}. Instale com: {hint(tool)}")
+    # A Fase 2 é Remotion-only e o SKILL.md manda carregar esta skill ao escrever
+    # qualquer código Remotion. Antes isso saía como um aviso e o instalador
+    # terminava com sucesso: a falha só aparecia na Fase 2, longe da causa.
+    if not args.no_remotion:
+        sem_remotion = [d for d in dests
+                        if not (d.parent / REMOTION_NAME / "SKILL.md").is_file()]
+        if sem_remotion:
+            missing.append(REMOTION_NAME)
+            log(f"  x {REMOTION_NAME} — exigido pela Fase 2 (Remotion-only). Não chegou em:")
+            for d in sem_remotion:
+                log(f"      {d.parent / REMOTION_NAME}")
+        elif dests:
+            log(f"  ok {REMOTION_NAME}")
+
     # git is not an cena-raiz dependency — the install above used no git at all. But
     # Claude Code leans on it, so its absence is worth a word rather than
     # silence. Deliberately NOT added to `missing`: nothing here is blocked by it.
@@ -431,7 +491,11 @@ def main() -> None:
     log("instalado em:")
     for d in dests:
         log(f"  {d}")
-        log(f"  {d.parent / REMOTION_NAME}")
+        # Só anunciar o Remotion onde ele realmente chegou: a linha incondicional
+        # que estava aqui afirmava sucesso mesmo quando a instalação falhou.
+        remotion_dest = d.parent / REMOTION_NAME
+        if (remotion_dest / "SKILL.md").is_file():
+            log(f"  {remotion_dest}")
 
     if skipped:
         log()
@@ -450,9 +514,8 @@ def main() -> None:
             else:
                 log("    É um clone git. Um clone limpo é substituído pela versão")
                 log("    publicada; se tiver alterações suas, ele é guardado ao lado.")
-                log("    Rode de novo com --force:")
-                log("      uv run https://raw.githubusercontent.com/daniela-socoloski/raiz-engine/main/skills/cena-raiz/"
-                    "main/cenaraiz_install.py --force")
+                log("    Rode o bootstrap autenticado novamente ou execute:")
+                log(f'      uv run "{Path(__file__).resolve()}" --source "{src}" --force')
         log("=" * 68)
 
     if failed:
@@ -467,11 +530,15 @@ def main() -> None:
     if missing:
         log(f"Falta instalar: {', '.join(missing)}. Rode os comandos acima e"
             " depois este comando de novo.")
-        return
+        return 1
 
     if skipped:
         log("Instalação parcial — veja o aviso acima antes de usar.")
-        return
+        return 1
+
+    if failed:
+        log("Instalação incompleta — corrija os destinos listados e rode de novo.")
+        return 1
 
     # Name the agents it actually wrote to, not the three it supports. Telling
     # someone to use the skill in Codex when they only run Claude Code sends
@@ -481,7 +548,7 @@ def main() -> None:
 
     if ja_existia:
         log("cena-raiz atualizada! Você está na última versão disponibilizada por")
-        log("Fill Rocha.")
+        log("Raiz Engine.")
         log()
         log("Reinicie o agente para ele carregar a nova versão.")
     else:
@@ -495,7 +562,8 @@ def main() -> None:
         # sources — so the wrong folder is a wrong session, not a recoverable
         # mistake. Only said on a first install; by the second run they know.
         log("Abra a sessão DENTRO da pasta onde estão os seus vídeos.")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

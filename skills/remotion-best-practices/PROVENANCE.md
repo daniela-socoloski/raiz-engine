@@ -8,6 +8,29 @@
 | Vendorizado em | 2026-08-20 |
 | Classificação | `RENT` — dependência de commodity, mantida a montante |
 
+## Licença
+
+**A licença MIT do Raiz Engine não cobre esta pasta.** O `PROVENANCE.md` da raiz
+afirma que "ambos os componentes carregam licença MIT" — isso vale para
+`skills/cena-raiz/` e `apps/cena-raiz-desktop/`, não para este terceiro.
+
+O upstream `remotion-dev/skills` não publica arquivo de licença (`license: null`
+na API do GitHub, verificado em 2026-08-20) e é espelho de
+`remotion-dev/remotion`, `packages/skills`. Vale portanto a
+[Remotion License](https://github.com/remotion-dev/remotion/blob/main/LICENSE.md)
+— source-available, não OSS:
+
+- **Uso gratuito** para pessoas físicas, organizações sem fins lucrativos e
+  empresas com **até 3 funcionários**. Acima disso, é exigida uma
+  [Company License](https://www.remotion.pro/license).
+- **Vedado** copiar ou modificar código do Remotion para vender, alugar ou
+  sublicenciar um derivado **do próprio Remotion**. Usar o Remotion para criar
+  vídeos — que é o que a Fase 2 faz — é caso de uso expressamente permitido.
+
+A eventual exigência de Company License decorre de o produto **renderizar com o
+`@remotion/cli`**, não de a documentação estar vendorizada aqui: ela existiria
+igual se esta pasta não existisse.
+
 ## Por que está aqui dentro
 
 É dependência **declarada** da Fase 2 da skill cena-raiz:

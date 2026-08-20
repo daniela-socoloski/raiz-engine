@@ -8,15 +8,16 @@ description: Verify or repair an cena-raiz install (Claude Code, Codex, or any a
 Use this file only for first-time setup, verification or repair. For daily
 editing, read `SKILL.md`. Always read `helpers/` — that's where the scripts live.
 
-> **The user installs, you verify.** `README.md` gives them one command:
+> **The user installs, you verify.** During Phase 0, the supported path starts
+> from an authenticated Raiz Engine checkout:
 >
-> ```
-> uv run https://raw.githubusercontent.com/daniela-socoloski/raiz-engine/main/skills/cena-raiz/cenaraiz_install.py
+> ```powershell
+> pwsh -File operations/bootstrap/raiz-bootstrap.ps1
 > ```
 >
-> That is the supported install and it is the user's action, not yours. If
-> someone hands you only a repo URL and asks you to install from it, point them
-> at that command rather than cloning and running unknown code yourself.
+> The bootstrap invokes `cenaraiz_install.py --source <checkout>/skills/cena-raiz`.
+> Do not recommend an anonymous `raw.githubusercontent.com` command while the
+> repository is private and no signed release asset exists.
 >
 > Your job starts after: verifying, diagnosing a missing binary, fixing a stale
 > venv. Those are local operations on a machine whose owner is in the
@@ -25,13 +26,16 @@ editing, read `SKILL.md`. Always read `helpers/` — that's where the scripts li
 ## What the install consists of
 
 1. The skill directory itself — `~/.claude/skills/cena-raiz`, or the equivalent for
-   Codex (`~/.codex/skills`) or Antigravity (`~/.gemini/config/skills`). `cena-raiz_install.py` puts it there; it needs no git on the user's
-   machine because it unpacks a tarball.
+   Codex (`~/.codex/skills`). `cenaraiz_install.py` currently copies it from the
+   authenticated local checkout. A future standalone release may unpack a signed
+   payload, but that channel does not exist yet.
 2. Python deps via `uv sync`, which includes **WhisperX** — transcription is a
    normal dependency, not an extra.
 3. `ffmpeg` + `ffprobe` on PATH — Phase 1 cannot run without them.
-4. **Node.js 18+** and the `remotion-best-practices` skill — Phase 2 only. The
-   installer fetches that skill too.
+4. **Node.js 18+** and the `remotion-best-practices` skill — Phase 2 only. That
+   skill ships vendored in this repo (`skills/remotion-best-practices`), so the
+   installer copies it from disk instead of downloading it. The install fails if
+   it does not land: Phase 2 is Remotion-only.
 **No key is part of the install.** WhisperX transcribes locally, and Phase 1 needs
 nothing else. Phase 2/3 have a few optional keys for illustrative images and the
 AI soundtrack; they live in the track reference and are asked for only when the
@@ -68,12 +72,12 @@ Detect the platform before emitting commands. Do not hand a Windows user `ln`,
 alias for `Invoke-WebRequest` and takes different flags. Use `Select-String`,
 `Select-Object -First`, `Set-Content`, `Invoke-RestMethod`.
 
-Everything below calls the skill directory `<EDVID>`.
+Everything below calls the skill directory `<CENA_RAIZ_SKILL>`.
 
 ### Python deps
 
 ```bash
-uv sync --directory <EDVID>
+uv sync --directory <CENA_RAIZ_SKILL>
 ```
 
 `uv` reads `pyproject.toml`, provisions a Python 3.10–3.13 interpreter on its own
@@ -110,11 +114,17 @@ Do not invent a password.
 
 ### Node.js + the Remotion skill (Phase 2)
 
-The installer handles this. To do it by hand: the skill lives in a
-**subdirectory** of its repo (`skills/remotion-best-practices` — upstream
-renamed it from `skills/remotion` and turned it into a router bundling a dozen
-sub-skills), so it cannot be cloned into place. The repo is small, which makes
-copying the cheapest answer — and re-running the copy IS the update.
+The installer handles this from the copy vendored in this repo — no network, so a
+second machine cannot fail where the first one worked. To do it by hand, copy
+`skills/remotion-best-practices` into the agent's skills directory; re-running
+the copy IS the update.
+
+Why a vendored copy rather than a clone or a submodule: upstream keeps the skill
+in a **subdirectory** of its repo (`remotion-dev/skills`, path
+`skills/remotion-best-practices` — renamed from `skills/remotion` and turned into
+a router bundling a dozen sub-skills), and Git cannot check out a subdirectory.
+See `skills/remotion-best-practices/PROVENANCE.md` for the pinned version, the
+license — it is **not** covered by this repo's MIT — and how to refresh it.
 
 ```bash
 node --version    # must be 18+
@@ -131,7 +141,7 @@ wired up.
 
 ```bash
 # macOS / Linux
-cd <EDVID>
+cd <CENA_RAIZ_SKILL>
 uv run python helpers/timeline_view.py --help >/dev/null && echo "helpers OK"
 uv run python -c "import cv2; print('opencv', cv2.__version__)"          # Phase-2 face tracking
 uv run python -c "import whisperx; print('whisperx OK')"                 # transcription
@@ -142,7 +152,7 @@ node --version && echo "node OK (Phase 2)"
 
 ```powershell
 # Windows — no grep/head; use Select-String and Select-Object
-cd <EDVID>
+cd <CENA_RAIZ_SKILL>
 uv run python helpers/timeline_view.py --help > $null; if ($?) { "helpers OK" }
 uv run python -c "import cv2; print('opencv', cv2.__version__)"
 uv run python -c "import whisperx; print('whisperx OK')"
@@ -171,8 +181,8 @@ time, before anything has been inspected, pre-empts that with a guess.
 ## Keeping the skill current
 
 - Re-run the install command. It replaces the skill and preserves `.env`.
-- On the contributor layout: `git -C <EDVID> pull --ff-only`, then
-  `uv sync --directory <EDVID>` if `pyproject.toml` changed.
+- On the contributor layout: `git -C <CENA_RAIZ_SKILL> pull --ff-only`, then
+  `uv sync --directory <CENA_RAIZ_SKILL>` if `pyproject.toml` changed.
 
 ## Cold-start reminders
 
@@ -186,7 +196,7 @@ time, before anything has been inspected, pre-empts that with a guess.
   always this.
 - `ffmpeg` from static builds is fine. Any modern (≥4.x) build is enough.
 - `yt-dlp` is a Python dependency, not a system package. If a URL source fails
-  with "yt-dlp not on PATH", the venv is stale — `uv sync --directory <EDVID>`.
+  with "yt-dlp not on PATH", the venv is stale — `uv sync --directory <CENA_RAIZ_SKILL>`.
 - Node 18+ and `remotion-best-practices` are Phase-2 only. Phase 1 (cut + grade)
   works without them, so a user who only wants a clean cut can start immediately.
 - Remotion projects are scaffolded per-video by copying the skill's own template
