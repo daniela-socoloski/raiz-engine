@@ -100,11 +100,12 @@ nem para um R2 próprio.
 Classificação: `ENVIRONMENT-DEPENDENCY` · `BOOTSTRAP-GAP`.
 
 `publish:runtimes`, `publish:update` e `make:signed` invocam `bash -c` para carregar
-`signing.env`. Funciona nesta máquina porque o Git Bash está no `PATH`
-(`/usr/bin/bash`, GNU bash 5.3), mas não há garantia de Bash no `PATH` de um
-PowerShell puro nem de uma máquina Windows recém-formatada. É fragilidade de
-portabilidade, não falha comprovada nesta máquina. O bootstrap deve instalar e
-verificar Bash, ou substituir a dependência por leitura de ambiente em Node.
+`signing.env`. A validação de 2026-08-20 comprovou a falha nesta máquina recém-
+formatada: `bash` não resolve no `PATH` do PowerShell. O executável existe em
+`C:\Program Files\Git\bin\bash.exe` e os scripts `.sh` passam em `bash -n` quando
+esse caminho é usado explicitamente, mas os comandos npm atuais continuam
+frágeis. Antes da distribuição, o bootstrap deve tornar essa resolução explícita
+ou a dependência deve ser substituída por um runner Windows/Node portátil.
 
 ### Passos no Coolify, quando a decisão acima estiver tomada
 

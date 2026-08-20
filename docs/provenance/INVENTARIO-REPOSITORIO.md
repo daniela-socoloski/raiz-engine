@@ -625,7 +625,11 @@ Registradas aqui porque afetam o comportamento do produto, embora não sejam arq
 Credenciais expostas durante a configuração permanecem **pendentes de revogação**;
 ver `docs/integrations/INFRAESTRUTURA-PROPRIA.md`.
 
-## 15.4 Estado verificado agora
+## 15.4 Estado verificado antes do primeiro commit
+
+Este quadro preserva a medição anterior ao primeiro commit. Ele não descreve a
+árvore de trabalho atual; os estados posteriores prevalecem em 15.8, 15.9 e
+15.10.
 
 | Indicador | Valor |
 |---|---|
@@ -639,11 +643,15 @@ ver `docs/integrations/INFRAESTRUTURA-PROPRIA.md`.
 | Suítes de teste | 4 do desktop + 4 da skill, todas passando |
 | Segredos no que entraria | nenhum |
 
-## 15.5 Decisões pendentes de aprovação
+## 15.5 Decisões reconciliadas
 
 1. **Corpus aplicado de marcas — decidido.** `marca-raiz-prisma/projetos/` **permanece no baseline**, classificado `KEEP — canonical brand-case corpus`. Não entra no `.gitignore`, não é excluído por tamanho, não é moveed nem reestruturado nesta etapa. Trabalho futuro genuinamente confidencial de cliente terá política própria de privacidade e armazenamento, sem autorizar exclusão do corpus existente.
-2. **Reconciliação documental** — corrigir nas seções 1–14 os pontos marcados `RECONCILE`, ou mantê-las como registro histórico do snapshot com esta seção prevalecendo.
-3. **Divergência plano × execução** — registrar no `PLANO-MIGRACAO-IDENTIDADE.md` que a estratégia de alias foi dispensada por evidência, para que não seja reintroduzida.
+2. **Reconciliação documental — decidida.** As seções 1–14 permanecem como
+   registro histórico do snapshot. As seções 15.7 em diante prevalecem para o
+   estado atual.
+3. **Divergência plano × execução — reconciliada.**
+   `PLANO-MIGRACAO-IDENTIDADE.md` registra `CLEAN CUT — ACCEPTED`; aliases e
+   fallbacks de identidade não devem ser reintroduzidos.
 
 ## 15.7 Corpus aplicado de marcas — `KEEP`
 
@@ -677,7 +685,7 @@ nesta etapa.
 política própria de privacidade e armazenamento. Isso não autoriza excluir os
 projetos existentes sem avaliação individual.
 
-### Composição real do baseline
+### Composição histórica do baseline antes da consolidação
 
 | Área | Bytes |
 |---|---|
@@ -725,8 +733,9 @@ Seis fatos que definem esse commit:
 4. **A proveniência anterior depende de três fontes externas a este histórico:**
    os upstreams públicos, os backups datados fora do repositório e os inventários
    em `docs/provenance/`.
-5. **A Etapa 5 foi executada localmente e aguarda aceitação humana.** O commit
-   existe; a etapa não está formalmente aceita.
+5. **A Etapa 5 foi aceita para a consolidação estrutural.** A autorização
+   explícita da proprietária em 2026-08-20 permitiu executar a Etapa 6; não
+   autorizou novo commit, amend, push, release ou publicação.
 6. **O primeiro push ocorreu somente depois das reescritas descritas acima.** O
    remoto privado contém `231e746` e trabalho posterior. O tip corrente deve ser
    consultado em `origin/main`, pois continua avançando; novo push exige
@@ -763,7 +772,64 @@ O bootstrap deve instalar e verificar `git-lfs` antes do clone, e decidir
 explicitamente quando baixar o corpus: um perfil de desenvolvimento que apenas
 compila o aplicativo não precisa de 398 MB de casos de marca.
 
-## 15.6 Condição de parada
+## 15.10 Consolidação estrutural — Etapa 6 executada
 
-Inventário diferencial entregue. Nenhuma mudança revertida, movida, renomeada,
-publicada ou executada em sistema externo durante esta tarefa.
+Em 2026-08-20, a proprietária autorizou explicitamente recriar a arquitetura de
+pastas, mover os componentes funcionais e reconciliar os documentos do projeto.
+Essa autorização aceitou o baseline como ponto de partida da consolidação, mas
+não autorizou commit, amend, push, release ou publicação.
+
+| Origem anterior | Fronteira funcional atual |
+|---|---|
+| `cena-raiz/cenaraiz/cena-raiz/` | `skills/cena-raiz/` |
+| `cena-raiz/cenaraiz/cena-raiz-desktop/` | `apps/cena-raiz-desktop/` |
+| `SKILLS/ads-produto/` | `recipes/ads-produto/` |
+| `SKILLS/architect-ai-systems.skill` | `skills/architect-ai-systems.skill` |
+| `cena-raiz/cenaraiz/PLANO-EVOLUCAO-AUDIOVISUAL-CENA-RAIZ.md` | `docs/architecture/cena-raiz-audiovisual-evolution.md` |
+
+Verificação de preservação feita imediatamente antes e depois dos movimentos:
+
+| Unidade movida | Arquivos | Bytes |
+|---|---:|---:|
+| skill Cena Raiz | 102 | 2.486.138 |
+| desktop, incluindo dependências locais ignoradas | 14.909 | 575.663.747 |
+| recipe `ads-produto` | 10 | 52.004 |
+| plano audiovisual | 1 | 48.285 |
+| pacote instalável da skill de arquitetura | 1 | 31.757 |
+
+Os totais coincidiram em origem e destino. A pasta vazia
+`cena-raiz-desktop-clone/` e a intermediária vazia `cena-raiz/cenaraiz/` foram
+removidas após verificação. `cena-raiz/` permanece somente como biblioteca local
+ignorada de referências externas em `gh repos clones/`; não contém código ativo
+do produto.
+
+### Commit concorrente observado
+
+Durante a consolidação, outra sessão local criou `dd0c130` com o assunto
+`Add Windows build and smoke tests for cena-raiz`. O diff desse commit inclui a
+movimentação estrutural, bootstrap, contratos de motion e documentação, portanto
+o assunto é estreito e não descreve corretamente seu conteúdo. Na verificação,
+`HEAD` era `dd0c130` e `origin/main` permanecia em `cac2f6f`: não houve push. Não
+reescrever nem publicar esse commit sem autorização humana separada.
+
+### Evidência da Etapa 7
+
+| Verificação | Resultado |
+|---|---|
+| fronteira Git própria | uma em `raiz-engine/.git`; duas fronteiras externas continuam ignoradas em `cena-raiz/gh repos clones/` |
+| caminhos antigos ativos | ausentes; `cena-raiz/` contém somente a biblioteca externa ignorada |
+| grafia canônica | `skills/` minúsculo registrado no índice por renomeação case-safe; nenhuma colisão de caixa |
+| manifests e locks | `package.json` + `package-lock.json` no desktop; `pyproject.toml` + `uv.lock` na skill |
+| links Markdown do projeto | todos resolvidos; documentação interna de runtimes baixados e ignorados não integra essa verificação |
+| typecheck | `npm run typecheck`, zero erros |
+| testes do desktop | seis comandos declarados, todos passando |
+| testes da skill | quatro testes do instalador, todos passando |
+| recipes shell | seis scripts passam em Git Bash 5.3 por caminho explícito |
+| integridade Git | `git fsck` sem erro; objetos pendentes históricos registrados |
+| integridade LFS | `git lfs fsck` OK |
+| segredos por nome e clones no índice | nenhuma ocorrência proibida |
+| bootstrap | entrada completa em `-DryRun` OK; `doctor` detecta corretamente que `.venv` da skill ainda não foi instalada |
+
+**Estado do portão:** Etapas 6 e 7 concluídas localmente. Etapa 10/Fase 0 é o
+portão atual. O `uv sync` completo da skill, o perfil `creator`, a resolução de
+Bash para assinatura/publicação e a prova em VM limpa continuam pendentes.

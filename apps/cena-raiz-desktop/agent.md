@@ -12,19 +12,19 @@ foi deliberadamente omitida deste arquivo.
 
 ## 1. Identidade e separação dos projetos
 
-Existem três contextos diferentes que não devem ser misturados:
+Existem três fronteiras diferentes que não devem ser misturadas:
 
 1. **cena-raiz-desktop**
-   - Repositório de desenvolvimento: 
-   - GitHub: `https://github.com/daniela-socoloski/sistema-marca-raiz`
-   - Branch principal: `main-cena-desktop`
+   - Componente canônico no monorepositório: `apps/cena-raiz-desktop/`.
+   - GitHub: `https://github.com/daniela-socoloski/raiz-engine`.
+   - Branch principal: `main`.
  
 
 2. **Skill cena-raiz**
-   - Componente canônico no monorepositório: `apps/cena-raiz-desktop/`
+   - Componente canônico no monorepositório: `skills/cena-raiz/`.
    - Contém o método de edição, helpers de vídeo e templates compartilhados.
-   - Não colocar código do Desktop neste repositório. Essa separação já foi um
-     problema anteriormente e foi corrigida.
+   - Não colocar código do Desktop dentro da skill. Ambos vivem no mesmo
+     monorepositório, mas continuam com responsabilidades separadas.
 
 3. **Projetos individuais de vídeo**
    - Exemplo que originou várias decisões: 
@@ -164,8 +164,8 @@ conta e escolhe qual conduz a conversa (`settings.json` em userData guarda
 `aiProvider`). Cada provedor aceita até dois modos: ASSINATURA (ChatGPT e
 Claude, OAuth no navegador) e CHAVE DE API (os três; no Gemini é o único
 caminho — o login gratuito com conta Google do Gemini CLI foi descontinuado
-pelo Google em 18/06/2026, com migração para o Antigravity, que não suporta
-ser embutido). Os TRÊS adaptadores emitem o mesmo vocabulário de eventos
+pelo Google em 18/06/2026 e o fluxo sucessor não suporta ser embutido). Os TRÊS
+adaptadores emitem o mesmo vocabulário de eventos
 (`assistant-delta`, `assistant-final`, `turn-state`, `approval-*`) pelo canal
 `codex:event` — o chat do renderer não sabe qual provedor está por trás. O
 roteamento fica no main: `codex:message` despacha pelo provedor ativo;
@@ -212,7 +212,7 @@ Claude (Agent SDK — detalhes na seção 13e):
   `userData/claude-auth.json` (0600), refresh automático.
 - A conversa roda no `@anthropic-ai/claude-agent-sdk` pinado, instalado sob
   demanda em `userData/runtime/claude` pelo npm empacotado (como o Remotion).
-- Onboarding: depois do login da Creator Factory, se nenhuma IA estiver
+- Onboarding: depois do login do Raiz Engine, se nenhuma IA estiver
   conectada, um modal oferece os dois logos; clicar abre o login daquele
   provedor. Também dá para conectar/trocar em Configurações → Geral.
 - Se o provedor ativo está desconectado e o outro está pronto, o app troca
@@ -289,8 +289,8 @@ Layout aprovado:
 
 Assets oficiais foram fornecidos originalmente nestes caminhos:
 
-- Ícone: `/Volumes/T7 FILL/_Creator Factory/Cursos/IA Edit Pro/Design/Icone_cena-raiz.png`
-- Logo: `/Volumes/T7 FILL/_Creator Factory/Cursos/IA Edit Pro/Design/logo_cena-raiz.png`
+- Ícone canônico: `src/brand/cena-raiz-icon.png`
+- Logo canônico: `src/brand/cena-raiz-logo.png`
 
 Eles já foram preparados e incorporados ao repositório em `src/brand/`:
 
@@ -736,11 +736,11 @@ runtime pack uma única vez no primeiro boot, com progresso no chat
   bucket) — e o publish:update da release correspondente.
 - QA visual: `?pack` na URL simula o download do primeiro boot.
 
-### 13c. Login de alunos — Creator Factory (0.8.0)
+### 13c. Login de usuários — Raiz Engine (0.8.0)
 
 O acesso ao cena-raiz é dos alunos com matrícula ativa no curso **IA Edit Pro**
-da Creator Factory (plataforma própria, Next.js + Supabase, repo
-`fillrochaa/creator-factory`). O gate usa a infraestrutura existente, sem
+do Raiz Engine (infraestrutura própria em Supabase). O gate usa o projeto
+controlado pela proprietária, sem
 backend novo:
 
 - **Mesmo login da área de membros**: Supabase Auth direto
@@ -757,7 +757,7 @@ backend novo:
   `signed-out`, `checking`, `no-access` (login ok sem matrícula; sessão fica
   guardada para reabrir resolver) e `signed-in` (com `offline: true` quando
   validando pela tolerância de 7 dias sem rede).
-- **UI**: tela de login em tela cheia (e-mail/senha da Creator Factory),
+- **UI**: tela de login em tela cheia (e-mail/senha do Raiz Engine),
   tela "matrícula não está ativa", bloco do aluno com Sair na rail. O login
   do ChatGPT (agente) permanece separado.
 - **Para ativar**: preencher `MEMBER_SUPABASE_URL` e
@@ -1011,7 +1011,7 @@ numa máquina Windows real e validar o ciclo completo de aluno.
 PUBLICADO no R2 em 2026-08-19 (run com publish, 8ª iteração): runtime pack
 `runtimes/runtimes-win32-x64-<chave>.tar.gz`, canal `win32/RELEASES`
 (cena-raiz-0.13.2-full.nupkg) e instalador `cena-raizSetup.exe` estável na raiz —
-o link para a página de download da Creator Factory. feed.json do mac
+o link para a página de download do Raiz Engine. feed.json do mac
 intacto. Secrets adicionados ao repositório com autorização do Fill.
 
 Lições das 8 iterações (vao doer de novo se esquecidas):
@@ -1070,7 +1070,7 @@ O que cada peça faz no win32-x64:
   pasta); publish-update.mjs detecta a plataforma do make: no win sobe
   nupkg → RELEASES sob win32/ e o instalador como
   win32/cena-raiz-Setup-<v>.exe + cena-raizSetup.exe ESTÁVEL na raiz (link de
-  download da Creator Factory). O feed.json do mac fica intacto. No mac o
+  download do Raiz Engine). O feed.json do mac fica intacto. No mac o
   mesmo script também publica o DMG: cena-raiz-<v>-arm64.dmg (arquivado) +
   cena-raiz.dmg ESTÁVEL na raiz — o par macOS do cena-raizSetup.exe. Links de
   download da página: <base>/cena-raiz.dmg e <base>/cena-raizSetup.exe.
@@ -1368,7 +1368,7 @@ Dependências do Fill:
   ponta a ponta com o par de versões — download em segundo plano, botão no
   topo e troca automática. Publicador R2 via S3 multipart. Botão de update
   também no gate de login (pós-0.8.2).
-- 0.8.0: gate de login dos alunos — mesma conta da Creator Factory
+- 0.8.0: gate de login dos usuários — conta própria do Raiz Engine
   (Supabase Auth com anon key), matrícula ativa do IA Edit Pro via RLS
   existente, refresh token em userData, tolerância offline de 7 dias, telas
   de login/sem-matrícula e conta do aluno na rail. Inerte até preencher a
@@ -1378,7 +1378,7 @@ Dependências do Fill:
   assinatura de produção/notarização env-driven no Forge com
   entitlements.mac.plist. Inerte até plugar certificado, credenciais e a URL
   do feed (seção 13b). Login de alunos: aguardando detalhes da plataforma
-  própria da Creator Factory para desenhar a integração.
+  própria do Raiz Engine para desenhar a integração.
 - 0.7.8: o trim por arrasto voltou — a regra `.timeline-clip > span` criada
   para o rótulo sobre as ondas tinha especificidade maior que `.clip-handle`
   e roubava position/z-index das alças (lição: estilos de rótulo em classe

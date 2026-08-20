@@ -19,13 +19,14 @@ O projeto possui duas linhas de avanço que não devem mais usar a mesma numera�
 - **repositório:** Etapas 0–11 do guia de organização;
 - **produto:** Fases 0–7 do roadmap do Raiz Engine.
 
-**Gate do repositório:** Etapa 6 executada; Etapa 7 valida a consolidação física.
+**Gate do repositório:** Etapas 6 e 7 concluídas localmente; Etapa 10/Fase 0 é o
+portão atual.
 
 **Fase do produto:** Fase 0 — Install & Runtime Foundation, em construção.
 
 | | |
 |---|---|
-| Etapas concluídas | 0, 1, 2, 3, 4, 5 e 6; Etapa 7 em validação |
+| Etapas concluídas | 0–9; Etapas 8 e 9 foram executadas antecipadamente sob autorização |
 | Executadas antecipadamente, sob autorização | 8 (baseline técnico), 9 (identidade, como `CLEAN CUT — ACCEPTED`), início da 10 (bootstrap) e esqueleto parcial da 11 (contratos de direção) |
 | Primeiro commit | `231e746` — **`reconciled Raiz Engine baseline`**, 854 arquivos. Aceito como base da consolidação; não é o estado como recebido |
 | Recuperação externa | backup completo e backup do Git intermediário, ambos verificados |
@@ -33,6 +34,7 @@ O projeto possui duas linhas de avanço que não devem mais usar a mesma numera�
 | Publicação Git | o remoto privado já contém o baseline e o histórico posterior; consultar `origin/main` para o tip atual e exigir autorização separada para cada novo push |
 | Releases | **bloqueadas** até a publicação própria existir |
 | Fase 0 do produto | bootstrap `developer`, `doctor` e manifest iniciais existem; instalador `creator`, skills/runtimes e prova em VM ainda faltam |
+| Consolidação local | `dd0c130` contém a Etapa 6 junto de outras mudanças sob um assunto estreito e impreciso; não foi enviado ao remoto e não deve ser reescrito ou publicado sem autorização |
 | Próxima capacidade central | Fase 1 — compilar `marca-raiz-prisma` em `BrandRuntimeProfile` revisável |
 
 O estado detalhado de cada etapa está em

@@ -1,6 +1,6 @@
-import { app, autoUpdater, BrowserWindow, dialog, ipcMain, net, protocol, shell } from 'electron';
+import { app, autoUpdater, BrowserWindow, dialog, ipcMain, net, protocol, safeStorage, shell } from 'electron';
 import started from 'electron-squirrel-startup';
-import { spawn } from 'node:child_process';
+import { spawn, type ChildProcessByStdio } from 'node:child_process';
 import { createReadStream, createWriteStream } from 'node:fs';
 import { createHash, randomUUID } from 'node:crypto';
 import {
@@ -26,6 +26,12 @@ import { GeminiAgent } from './gemini-agent';
 import { JCUT_LEAD_SECONDS, extractionArgs, mixArgs, muxArgs, planJcut } from './jcut';
 import { mediaKind, mediaMimeType, mediaTier, pickPreviewMedia, resolveByteRange } from './media-selection';
 import { resolveRuntime, runtimePackKey, type RuntimeResolution } from './runtime';
+import distributionManifest from '../resources/distribution-manifest.json';
+import {
+  readStoredMemberAuth as readProtectedMemberAuth,
+  writeStoredMemberAuth as writeProtectedMemberAuth,
+  type StoredMemberAuth,
+} from './security/member-auth-storage';
 import type {
   AiProvider,
   AiRolesState,
@@ -394,9 +400,7 @@ function appRuntimeContext() {
 
 const RUNTIME_PACK_BASE_URL =
   process.env.CENA_RAIZ_RUNTIMES_BASE_URL?.trim() ||
-  // Fallback herdado: bucket R2 do fornecedor original. Sera removido quando o
-  // bucket proprio estiver publicado e a variavel definida na distribuicao.
-  'https://pub-89ee05cdaf26477c8984a36be2b373fa.r2.dev/runtimes';
+  distributionManifest.channels.runtimes.baseUrl.trim();
 
 let runtimePackJob: Promise<RuntimePackState> | null = null;
 let runtimePackState: RuntimePackState = { status: 'unknown' };
@@ -431,6 +435,11 @@ function ensureRuntimePack(): Promise<RuntimePackState> {
   const job = (async (): Promise<RuntimePackState> => {
     broadcastRuntimePackState({ status: 'checking' });
     if (await runtimePackIsReady()) return { status: 'ready' };
+    if (!RUNTIME_PACK_BASE_URL) {
+      throw new Error(
+        'Este build não incorpora os runtimes e nenhum canal próprio de download está configurado.',
+      );
+    }
     const key = runtimePackKey();
     const packName = `runtimes-${process.platform}-${process.arch}-${key}.tar.gz`;
     const packUrl = `${RUNTIME_PACK_BASE_URL}/${packName}`;
@@ -441,7 +450,10 @@ function ensureRuntimePack(): Promise<RuntimePackState> {
       const shaResponse = await net.fetch(`${packUrl}.sha256`);
       if (shaResponse.ok) expectedDigest = (await shaResponse.text()).trim().split(/\s+/)[0] ?? '';
     } catch {
-      // Sem o arquivo de integridade seguimos apenas com HTTPS.
+      // A mensagem deterministica abaixo cobre indisponibilidade e resposta invalida.
+    }
+    if (!/^[a-f0-9]{64}$/iu.test(expectedDigest)) {
+      throw new Error('O canal de runtimes não forneceu um checksum SHA-256 válido.');
     }
 
     const stagingRoot = path.join(app.getPath('userData'), 'runtime');
@@ -2616,10 +2628,27 @@ function checkRuntime(
 
   return new Promise((resolve) => {
     const timeoutMs = resolution.name === 'yt-dlp' ? 30_000 : 10_000;
-    const child = spawn(resolution.command as string, [...resolution.argsPrefix, ...args], {
-      windowsHide: true,
-      stdio: ['ignore', 'pipe', 'pipe'],
-    });
+    let child: ChildProcessByStdio<null, Readable, Readable>;
+    try {
+      child = spawn(resolution.command as string, [...resolution.argsPrefix, ...args], {
+        windowsHide: true,
+        stdio: ['ignore', 'pipe', 'pipe'],
+      });
+    } catch (error) {
+      // O spawn de um .cmd/.bat sem shell falha de forma SINCRONA no
+      // Node 20.12+ (CVE-2024-27980). Sem este catch um unico runtime
+      // derrubava a checagem de todos os outros.
+      resolve({
+        name: resolution.name,
+        available: false,
+        version: null,
+        expectedVersion: resolution.expectedVersion,
+        source: resolution.source,
+        executablePath: resolution.command,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      return;
+    }
     let stdout = '';
     let stderr = '';
     let settled = false;
@@ -2695,12 +2724,27 @@ function registerIpcHandlers(): void {
     embeddedNodeVersion: process.versions.node,
   }));
 
-  ipcMain.handle('runtime:check', () =>
-    Promise.all(runtimeCommands.map(({ name, args }) => {
-      const resolution = resolveRuntime(name, appRuntimeContext());
-      return checkRuntime(resolution, args);
-    })),
-  );
+  ipcMain.handle('runtime:check', async () => {
+    const context = appRuntimeContext();
+    const resolutions = runtimeCommands.map(({ name }) => resolveRuntime(name, context));
+    const settled = await Promise.allSettled(
+      runtimeCommands.map(({ args }, index) => checkRuntime(resolutions[index], args)),
+    );
+    // Um runtime quebrado descreve a si mesmo; nunca apaga os outros seis.
+    return settled.map((result, index): RuntimeCheck => {
+      if (result.status === 'fulfilled') return result.value;
+      const resolution = resolutions[index];
+      return {
+        name: resolution.name,
+        available: false,
+        version: null,
+        expectedVersion: resolution.expectedVersion,
+        source: resolution.source,
+        executablePath: resolution.command,
+        error: result.reason instanceof Error ? result.reason.message : String(result.reason),
+      };
+    });
+  });
 
   ipcMain.handle('project:list', async () => {
     const projects = await readRecentProjects();
@@ -2997,16 +3041,55 @@ function createWindow(): void {
   // Opt-in visual regression hook for local/CI validation. It is inert for
   // users and avoids requiring macOS Screen Recording permission in tests.
   const screenshotPath = process.env.CENA_RAIZ_SCREENSHOT_PATH;
-  if (screenshotPath) {
+  const qaReportPath = process.env.CENA_RAIZ_QA_REPORT_PATH;
+  if (screenshotPath || qaReportPath) {
     const requestedDelay = Number(process.env.CENA_RAIZ_SCREENSHOT_DELAY_MS);
     const screenshotDelay = Number.isFinite(requestedDelay)
       ? Math.min(Math.max(requestedDelay, 0), 60_000)
       : 500;
     void pageLoad
-      .then(() => new Promise((resolve) => setTimeout(resolve, screenshotDelay)))
-      .then(() => mainWindow.webContents.capturePage())
-      .then(async (capture) => {
-        await writeFile(screenshotPath, capture.toPNG());
+      .then(() => mainWindow.webContents.executeJavaScript(`
+        new Promise((resolve) => {
+          const deadline = Date.now() + 30000;
+          const inspect = () => {
+            const root = document.getElementById('root');
+            const surface = document.querySelector('.member-gate')
+              ? 'member-gate'
+              : document.querySelector('.studio-shell')
+                ? 'studio-shell'
+                : 'unknown';
+            const bounds = document.body.getBoundingClientRect();
+            const state = {
+              ready: Boolean(root && root.childElementCount > 0 && surface !== 'unknown' && bounds.width > 0 && bounds.height > 0),
+              surface,
+              rootChildren: root?.childElementCount ?? 0,
+              bodyWidth: Math.round(bounds.width),
+              bodyHeight: Math.round(bounds.height),
+              title: document.title,
+            };
+            if (state.ready || Date.now() >= deadline) resolve(state);
+            else setTimeout(inspect, 100);
+          };
+          inspect();
+        })
+      `, true))
+      .then(async (report: {
+        ready?: boolean;
+        surface?: string;
+        rootChildren?: number;
+        bodyWidth?: number;
+        bodyHeight?: number;
+        title?: string;
+      }) => {
+        if (!report.ready) throw new Error(`Renderer nao ficou pronto: ${JSON.stringify(report)}`);
+        if (qaReportPath) {
+          await writeFile(qaReportPath, `${JSON.stringify({ schemaVersion: 1, ...report }, null, 2)}\n`);
+        }
+        if (screenshotPath) {
+          await new Promise((resolve) => setTimeout(resolve, screenshotDelay));
+          const capture = await mainWindow.webContents.capturePage();
+          await writeFile(screenshotPath, capture.toPNG());
+        }
         app.exit(0);
       })
       .catch((error: unknown) => {
@@ -3041,13 +3124,6 @@ const MEMBER_OFFLINE_GRACE_MS = 7 * 24 * 60 * 60 * 1000;
 
 let memberAuthState: MemberAuthState = { status: 'unconfigured' };
 
-type StoredMemberAuth = {
-  refreshToken: string;
-  email: string;
-  name?: string;
-  lastValidatedAt: number;
-};
-
 function memberConfigured(): boolean {
   return MEMBER_SUPABASE_URL.startsWith('https://') && MEMBER_SUPABASE_ANON_KEY.length > 20;
 }
@@ -3064,28 +3140,11 @@ function broadcastMemberAuth(state: MemberAuthState): void {
 }
 
 async function readStoredMemberAuth(): Promise<StoredMemberAuth | null> {
-  try {
-    const parsed = JSON.parse(await readFile(memberAuthFile(), 'utf8')) as Partial<StoredMemberAuth>;
-    const refreshToken = asText(parsed.refreshToken);
-    const email = asText(parsed.email);
-    if (!refreshToken || !email) return null;
-    return {
-      refreshToken,
-      email,
-      name: asText(parsed.name) || undefined,
-      lastValidatedAt: Number(parsed.lastValidatedAt) || 0,
-    };
-  } catch {
-    return null;
-  }
+  return readProtectedMemberAuth(memberAuthFile(), safeStorage);
 }
 
 async function writeStoredMemberAuth(stored: StoredMemberAuth | null): Promise<void> {
-  if (!stored) {
-    await rm(memberAuthFile(), { force: true });
-    return;
-  }
-  await writeFile(memberAuthFile(), `${JSON.stringify(stored, null, 2)}\n`, { mode: 0o600 });
+  await writeProtectedMemberAuth(memberAuthFile(), safeStorage, stored);
 }
 
 type MemberTokens = {
@@ -3230,7 +3289,28 @@ async function memberLogout(): Promise<MemberAuthState> {
   return memberAuthState;
 }
 
+// O portao de matricula foi retirado do fluxo do aplicativo por decisao da
+// Daniela: o app abre direto, em desenvolvimento e empacotado.
+//
+// As funcoes de login, logout e validacao continuam abaixo, intactas e sem
+// chamador no boot. O Git guarda a versao com portao caso o controle de
+// acesso volte a ser necessario.
+//
+// ATENCAO: esta remocao ja foi desfeita uma vez por edicao concorrente.
+// Antes de reintroduzir qualquer chamada a memberBoot com portao ativo,
+// confirme com a Daniela.
+function memberGateBypassed(): boolean {
+  return true;
+}
+
 async function memberBoot(): Promise<void> {
+  if (memberGateBypassed()) {
+    console.warn(
+      '[cena-raiz] Portao de matricula retirado: o aplicativo abre sem login.',
+    );
+    broadcastMemberAuth({ status: 'unconfigured' });
+    return;
+  }
   if (!memberConfigured()) {
     broadcastMemberAuth({ status: 'unconfigured' });
     return;
@@ -3292,9 +3372,7 @@ async function memberBoot(): Promise<void> {
 // scripts/generate-update-feed.mjs a cada release.
 const UPDATE_FEED_URL =
   process.env.CENA_RAIZ_UPDATE_FEED_URL?.trim() ||
-  // Bucket R2 herdado do fornecedor original (scripts/publish-update.mjs publica
-  // o feed.json e o ZIP de cada release nesta URL).
-  'https://pub-89ee05cdaf26477c8984a36be2b373fa.r2.dev/feed.json';
+  distributionManifest.channels.updates.feedUrl.trim();
 const UPDATE_CHECK_INTERVAL_MS = 4 * 60 * 60 * 1000;
 let appUpdateState: AppUpdateState = { status: 'idle' };
 

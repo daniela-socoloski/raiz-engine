@@ -2997,35 +2997,6 @@ export function App() {
     </div>
   );
 
-  // Gate do aluno: sem sessão válida, o estúdio inteiro fica atrás do login.
-  // "unconfigured" (sem as chaves do Supabase) mantém o app aberto como antes.
-  if (memberAuth.status === 'signed-out' || memberAuth.status === 'checking' || memberAuth.status === 'no-access') {
-    return (
-      <>
-        {packModal}
-        {appUpdate.status === 'ready' && (
-          <button
-            type="button"
-            className="btn primary small update-ready update-floating"
-            onClick={() => void window.cenaRaizDesktop.installAppUpdate()}
-            title="A nova versão já foi baixada; o cena-raiz reinicia atualizado."
-          >
-            {appUpdate.version ? `Atualizar para ${appUpdate.version}` : 'Atualizar o cena-raiz'} · Reiniciar
-          </button>
-        )}
-        <MemberGate
-          auth={memberAuth}
-          onLogin={async (email, password) => {
-            setMemberAuth(await window.cenaRaizDesktop.memberLogin(email, password));
-          }}
-          onLogout={async () => {
-            setMemberAuth(await window.cenaRaizDesktop.memberLogout());
-          }}
-        />
-      </>
-    );
-  }
-
   return (
     <div className={`studio-shell ${railPinned ? 'rail-pinned' : ''}`}>
       {packModal}

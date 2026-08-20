@@ -84,7 +84,7 @@ Pronto. Não há passo 4.
 
 ### O que o instalador faz
 
-- Descobre sozinho qual agente você usa (Claude Code, Codex, Antigravity) e
+- Descobre sozinho qual agente você usa (Claude Code ou Codex) e
   instala nas pastas de skills que existirem — sem você dizer qual.
 - Baixa e instala a **skill do Remotion** também, que a Fase 2 precisa. Era o
   passo que todo mundo esquecia.
@@ -102,7 +102,7 @@ Na primeira transcrição ele baixa os modelos do Whisper e de alinhamento
 ## Primeiro uso
 
 1. Coloque seus vídeos brutos numa pasta.
-2. Abra o seu agente (Claude Code, Codex ou Antigravity) **dentro dessa pasta**.
+2. Abra o seu agente (Claude Code ou Codex) **dentro dessa pasta**.
 3. Diga: *"edita esses vídeos num Reels"* ou *"faz um inventário dessas tomadas
    e me propõe uma estratégia"*.
 

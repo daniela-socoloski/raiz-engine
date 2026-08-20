@@ -155,7 +155,8 @@ Ele deve:
 2. compreender o objetivo e o conteúdo de uma produção específica;
 3. formular uma direção criativa verificável;
 4. selecionar recursos compatíveis;
-5. escolher o motor de execução adequado;
+5. compilar cada operação aprovada e roteá-la para o adapter elegível mais
+   simples, sem escolher um único motor para a produção inteira;
 6. transformar o plano aprovado em operações determinísticas;
 7. registrar correções e resultados para não recomeçar do zero.
 8. reconstruir um ambiente funcional em outra máquina por um bootstrap versionado e verificável.
@@ -593,7 +594,7 @@ chama `core`, sem repetir `raiz-engine/raiz-engine`.
 `doctor` pertence a `operations/bootstrap/`, junto da única fonte de instalação.
 Separá-lo em outra árvore criaria duas autoridades sobre a saúde da máquina.
 
-Consolidação estrutural executada em 2026-08-20:
+Consolidação estrutural concluída e validada localmente em 2026-08-20:
 
 | Origem anterior | Caminho canônico atual |
 |---|---|
@@ -905,8 +906,18 @@ entregar o estado canônico a uma ferramenta externa?
 **Entrega:** `ValidatedExecutionPlan`, `CanonicalTimeline` atualizada e jobs
 auditáveis.
 
+Esta fase não pergunta “qual programa fará este vídeo?”. Ela divide a produção
+em operações. O mesmo vídeo pode usar FFmpeg para mídia e áudio, Remotion para
+legendas e layouts, `raiz-Images` para uma imagem ausente e um adapter Adobe
+somente para o job que realmente exige essa capacidade.
+
 - compilar direção e assets em operações tipadas;
-- escolher FFmpeg, Remotion, `raiz-Images` ou outro adapter por capacidade;
+- escolher FFmpeg, Remotion, `raiz-Images` ou outro adapter **por operação e por
+  capacidade**, nunca por preferência do modelo;
+- respeitar o engine declarado por um asset registrado e validar versão,
+  parâmetros, fontes, plugins, duração e formato;
+- preferir o caminho local mais simples; usar Adobe apenas quando a capacidade
+  profissional for necessária, estiver disponível e tiver fallback explícito;
 - manter fallback explícito, idempotência, cancelamento, custo e readback;
 - preservar `TimelineModel`, originais, EDL, J-Cut e edição não destrutiva;
 - validar o resultado real, não a alegação do modelo.
@@ -935,6 +946,10 @@ próxima produção sem transformar conversa em fonte de verdade.
 
 **Pergunta:** quais acabamentos exigem capacidades profissionais opcionais que o
 core não deve reimplementar?
+
+Esta fase não escolhe o motor de cada job. Ela apenas torna After Effects e
+Premiere elegíveis como capacidades opcionais. A escolha operacional continua
+pertencendo ao router determinístico da Fase 5.
 
 **Entrega:** adapters controlados de After Effects e Premiere, com os mesmos
 contratos, validações e fallbacks da Fase 5.
@@ -1098,10 +1113,10 @@ capacidade nova possa ser reproduzida em outra máquina.
 
 A sequência atual, considerando o que já foi executado, é:
 
-1. concluir a Etapa 7 validando a consolidação já executada, sem confundi-la com
-   autorização de commit ou push;
-2. concluir o bootstrap `developer` da
+1. concluir o bootstrap `developer` da
    Fase 0;
+2. resolver a dependência de Bash dos comandos de assinatura/publicação ou
+   substituí-la por uma entrada Windows portátil;
 3. provar `bootstrap → doctor → typecheck → testes → aplicativo aberto` em uma
    VM Windows 11 x64 limpa;
 4. construir o perfil `creator` e gerar o primeiro instalador local, sem publicar;

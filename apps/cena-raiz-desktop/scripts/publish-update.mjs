@@ -123,7 +123,7 @@ if (isWindowsRelease) {
   const releasesPath = path.join(squirrelDirectory, releasesName);
   await putObject('win32/RELEASES', releasesPath, 'application/octet-stream', (await stat(releasesPath)).size);
   // Instalador para alunos novos: versao arquivada + nome ESTAVEL para o
-  // link de download da Creator Factory.
+  // link de download do canal proprio do Raiz Engine.
   const setupPath = path.join(squirrelDirectory, setupExe);
   const setupSize = (await stat(setupPath)).size;
   await putObject(`win32/CenaRaiz-Setup-${version}.exe`, setupPath, 'application/octet-stream', setupSize);
@@ -156,7 +156,7 @@ if (isWindowsRelease) {
   await putObject('feed.json', feedPath, 'application/json', feedInfo.size);
 
   // Instalador para alunos novos: versao arquivada + nome ESTAVEL para a
-  // pagina de download da Creator Factory (par do CenaRaizSetup.exe do Windows).
+  // pagina de download do Raiz Engine (par do CenaRaizSetup.exe do Windows).
   const dmgName = `CenaRaiz-${version}-arm64.dmg`;
   const dmgPath = path.join(projectRoot, 'out', 'make', dmgName);
   const dmgInfo = await stat(dmgPath).catch(() => null);

@@ -116,7 +116,7 @@ flowchart TD
     DP --> HA["Human approval"]
     HA --> P4["4. Asset Intelligence"]
     P4 --> EP["Validated Execution Plan"]
-    EP --> P5["5. Execution Router"]
+    EP --> P5["5. Compile jobs and route each operation"]
     P5 --> RM["Remotion"]
     P5 --> FF["FFmpeg"]
     P5 -. "optional professional capability" .-> AE["After Effects MCP"]
@@ -132,7 +132,10 @@ flowchart TD
 Operationally, a new video starts at phase 2 only when an approved
 `BrandRuntimeProfile` already exists. If it does not, the system routes the user
 through phase 1 first. Adobe belongs to product phase 7 and appears above only as
-an optional adapter selected by phase 5; it never blocks the core path.
+an optional adapter selected by phase 5; it never blocks the core path. Phase 5
+does not choose one engine for the whole video. It compiles each approved
+operation into a job and routes every job independently, so one production may
+use FFmpeg, Remotion and, when justified and available, one professional adapter.
 
 ## 6. Responsibility boundaries
 
@@ -216,7 +219,7 @@ export interface SceneMotionNeed {
     | 'call-to-action';
   content: Record<string, string | number | boolean>;
   visualPriority: 'low' | 'medium' | 'high';
-  preferredEngine?: 'remotion' | 'after-effects' | 'premiere' | 'ffmpeg';
+  engineRecommendation?: 'remotion' | 'after-effects' | 'premiere' | 'ffmpeg';
   assetQuery: {
     capabilities: string[];
     brandTags: string[];
@@ -312,22 +315,123 @@ export interface TimelineOverlay {
 
 Unknown fields may be preserved for backward compatibility, but new production behavior must use official schemas.
 
-## 7. Execution router
+## 7. Execution compilation and engine routing — product phase 5
 
-The router selects an engine using deterministic rules after the planner identifies the visual need.
+The `7` above is this document's section number, not product phase 7. In the
+canonical lifecycle, routing happens in **product phase 5**. Product phase 7 only
+adds optional professional adapters to the capability set that phase 5 may route
+to.
 
-Initial routing policy:
+This step does **not** ask the model or the user to choose one application for the
+entire video. It converts the approved direction into small typed operations and
+selects the simplest eligible engine for each operation.
 
-| Need | Primary engine | Fallback |
+```text
+approved scene need
+→ selected asset, when one exists
+→ typed operation
+→ capability and compatibility checks
+→ engine job or explicit fallback
+→ execution
+→ readback and validation
+```
+
+### 7.1 What enters and leaves this step
+
+Required inputs:
+
+- approved `AudiovisualDirectionPlan`;
+- selected and validated asset manifests;
+- current `CanonicalTimeline`;
+- runtime capability snapshot from bootstrap and `doctor`;
+- routing policy, including quality, safety, cost and fallback constraints.
+
+Required output:
+
+- one `ValidatedExecutionPlan` containing ordered jobs;
+- the selected adapter and reason for every job;
+- required inputs, expected outputs and timeline destination;
+- fallback or terminal blocking reason;
+- idempotency key, timeout, cancellation and readback policy.
+
+The output is not “use After Effects”. It is closer to:
+
+```text
+job 01  ffmpeg        clean cuts and normalize dialogue
+job 02  remotion      render captions from registered component
+job 03  after-effects render approved branded opener asset
+job 04  ffmpeg        mux the opener and caption render into the canonical cut
+```
+
+### 7.2 Who makes which decision
+
+| Decision | Owner | Rule |
 |---|---|---|
-| Clean cut, concat, proxy, audio, J-cut | FFmpeg | None |
-| Captions, headlines, standard split layouts | Remotion | FFmpeg-safe render |
-| Registered reusable motion component | Asset-defined engine | Remotion placeholder |
-| Custom branded motion or complex composition | After Effects MCP | Remotion simplified version |
-| Professional timeline assembly and human finishing | Premiere MCP | Canonical timeline + app render |
-| MOGRT placement | Premiere MCP | Pre-rendered asset |
+| What the scene must communicate | planner + human approval | probabilistic interpretation is allowed |
+| Which approved asset fits that need | Asset Registry selection | only compatible registered candidates |
+| Which engine an asset requires | asset manifest | deterministic metadata, not model preference |
+| Which adapter executes a generic operation | Execution Router | deterministic policy and capability checks |
+| Whether to accept a fallback | routing policy or human gate | never silently lower a high-priority result |
 
-The planner may recommend an engine, but the router is authoritative and must verify availability, compatibility, required plugins, project state, and fallback readiness.
+`engineRecommendation` in the direction plan is only a hint. It never authorizes
+execution and may be rejected by the router.
+
+### 7.3 Deterministic routing order
+
+For each operation, the router applies this order:
+
+1. Validate that the operation traces to an approved scene need.
+2. If a registered asset was selected, honor its declared engine and validate its
+   version, parameters, fonts, plugins, aspect ratio and duration.
+3. If no asset fixes the engine, choose the simplest local engine that satisfies
+   the required capability and output contract.
+4. Use a professional Adobe adapter only when the required result cannot be met
+   by the core path, the capability probe passes and the plan permits it.
+5. If the primary engine is unavailable, use the declared fallback only when it
+   still preserves the scene purpose and minimum quality.
+6. Otherwise stop that job with an explicit `engine-unavailable`,
+   `asset-incompatible` or `fallback-insufficient` result. Do not improvise.
+
+### 7.4 Initial routing matrix
+
+| Operation need | Route when | Selected adapter | Fallback or block |
+|---|---|---|---|
+| Probe, proxy, clean cut, concat, audio normalization, J-cut, mux | deterministic media transformation is sufficient | FFmpeg | block if FFmpeg is unavailable |
+| Captions, headlines, standard layouts, registered React motion and repeatable variants | composition exists in the Remotion registry | Remotion | simpler registered Remotion component or static overlay |
+| Static or generated image | approved image already exists or an `ImageRequest` is authorized | media adapter or `raiz-Images` adapter | approved placeholder; never invent an external provider call |
+| Registered After Effects composition | selected asset requires After Effects and capability probe, fonts and plugins pass | After Effects adapter | registered Remotion alternative; otherwise request approval or block |
+| MOGRT placement or human-editable professional timeline | selected asset is a MOGRT or the approved output explicitly requires NLE handoff | Premiere adapter | pre-rendered asset or canonical app timeline |
+| Final assembly of pre-rendered outputs | all upstream jobs passed readback | FFmpeg + canonical timeline | block on missing or invalid upstream output |
+
+The asset's `engine` field and the execution adapter are related but not always
+identical. For example, a `mogrt` asset routes to the Premiere adapter; a
+`media` asset may be placed by the canonical timeline and muxed by FFmpeg. The
+router owns this mapping so provider-specific semantics do not leak into the
+planner.
+
+### 7.5 Concrete example
+
+Suppose the approved plan asks for:
+
+- clean dialogue cuts;
+- dynamic captions;
+- a five-second branded opener;
+- final vertical delivery;
+- an editable Premiere handoff only if requested by the human reviewer.
+
+The router produces:
+
+1. FFmpeg job for cuts, J-cuts and dialogue normalization.
+2. Remotion job using the compatible registered caption asset.
+3. After Effects job only if the selected opener manifest requires it and the
+   local capability probe passes; otherwise its registered Remotion fallback.
+4. FFmpeg job to assemble validated renders into the canonical output.
+5. No Premiere job by default. It is added only when editable NLE handoff is an
+   approved delivery requirement.
+
+This makes engine selection explainable, reproducible and replaceable. A missing
+Adobe application changes only the affected job; it does not invalidate the
+entire Raiz Engine workflow.
 
 ## 8. Adobe integration architecture
 

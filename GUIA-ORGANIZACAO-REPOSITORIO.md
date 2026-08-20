@@ -222,8 +222,8 @@ está, sem reordenar nem promover etapas.
 | 4 — Política de versionamento | **concluída** — `.gitignore` revisado item a item; varredura de credenciais sem ocorrências |
 | 5 — Baseline | **concluída e aceita para consolidação.** Commit `231e746`, designação canônica `reconciled Raiz Engine baseline`. O remoto privado já contém o baseline; novos pushes exigem autorização separada |
 | 6 — Reorganização estrutural | **executada no worktree em 2026-08-20**; caminhos ativos antigos removidos |
-| 7 — Validar a consolidação | **em execução**; contagens preservadas, manifests, links, typecheck e testes em validação |
-| 8 — Recuperar o baseline técnico | **executada antecipadamente** sob autorização: typecheck limpo, oito suítes executáveis |
+| 7 — Validar a consolidação | **concluída localmente**; contagens, manifests, locks, links, fronteiras, segredos por nome, typecheck, testes, Git e LFS verificados |
+| 8 — Recuperar o baseline técnico | **executada antecipadamente** sob autorização: typecheck limpo e todos os testes declarados executáveis |
 | 9 — Migrar identidade | **executada antecipadamente** como `CLEAN CUT — ACCEPTED` |
 | 10 — Bootstrap reproduzível | **em construção antecipadamente sob autorização**: launcher Windows, bootstrap `developer`, `doctor` e manifest iniciais; perfil `creator` e prova em VM pendentes |
 | 11 — Começar o Raiz Engine | **iniciada antecipadamente de forma parcial** no desktop com contratos de direção; o começo canônico pela compilação de Brand Intelligence permanece pendente |
@@ -377,7 +377,11 @@ Esse commit não afirma autoria sobre o código herdado. Ele cria o ponto de com
 
 ### Etapa 6 — Reorganizar em um commit separado
 
-> **Executada no worktree em 2026-08-20 sob autorização explícita da proprietária.**
+> **Concluída localmente em 2026-08-20 sob autorização explícita da proprietária.**
+> Uma sessão concorrente criou `dd0c130` durante o trabalho. Esse commit inclui a
+> consolidação e outras mudanças sob o assunto impreciso “Add Windows build and
+> smoke tests for cena-raiz”; não foi enviado a `origin/main` e não deve ser
+> reescrito ou publicado sem autorização separada.
 
 Movimentos realizados:
 
@@ -413,6 +417,9 @@ chore: consolidate inherited components into monorepo boundaries
 ```
 
 ### Etapa 7 — Validar a consolidação
+
+> **Concluída localmente em 2026-08-20.** Evidência detalhada em
+> `docs/provenance/INVENTARIO-REPOSITORIO.md` § 15.10.
 
 Verificar:
 

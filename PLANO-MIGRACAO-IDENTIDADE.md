@@ -197,7 +197,7 @@ Exemplos:
 - o diretório de dados do usuário deriva de `productName`, que já era próprio;
 - não existem integrações externas comprovadas consumindo os contratos `Edvid`;
 - o typecheck passa com os identificadores canônicos;
-- as oito suítes de teste estão executáveis e passando.
+- todos os testes declarados do desktop e da skill estão executáveis e passando.
 
 ### Regra permanente
 
@@ -483,7 +483,8 @@ PROVENANCE.md
 
 ### Fase 0E — Consolidação do monorepositório
 
-> **Executada no worktree em 2026-08-20.**
+> **Concluída localmente em 2026-08-20.** O commit local concorrente `dd0c130`
+> contém a consolidação junto de outras mudanças e ainda não foi publicado.
 
 - `SKILLS/ads-produto/` foi movida primeiro para liberar o nome `skills/`;
 - a skill foi movida para `skills/cena-raiz/`;
@@ -492,8 +493,11 @@ PROVENANCE.md
   `docs/architecture/cena-raiz-audiovisual-evolution.md`;
 - a recipe foi consolidada em `recipes/ads-produto/`;
 - a pasta clone vazia e a árvore intermediária foram removidas;
-- manifests, links, licenças e contagens são validados na Etapa 7;
-- commit e push continuam ações separadas, não autorizadas pela movimentação.
+- manifests, links, licenças, contagens, typecheck, testes, Git e LFS foram
+  validados na Etapa 7;
+- a movimentação por si só não autorizava commit nem push; uma sessão concorrente
+  criou o commit local `dd0c130`, registrado em `PROVENANCE.md`; o push continua
+  pendente de autorização separada.
 
 ### Fase 1A — Reparar a substituição mecânica
 

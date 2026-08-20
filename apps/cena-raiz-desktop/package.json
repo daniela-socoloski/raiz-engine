@@ -33,7 +33,7 @@
     "pack:runtimes": "node scripts/pack-runtimes.mjs",
     "publish:runtimes": "bash -c 'set -a && source ./signing.env && set +a && node scripts/publish-runtimes.mjs'"
   },
-  "author": "Creator Factory",
+  "author": "Raiz Engine",
   "license": "MIT",
   "dependencies": {
     "electron-squirrel-startup": "^1.0.1",

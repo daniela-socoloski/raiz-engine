@@ -52,8 +52,8 @@ Windows limpo
 → raiz-bootstrap.ps1 lê toolchain.json
 → winget instala ou valida Node, uv, Python 3.12 e demais ferramentas
 → git lfs pull            (o corpus, se não for -SkipCorpus)
-→ npm install             (desktop)
-→ uv sync                 (skill)
+→ npm ci                  (desktop, reproduzido pelo `package-lock.json`)
+→ uv sync --frozen        (skill, reproduzida pelo `uv.lock`)
 → raiz doctor
 ```
 
@@ -111,6 +111,11 @@ O bootstrap ainda não cobre: instalação das skills no Codex e Claude Code,
 preparação dos runtimes empacotados, build do instalador `creator`, reparo
 automático completo, nem validação em VM limpa. Estão na sequência da Fase 0,
 depois da consolidação estrutural.
+
+Os comandos `make:signed`, `publish:update` e `publish:runtimes` ainda chamam
+`bash` pelo nome. Nesta máquina o Git Bash existe em
+`C:\Program Files\Git\bin\bash.exe`, mas não está no `PATH` do PowerShell; esses
+comandos permanecem bloqueados até a Fase 0 resolver a entrada de forma portátil.
 
 O repositório é privado. Portanto, uma URL `raw.githubusercontent.com` anônima
 não é uma entrada funcional para máquina limpa. O `install.ps1` existe e pode ser

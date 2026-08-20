@@ -147,8 +147,8 @@ without a concrete architecture driver and a real first consumer.
 The project is in the repository-foundation stage. Steps `Etapa 0` through
 `Etapa 5` are concluded. The owner accepted the baseline for structural
 consolidation by explicitly authorizing the repository recreation and file moves
-on 2026-08-20. `Etapa 6` has been executed in the worktree; `Etapa 7` validation
-is the current gate. The private remote contains the baseline and later work;
+on 2026-08-20. `Etapa 6` and `Etapa 7` are concluded locally. Product `Fase 0`
+through guide `Etapa 10` is the current gate. The private remote contains the baseline and later work;
 verify `origin/main` instead of copying its changing tip into normative text.
 
 Evidence for the concluded steps, and for work executed out of order, is recorded
@@ -156,12 +156,13 @@ in section 15 of `docs/provenance/INVENTARIO-REPOSITORIO.md`. Sections 1–14 of
 that document describe the earlier snapshot; where they disagree with section 15,
 section 15 is current.
 
-Until `Etapa 7` validates the consolidation:
+While `Etapa 10` and product `Fase 0` remain incomplete:
 
 - do not stage the repository wholesale;
-- do not run inherited installers or updaters;
 - do not restore `cena-raiz/cenaraiz/`, `SKILLS/`, or another active copy of a
   consolidated component;
+- do not run release, updater, signing, or publication commands until the owned
+  distribution path and the Windows Bash dependency are resolved;
 - do not implement Adobe runtime mutations or product capabilities outside the
   explicitly authorized Fase 0 bootstrap and architectural alignment. Those
   authorizations do not activate Adobe writes.
@@ -170,7 +171,7 @@ Two steps were executed outside the documented order, each under explicit human
 approval, and both are recorded rather than hidden:
 
 - `Etapa 8` — technical baseline recovery: type-check restored from 29 errors to
-  zero and eight test suites made runnable, in the desktop and in the skill.
+  zero and all declared desktop and skill tests made runnable.
 - `Etapa 9` — identity migration: executed as a clean cut, without the alias and
   fallback layer the plan prescribes, after verifying that no build was ever
   distributed and no persisted state existed to honour. The plan must record this
@@ -220,11 +221,11 @@ The guide's `Etapa 10` implements product `Fase 0`; `Etapa 11` opens product
 | `Etapa 3 — Adotar o nome local e uma única fronteira Git` | Establish the repository root as the single owned Git boundary after backup and explicit approval. |
 | `Etapa 4 — Criar política de versionamento` | Create or review root `.gitignore`, protect secrets and generated files, scan credentials, and review staging policy. |
 | `Etapa 5 — Baseline` | **Accepted for consolidation.** Commit `231e746`, canonically `reconciled Raiz Engine baseline`. Never call it the inherited state. |
-| `Etapa 6 — Reorganizar em um commit separado` | **Executed in the worktree.** Canonical roots are `apps/`, `skills/`, `recipes/`, and `docs/architecture/`; old active roots were removed. |
-| `Etapa 7 — Validar a consolidação` | **Current gate.** Prove files, manifests, locks, links, boundaries, and staging remained correct. |
+| `Etapa 6 — Reorganizar em um commit separado` | **Concluded locally.** Canonical roots are `apps/`, `skills/`, `recipes/`, and `docs/architecture/`; old active roots were removed. The concurrent local commit `dd0c130` contains the consolidation under an inaccurate narrow subject and has not been pushed. |
+| `Etapa 7 — Validar a consolidação` | **Concluded locally.** Counts, manifests, locks, links, boundaries, secret-name scan, type-check, tests, Git integrity, and LFS integrity were verified. |
 | `Etapa 8 — Recuperar o baseline técnico` | Restore type-check, tests, and development startup before feature work. |
 | `Etapa 9 — Migrar identidade` | Migrate visible identity and internal compatibility in verified stages. |
-| `Etapa 10 — Construir o bootstrap reproduzível` | Build and validate the canonical developer bootstrap and toolchain manifest. |
+| `Etapa 10 — Construir o bootstrap reproduzível` | **Current gate.** Finish and prove the canonical developer bootstrap, then build the creator installer and validate both on a clean Windows VM. |
 | `Etapa 11 — Começar o Raiz Engine` | Introduce the first owned contract and core capability at the verified integration seam. |
 
 The ignore policy and repository-level secret exclusions were concluded in

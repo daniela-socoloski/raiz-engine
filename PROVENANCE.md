@@ -151,6 +151,19 @@ Os componentes foram movidos sem criar cópias ativas:
 da verificação. `cena-raiz/` permanece apenas como contêiner local ignorado dos
 clones externos de referência. As licenças MIT acompanharam os componentes.
 
+### Commit local concorrente
+
+Durante essa consolidação, outra sessão criou o commit local `dd0c130`, assunto
+`Add Windows build and smoke tests for cena-raiz`. O commit inclui a movimentação
+estrutural, bootstrap, contratos de motion e documentação; seu assunto não
+descreve todo o escopo. Na verificação, `origin/main` permanecia em `cac2f6f`.
+Esse histórico não deve ser reescrito nem publicado sem autorização separada.
+
+A Etapa 7 validou localmente contagens, manifests, locks, links, fronteiras,
+segredos por nome, typecheck, testes, integridade Git e integridade LFS. A grafia
+canônica `skills/` foi registrada por renomeação case-safe para não voltar a
+`SKILLS/` em clones Linux. A Fase 0 continua em construção.
+
 ## Git LFS — dependência obrigatória
 
 O corpus **continua integralmente versionado**. Não foi excluído, reduzido nem

@@ -21,8 +21,8 @@ Codex or Claude Code
   -> After Effects or Premiere Pro
 ```
 
-There is no Antigravity-specific layer. A client selects and invokes MCP tools;
-creative intent and canonical state remain owned by the Raiz Engine.
+Codex and Claude Code invoke the same MCP contracts. Creative intent and
+canonical state remain owned by the Raiz Engine rather than by either client.
 
 ## Canonical local contracts
 

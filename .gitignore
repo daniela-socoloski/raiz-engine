@@ -78,6 +78,7 @@ resources/runtimes/
 *.bin
 *.safetensors
 .cache/
+.runtime-cache/
 .huggingface/
 .torch/
 whisper-models/

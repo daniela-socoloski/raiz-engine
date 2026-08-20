@@ -96,20 +96,21 @@
   "components": {
     "desktop": {
       "path": "apps/cena-raiz-desktop",
-      "install": ["npm", "install"],
+      "install": ["npm", "ci"],
       "verify": ["npm", "run", "typecheck"],
-      "tests": ["test:timeline", "test:media", "test:helpers", "test:jcut"],
+      "tests": ["test:timeline", "test:media", "test:helpers", "test:jcut", "test:direction-plan", "test:motion-registry"],
       "note": "Aplicativo desktop canonico apos a consolidacao estrutural."
     },
     "skill": {
       "path": "skills/cena-raiz",
-      "install": ["uv", "sync"],
-      "verify": ["python", "-m", "unittest", "discover", "-s", "tests"],
+      "install": ["uv", "sync", "--frozen"],
+      "verify": ["uv", "run", "python", "-m", "unittest", "discover", "-s", "tests"],
       "note": "Skill audiovisual canonica apos a consolidacao estrutural."
     }
   },
 
   "pendingBeforeDistribution": [
+    "resolver a dependencia de bash dos comandos make:signed, publish:update e publish:runtimes no Windows",
     "publicacao propria de runtimes e feed de update (hoje aponta para infraestrutura do fornecedor)",
     "workflow em .github/workflows/ (hoje o GitHub nao o executa)",
     "refresh token em safeStorage/DPAPI",

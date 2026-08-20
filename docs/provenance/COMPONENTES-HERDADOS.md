@@ -98,10 +98,10 @@ Nenhuma dessas classes significa “arquivo aleatório” ou autorização de re
 As evidências locais registram dois repositórios de origem separados, mas com
 responsabilidades complementares dentro da mesma base adquirida:
 
-| Componente local | Origem declarada | Função original | Classe atual |
-|---|---|---|---|
-| `cena-raiz/cenaraiz/cena-raiz/` | `fillrochaa/edvid` | método de edição para agentes, helpers e templates | `adapted-inherited` |
-| `cena-raiz/cenaraiz/cena-raiz-desktop/` | `fillrochaa/edvid-desktop` | aplicativo Electron e host local de execução | `adapted-inherited` |
+| Componente local atual | Local anterior | Origem declarada | Função original | Classe atual |
+|---|---|---|---|---|
+| `skills/cena-raiz/` | `cena-raiz/cenaraiz/cena-raiz/` | `fillrochaa/edvid` | método de edição para agentes, helpers e templates | `adapted-inherited` |
+| `apps/cena-raiz-desktop/` | `cena-raiz/cenaraiz/cena-raiz-desktop/` | `fillrochaa/edvid-desktop` | aplicativo Electron e host local de execução | `adapted-inherited` |
 
 As cópias locais não preservam o `.git` próprio desses upstreams. A revisão
 exata de origem e o delta local ainda são desconhecidos. Uma consulta pública
@@ -128,12 +128,13 @@ seja executada em lotes verificáveis.
 
 Os dois arquivos `LICENSE` locais são MIT e declaram Copyright (c) 2026 Creator
 Factory. Eles são idênticos e devem ser preservados até a revisão formal de
-proveniência. A raiz ainda precisa de `LICENSE`, `NOTICE.md` e `PROVENANCE.md`.
+proveniência. A raiz agora possui `LICENSE`, `NOTICE.md` e `PROVENANCE.md`.
 
 ## 3. Skill de edição herdada
 
-- caminho atual: `cena-raiz/cenaraiz/cena-raiz/`;
-- destino estrutural: `skills/cena-raiz/`;
+- caminho atual e fronteira estrutural: `skills/cena-raiz/`;
+- caminho anterior preservado apenas como proveniência:
+  `cena-raiz/cenaraiz/cena-raiz/`;
 - volume: 99 arquivos, 2.444.138 bytes;
 - manifest: `pyproject.toml` (`cenaraiz` 0.1.0, Python `>=3.10,<3.14`);
 - lock: `uv.lock`;
@@ -155,29 +156,32 @@ A skill contém:
 Ela deve continuar sendo a camada de método e orquestração do agente. Não deve
 se tornar a interface desktop nem o futuro núcleo de contratos do Raiz Engine.
 
-### 3.2 Adaptação incompleta
+### 3.2 Achados históricos e correções posteriores
 
-Evidências simultâneas:
+No snapshot inicial, as evidências eram:
 
 - `README.md` e `SKILL.md` já usam a identidade ativa `Cena Raiz`;
 - `install.md` ainda usa o marcador histórico `<EDVID>`;
-- README, `install.md` e `cenaraiz_install.py` apontam para
+- README, `install.md` e `cenaraiz_install.py` apontavam para
   `fillrochaa/cena-raiz`, remoto que não foi confirmado como fonte publicável;
-- README e `install.md` citam `cena-raiz_install.py`, mas o arquivo existente e
+- README e `install.md` citavam `cena-raiz_install.py`, mas o arquivo existente e
   o entry point usam o identificador Python válido `cenaraiz_install.py`;
 - o manifest já usa o projeto `cenaraiz` e a CLI `cenaraiz-install`;
 - `cenaraiz_install.py` passou em compilação sintática isolada em 2026-08-20;
-- `tests/test_installer.py` importa `CENA_RAIZ_install`, módulo que não existe
-  com esse nome, portanto o conjunto ainda não possui baseline de teste válido.
+- `tests/test_installer.py` importava `CENA_RAIZ_install`, módulo que não existia
+  com esse nome; naquele momento o conjunto ainda não possuía baseline de teste
+  válido.
 
-Conclusão: houve renomeação local ampla, mas ela ainda não formou uma versão
-verificada nem uma nova proveniência. Corrigir isso é trabalho da Etapa 8 e da
-migração de identidade posterior, nunca do commit de movimentação.
+As correções técnicas e de identidade foram executadas antes do primeiro commit,
+conforme `PROVENANCE.md`. Na consolidação estrutural, as referências operacionais
+ao instalador foram normalizadas para `cenaraiz_install.py`; os nomes antigos
+permanecem somente neste registro histórico.
 
 ## 4. Aplicativo desktop herdado
 
-- caminho atual: `cena-raiz/cenaraiz/cena-raiz-desktop/`;
-- destino estrutural: `apps/cena-raiz-desktop/`;
+- caminho atual e fronteira estrutural: `apps/cena-raiz-desktop/`;
+- caminho anterior preservado apenas como proveniência:
+  `cena-raiz/cenaraiz/cena-raiz-desktop/`;
 - volume: 115 arquivos, 2.754.256 bytes;
 - pacote: `@cena-raiz/desktop`, versão 0.13.8;
 - stack: Electron, React, TypeScript, Vite e Electron Forge;
@@ -218,11 +222,11 @@ regravou `App.tsx`, `renderer.tsx`, `forge.config.ts` e `test-jcut.mjs`. O estad
 resultante não foi validado por esta etapa e não deve ser confundido com a
 recuperação técnica controlada da Etapa 8.
 
-### 4.3 Pasta vazia
+### 4.3 Pasta vazia removida
 
-`cena-raiz/cenaraiz/cena-raiz-desktop-clone/` tem zero arquivos. Não é uma
-terceira implementação. Sua remoção só ocorre na Etapa 6, depois de nova
-confirmação e autorização.
+`cena-raiz/cenaraiz/cena-raiz-desktop-clone/` tinha zero arquivos e não era uma
+terceira implementação. Foi removida na Etapa 6 depois de nova confirmação e da
+autorização explícita da proprietária.
 
 ## 5. Sobreposição entre skill e desktop
 
@@ -309,7 +313,7 @@ Momento: cópia na Etapa 2; retirada da árvore somente na Etapa 3.
 | `ASSETS/` | material-fonte não classificado | Asset Registry | catalogar licença, origem, cliente e uso |
 | `slide-raiz/` | `project-owned-unverified` | Narrative Intelligence | identificar contratos reutilizáveis |
 | `raiz-Images/` | `project-owned-unverified` | Image Direction e adapters | separar config local e código portátil |
-| `SKILLS/ads-produto/` | `project-owned-unverified` | primeira Creative Recipe | mover para `recipes/ads-produto/` |
+| `recipes/ads-produto/` | `project-owned-unverified` | primeira Creative Recipe | fronteira estrutural consolidada |
 | documentos-mestre | `project-owned` | governança do Raiz Engine | manter atualizados com o estado verificado |
 
 Essas áreas não derivam automaticamente dos dois upstreams de vídeo, mas a
@@ -323,7 +327,7 @@ fixture precisam ser avaliados.
 
 ## 9. Pacote `architect-ai-systems.skill`
 
-- caminho atual: `SKILLS/architect-ai-systems.skill`;
+- caminho atual: `skills/architect-ai-systems.skill`;
 - formato: arquivo ZIP de skill instalável;
 - tamanho: 31.757 bytes;
 - SHA-256: `b2d5b78152deb5a0fe275769cdbdeaa8dad5fc38cf824182e9b7ee706a1bf525`;
@@ -331,9 +335,9 @@ fixture precisam ser avaliados.
 - verificação: o `SKILL.md` interno é idêntico ao instalado nesta máquina;
 - classe: `tooling-artifact`.
 
-Esse arquivo explica por que `SKILLS/` não ficará vazio após mover somente
-`ads-produto/`. Na Etapa 6, a própria pasta deve passar por renomeação
-intermediária `SKILLS` → `skills.__casefix__` → `skills`, preservando o pacote.
+Esse arquivo explicou por que `SKILLS/` não poderia ser simplesmente removido
+após mover `ads-produto/`. Na Etapa 6, a pasta passou por renomeação
+intermediária case-safe até `skills/`, preservando o pacote.
 
 Decisão futura para a Etapa 10: definir uma fonte canônica editável e um comando
 reproduzível que gere/instale o `.skill`. O pacote e a instalação local não podem
