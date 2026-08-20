@@ -14,14 +14,16 @@ mandar produzir.
 
 ## Fase atual
 
-**Etapa 4 — política de versionamento, em revisão.**
+**Etapa 5 — executada, aguardando aceitação após reconciliação documental.**
 
 | | |
 |---|---|
-| Etapas concluídas | 0, 1, 2 e 3 |
+| Etapas concluídas | 0, 1, 2, 3 e 4 |
 | Executadas antecipadamente, sob autorização | 8 (baseline técnico) e 9 (identidade, como `CLEAN CUT — ACCEPTED`) |
-| Commit-base herdado | **ainda não existe** |
+| Primeiro commit | `231e746` — **`reconciled Raiz Engine baseline`**, 854 arquivos. Executado localmente, **aguarda aceitação**; não é o estado como recebido |
 | Recuperação externa | backup completo e backup do Git intermediário, ambos verificados |
+| Git LFS | **obrigatório** — 505 caminhos, 501 objetos, 398 MB. Clone sem LFS traz ponteiros, não os assets |
+| Push para o remoto | **pendente**, exige autorização separada; o remoto segue vazio |
 | Releases | **bloqueadas** até a publicação própria existir |
 
 O estado detalhado de cada etapa está em

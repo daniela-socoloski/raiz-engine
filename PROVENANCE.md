@@ -70,9 +70,46 @@ isso não existir, os endpoints do fornecedor permanecem como
 `INHERITED-INFRASTRUCTURE-DEPENDENCY` — ver
 [docs/integrations/INFRAESTRUTURA-PROPRIA.md](docs/integrations/INFRAESTRUTURA-PROPRIA.md).
 
-## Sobre este commit-base
+## Designação canônica do primeiro commit
 
-Este commit **não** preserva o estado herdado como recebido.
+O commit `231e746` chama-se **`reconciled Raiz Engine baseline`**.
+
+Não deve ser chamado de "estado herdado" nem de "inherited baseline" em nenhum
+documento, mensagem ou conversa. O assunto do commit foi corrigido para essa
+designação **antes de qualquer push**.
+
+### Commits provisórios substituídos
+
+O primeiro commit local recebeu `9c5b9d8` e assunto `baseline of the reconciled
+inherited state`. Foi substituído por amend, e em seguida reescrito pela migração
+para Git LFS. Nenhuma dessas revisões chegou a remoto algum: o repositório remoto
+esteve vazio o tempo todo, e por isso a reescrita não afeta clone, fork ou
+histórico de terceiros.
+
+O `HEAD` válido é `231e746`. Referências a `9c5b9d8` em qualquer registro
+anterior descrevem um commit provisório que não existe mais.
+
+Seis fatos que definem esse commit:
+
+1. **Não existe snapshot completo do estado como recebido.** Nenhum backup local
+   corresponde ao que foi adquirido: o anterior à renomeação já contém as
+   correções de type-check, e o completo é posterior à renomeação.
+2. **As Etapas 8 e 9 ocorreram antes do primeiro commit**, sob autorização humana
+   explícita — recuperação técnica e migração de identidade como
+   `CLEAN CUT — ACCEPTED`.
+3. **Este é o primeiro estado completo e recuperável do Raiz Engine.** Antes dele
+   não havia histórico: apenas arquivos compactados datados.
+4. **A proveniência anterior depende de três fontes externas a este histórico:**
+   os upstreams públicos, os backups datados fora do repositório e os inventários
+   em `docs/provenance/`.
+5. **A Etapa 5 foi executada e aguarda aceitação após a reconciliação
+   documental.** O commit existe; a etapa não está formalmente aceita.
+6. **O push continua pendente** e exige autorização separada. O repositório remoto
+   segue vazio.
+
+## Sobre este commit
+
+Ele **não** preserva o estado como recebido.
 
 O guia previa criar o baseline antes de qualquer adaptação. Na prática, duas
 etapas foram executadas antes, sob autorização humana explícita:
@@ -93,6 +130,37 @@ eles divergem da cópia local conforme a tabela acima.
 dele**, não a fotografia do que foi adquirido. Quem precisar do original deve ir
 aos upstreams; quem precisar do estado intermediário, aos backups externos
 datados.
+
+## Git LFS — dependência obrigatória
+
+O corpus **continua integralmente versionado**. Não foi excluído, reduzido nem
+movido para fora do repositório: passou a ser armazenado por Git LFS.
+
+| | |
+|---|---|
+| Caminhos migrados | 505 |
+| Objetos LFS únicos | 501 |
+| Conteúdo em LFS | 397.879.806 bytes |
+| Verificação | `git lfs fsck` OK |
+| Padrões | `.gitattributes` na raiz |
+
+Abrangem apenas binários do corpus e dos assets: `pdf`, `jpg`, `jpeg`, `png`,
+`webp`, `mp4`, `woff`, `woff2`, `otf`, `ttf` sob `marca-raiz-prisma/projetos/` e
+`ASSETS/`. Texto, código, JSON e contratos permanecem no Git normal.
+
+### Consequências que não podem ser esquecidas
+
+**Git LFS é dependência obrigatória** do bootstrap e de qualquer instalação em
+outra máquina. Sem ele, o repositório é clonado mas o corpus não.
+
+**Um clone sem baixar os objetos LFS contém apenas ponteiros, não os assets
+reais.** Cada arquivo migrado vira um texto de poucas linhas apontando para o
+conteúdo. Ferramenta que abrir esse ponteiro esperando uma imagem falha — e falha
+de forma confusa, porque o arquivo existe e tem o nome certo.
+
+O bootstrap deve instalar e verificar `git-lfs` antes do clone, e decidir
+explicitamente quando baixar o corpus: um perfil de desenvolvimento que apenas
+compila o aplicativo não precisa de 398 MB de casos de marca.
 
 ## Classificação do código
 

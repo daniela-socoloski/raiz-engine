@@ -470,7 +470,10 @@ PROVENANCE.md
 - retirar referências externas da árvore versionada;
 - confirmar que nenhuma credencial entra no Git.
 
-### Fase 0D — Baseline herdado
+### Fase 0D — Baseline
+
+> Executada como `reconciled Raiz Engine baseline` (commit `231e746`), não como estado herdado.
+> Ver `PROVENANCE.md`.
 
 - registrar skill e desktop como componentes herdados de upstreams diferentes;
 - preservar as licenças MIT aplicáveis;

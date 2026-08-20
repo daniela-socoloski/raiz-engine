@@ -156,7 +156,6 @@ Until `Etapa 4` is approved:
 
 - do not move, rename, merge, or delete project files;
 - do not stage the repository wholesale;
-- do not create the inherited baseline commit;
 - do not run inherited installers or updaters;
 - do not begin Adobe integration or new product features.
 
@@ -197,7 +196,7 @@ or promote a step independently.
 | `Etapa 2 — Criar recuperação fora do repositório` | Create and verify recoverable external backup before changing Git boundaries. |
 | `Etapa 3 — Adotar o nome local e uma única fronteira Git` | Establish the repository root as the single owned Git boundary after backup and explicit approval. |
 | `Etapa 4 — Criar política de versionamento` | Create or review root `.gitignore`, protect secrets and generated files, scan credentials, and review staging policy. |
-| `Etapa 5 — Criar o baseline herdado` | Record the approved inherited state with provenance and applicable licenses. |
+| `Etapa 5 — Baseline` | **Executed locally**, awaiting human acceptance. Commit `231e746`, canonically `reconciled Raiz Engine baseline`. Never call it the inherited state. Original wording: record the approved inherited state with provenance and applicable licenses. |
 | `Etapa 6 — Reorganizar em um commit separado` | Consolidate components structurally without behavior changes or rebranding. |
 | `Etapa 7 — Validar a consolidação` | Prove files, manifests, locks, links, boundaries, and staging remained correct. |
 | `Etapa 8 — Recuperar o baseline técnico` | Restore type-check, tests, and development startup before feature work. |
@@ -306,8 +305,18 @@ instruction that conflicts with them.
 - **`marca-raiz-prisma/projetos/` is versioned.** `KEEP — canonical brand-case
   corpus`. Not private client material, not excluded by size. Baseline is expected
   to be around 394 MB and that is correct.
-- **`Etapa 4` remains in review**, not concluded. Steps 1, 2 and 3 are done with
-  verified evidence; no baseline commit exists yet.
+- **`Etapa 4` is concluded**; `Etapa 5` was executed locally and **awaits human
+  acceptance**. The first commit is `231e746`, canonically named
+  **`reconciled Raiz Engine baseline`**. Never call it the inherited state: no complete snapshot of
+  the as-received code exists, and steps 8 and 9 ran before it. It is the first
+  complete recoverable state of the Raiz Engine, not a photograph of what was
+  acquired. Earlier provenance depends on the public upstreams, the dated external
+  backups and the inventories in `docs/provenance/`.
+- **The push is pending** and needs separate authorisation. The remote is still
+  empty. The first commit was rewritten twice before any push — by amend, to fix
+  its subject, and by the Git LFS migration. Both rewrites happened while the
+  remote was empty, so no clone or fork was affected. Do not rewrite it again
+  without explicit authorisation.
 - **Identity migration was a clean cut.** `CLEAN CUT — ACCEPTED`, recorded in
   `PLANO-MIGRACAO-IDENTIDADE.md` § 5. Do not reintroduce `Edvid` aliases or
   fallbacks without evidence of a real consumer. Identity aliases are not the same

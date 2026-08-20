@@ -527,7 +527,7 @@ Adicionar planos e adapters ao redor dessas capacidades. Não criar uma segunda 
 
 A organização inicial deve corrigir as fronteiras reais: aplicativo, skill, motor compartilhado, recipes e documentação. Ela não autoriza reorganizar todos os sistemas apenas para deixar a árvore visualmente uniforme.
 
-Estrutura inicial sugerida na raiz, depois do baseline herdado:
+Estrutura inicial sugerida na raiz, depois do `reconciled Raiz Engine baseline`:
 
 ```text
 raiz-engine/
@@ -994,7 +994,7 @@ A sequência segura é:
 
 1. executar somente o inventário descrito na Etapa 1 do guia de organização;
 2. criar backup e consolidar a fronteira Git depois de aprovação;
-3. criar o baseline herdado e o commit exclusivamente estrutural;
+3. criar o baseline — executado como `reconciled Raiz Engine baseline` — e depois o commit exclusivamente estrutural;
 4. recuperar o typecheck e os testes do Cena Raiz Desktop;
 5. definir o manifest da toolchain e validar o perfil `developer` numa máquina limpa;
 6. implementar somente o `AudiovisualDirectionPlan v1`;

@@ -171,8 +171,8 @@ está, sem reordenar nem promover etapas.
 | 1 — Inventário somente de leitura | concluída; ver `docs/provenance/INVENTARIO-REPOSITORIO.md` |
 | 2 — Recuperação fora do repositório | **concluída e verificada**: backup completo relido (2.366 entradas) e backup separado do Git intermediário (525 objetos) |
 | 3 — Fronteira Git única | **concluída** com aprovação humana explícita |
-| 4 — Política de versionamento | **em revisão** — o `.gitignore` da raiz já existe, criado sob autorização durante a Etapa 1 |
-| 5 — Baseline herdado | pendente — **não existe commit-base** |
+| 4 — Política de versionamento | **concluída** — `.gitignore` revisado item a item; varredura de credenciais sem ocorrências |
+| 5 — Baseline | **executada, aguardando aceitação após reconciliação documental.** Commit `231e746`, designação canônica `reconciled Raiz Engine baseline`. Push pendente, exige autorização separada |
 | 6 — Reorganização estrutural | pendente |
 | 7 — Validar a consolidação | pendente |
 | 8 — Recuperar o baseline técnico | **executada antecipadamente** sob autorização: typecheck limpo, oito suítes executáveis |
@@ -287,7 +287,27 @@ gh repos clones/
 
 Exceções precisam ser deliberadas; por exemplo, `.env.example`, manifests de runtime e assets-fonte com licença registrada podem ser versionados.
 
-### Etapa 5 — Criar o baseline herdado
+### Etapa 5 — Baseline
+
+> **Executada localmente em 2026-08-20. Aguarda aceitação humana.**
+>
+> Commit `231e746`, designação canônica **`reconciled Raiz Engine baseline`**. 854 arquivos.
+>
+> A intenção original desta etapa — preservar o estado herdado antes de qualquer
+> adaptação — **não foi cumprida e não é mais cumprível**: as Etapas 8 e 9 rodaram
+> antes, sob autorização, e nenhum snapshot local corresponde ao estado como
+> recebido. O commit é o primeiro estado completo e recuperável do Raiz Engine,
+> não a fotografia do que foi adquirido.
+>
+> A proveniência anterior depende dos upstreams públicos, dos backups datados fora
+> do repositório e dos inventários em `docs/provenance/`. Ver `PROVENANCE.md`.
+>
+> O commit foi reescrito duas vezes antes de qualquer push — por amend, para
+> corrigir o assunto, e pela migração para Git LFS. As duas reescritas ocorreram com
+> o remoto vazio, sem afetar clone ou fork. **Não reescrever de novo sem autorização.
+> O push continua pendente e exige autorização separada.**
+
+O texto abaixo é a prescrição original da etapa, mantida como registro.
 
 Antes de reorganizar pastas ou mudar nomes:
 
@@ -492,7 +512,7 @@ A organização inicial estará pronta quando:
 - o diretório local canônico se chamar `raiz-engine/`;
 - `raiz-engine/.git` for a única fronteira Git do código próprio;
 - houver backup recuperável do estado anterior;
-- existir um baseline herdado revisado;
+- existir o `reconciled Raiz Engine baseline` aceito;
 - skill e desktop estiverem em diretórios com responsabilidades explícitas;
 - upstream, licença e divergências estiverem registrados;
 - clones e referências externas estiverem fora do produto versionado;
