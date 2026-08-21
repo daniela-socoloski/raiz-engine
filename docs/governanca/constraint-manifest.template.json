@@ -1,0 +1,49 @@
+{
+  "manifest_version": "1",
+  "system": {
+    "name": "NOME-DO-SISTEMA",
+    "owner": "Daniela Socoloski",
+    "tier": "minimo",
+    "tier_rationale": "Troque para completo se o sistema gastar dinheiro, escrever em sistema de terceiro, tocar dado de cliente ou falar em nome da marca.",
+    "updated": "AAAA-MM-DD",
+    "notes": "Esqueleto de partida. Substitua cada enunciado; nao deixe placeholder em manifesto aceito."
+  },
+  "constraints": [
+    {
+      "id": "SYS-FM-001",
+      "class": "forbidden_method",
+      "statement": "Meio proibido mesmo quando for o caminho mais eficiente para um resultado permitido.",
+      "authority": "FORBIDDEN",
+      "moment": ["design", "build"],
+      "enforcement": { "mechanism": "review" },
+      "status": "PROPOSAL",
+      "source": "Pendente de decisao."
+    },
+    {
+      "id": "SYS-AP-001",
+      "class": "approval_boundary",
+      "statement": "Acao que so ocorre com autorizacao humana explicita.",
+      "authority": "APPROVAL",
+      "moment": ["runtime"],
+      "enforcement": { "mechanism": "manual", "responsible": "NOME DO RESPONSAVEL" },
+      "status": "PROPOSAL"
+    },
+    {
+      "id": "SYS-ST-001",
+      "class": "stop_condition",
+      "statement": "Condicao que obriga o sistema a interromper a execucao em vez de seguir.",
+      "authority": "ESCALATE",
+      "moment": ["runtime"],
+      "enforcement": { "mechanism": "review" },
+      "status": "PROPOSAL"
+    },
+    {
+      "id": "SYS-RV-001",
+      "class": "reversibility_requirement",
+      "statement": "Operacao que precisa preservar rollback, historico e estado anterior.",
+      "moment": ["build", "post"],
+      "enforcement": { "mechanism": "review" },
+      "status": "PROPOSAL"
+    }
+  ]
+}
