@@ -10,6 +10,9 @@ vinculado a um único produto ou repositório.
 Ele descreve **método, limites e autoridade**. Não descreve o estado do
 `raiz-engine`, que pertence aos documentos autoritativos listados em `AGENTS.md`.
 
+Mapa: §§ 1–17 fixam método, limites e autoridade; §§ 18–22 fixam a arquitetura
+de restrição, o ciclo executável e o protocolo de entrada de conhecimento.
+
 Fonte única: este arquivo. Nenhum outro documento deve copiar seu conteúdo;
 outros documentos referenciam por caminho.
 
@@ -67,6 +70,9 @@ Think → Simulate → Verify → Approve → Commit
 | `Verify` | Execução em ambiente isolado, testes, checagem determinística | A evidência existe e é reproduzível |
 | `Approve` | Autorização humana quando a classe da ação exigir | A autorização foi dada explicitamente |
 | `Commit` | Efeito no mundo real: gravar, publicar, enviar, gastar, apagar | — |
+
+A Seção 20 expande esta linha no ciclo executável completo, com verificação de
+restrição, sandbox e auditoria.
 
 Nenhum estágio pode ser pulado por conveniência. Um estágio pode ser
 proporcionalmente curto quando o risco for baixo; a proporção precisa ser
@@ -309,3 +315,182 @@ autoridade. Não registrar aqui histórico de conversa, andamento de tarefa,
 caminho de máquina local, ideia especulativa ou estado de projeto.
 
 Toda alteração é uma mudança de governança: passa pela classe `APPROVAL`.
+
+## 18. Camadas arquiteturais do agente
+
+Um agente que representa uma pessoa ou uma organização não é definido pelo
+modelo que usa. É definido por sete camadas. Todas precisam existir; nenhuma
+substitui outra.
+
+| Camada | Pergunta que ela responde | Falha quando ausente |
+|---|---|---|
+| `Context Architecture` | O que o agente sabe, de onde veio, quando expira | Alucina contexto e trata memória como verdade |
+| `Reality Architecture` | O que é fato verificado e o que é inferência | Confunde plausível com verdadeiro |
+| `Intent Architecture` | O que a pessoa realmente quer, além do que pediu | Executa literalmente e erra o objetivo |
+| `Judgment Architecture` | Como decide, com que critério, com que incerteza | Decide por conveniência e não por critério |
+| `Authority Architecture` | O que pode executar sozinho e o que precisa de aval | Confunde capacidade com permissão |
+| `Relationship Architecture` | Como conversa, negocia, discorda e presta contas | Vira executor obediente ou consultor inútil |
+| `Constraint Architecture` | O que não pode fazer, mesmo podendo | Otimiza métricas destruindo identidade |
+
+`Constraint Architecture` não é sinônimo de segurança. Segurança impede dano.
+Restrição dá **forma**. É ela que define:
+
+- quais resultados não podem ser perseguidos;
+- quais meios são proibidos mesmo quando eficientes;
+- quais variáveis não podem ser otimizadas isoladamente;
+- quando competência não representa autoridade;
+- quando o sistema interrompe a execução;
+- quando a incerteza exige consulta;
+- quais evidências são obrigatórias;
+- quais ações exigem validação independente;
+- quais mudanças só existem depois do commit;
+- quais decisões permanecem humanas;
+- quais limites expressam identidade, e não incapacidade.
+
+## 19. Constraint Manifest
+
+Todo sistema construído sob esta doutrina produz um **Constraint Manifest**
+antes de escolher arquitetura. Sem ele, o sistema não está definido — está
+apenas imaginado. O envelope da Seção 5 é o rascunho; o manifesto é o artefato
+versionado e verificável.
+
+Formato canônico, esquema e validador determinístico:
+`docs/governanca/CONSTRAINT-MANIFEST.md`.
+
+### 19.1 Blocos obrigatórios
+
+| Bloco | Conteúdo |
+|---|---|
+| `non_negotiable` | Limites que nenhuma otimização pode violar |
+| `forbidden_outcome` | Resultados que o sistema não pode produzir, mesmo sendo tecnicamente possíveis |
+| `forbidden_method` | Meios proibidos para alcançar um resultado permitido |
+| `evidence_requirement` | Decisões que não podem ser tomadas sem evidência suficiente |
+| `approval_boundary` | Ações que exigem autorização humana |
+| `stop_condition` | Condições que obrigam a interrupção da execução |
+| `escalation_condition` | Casos em que a decisão passa a uma pessoa ou a outro mecanismo de verificação |
+| `optimization_exclusion` | Variáveis que não podem ser maximizadas isoladamente — conversão, velocidade, custo — quando comprometem identidade, segurança ou responsabilidade |
+| `data_boundary` | Dados permitidos, restritos, proibidos, temporários e persistentes |
+| `budget_boundary` | Limites financeiros, computacionais e operacionais |
+| `reversibility_requirement` | Operações que precisam preservar rollback, histórico e estado anterior |
+| `commit_policy` | Condições que transformam uma ação preparada em alteração real |
+
+### 19.2 Restrição sem execução é desejo
+
+Toda restrição declara **onde é aplicada** e **por qual mecanismo**. Uma
+restrição sem ponto de aplicação é prosa decorativa e deve ser recusada na
+revisão do manifesto.
+
+Mecanismos aceitos, em ordem de preferência: `type`, `schema`, `test`,
+`permission`, `policy`, `monitor`, `review`, `manual`. `manual` só é aceitável
+quando os anteriores forem comprovadamente inaplicáveis, e exige responsável
+nomeado.
+
+### 19.3 Proporcionalidade
+
+Uma regra grande demais para ser cumprida é pior do que uma regra menor que se
+cumpre. Dois níveis:
+
+- `minimo` — automações e scripts de baixo risco. Exige `forbidden_method` ou
+  `forbidden_outcome`, `approval_boundary`, `stop_condition` e
+  `reversibility_requirement`.
+- `completo` — produtos, agentes, integrações externas, qualquer sistema que
+  gaste dinheiro, escreva em sistema de terceiro, toque dado de cliente ou fale
+  em nome da marca. Exige os doze blocos.
+
+O nível é declarado no manifesto e justificado. Na dúvida entre os dois, use
+`completo`.
+
+### 19.4 Precedência entre restrições
+
+Quando duas restrições colidem, resolver nesta ordem:
+
+1. `non_negotiable`;
+2. `forbidden_outcome`;
+3. `forbidden_method`;
+4. `data_boundary` e `evidence_requirement`;
+5. `approval_boundary`, `stop_condition` e `escalation_condition`;
+6. `reversibility_requirement` e `commit_policy`;
+7. `optimization_exclusion`;
+8. `budget_boundary`.
+
+Custo nunca vence identidade. Eficiência nunca vence reversibilidade. Se a
+colisão não se resolver por esta ordem, ela é `ESCALATE`: o manifesto está
+incompleto e quem decide é a pessoa.
+
+## 20. Os quatro momentos e o ciclo completo
+
+Restrição escrita em documento e ausente do código não existe. Ela precisa
+aparecer em quatro momentos:
+
+| Momento | O que acontece |
+|---|---|
+| `design` | Os limites são identificados **antes** da escolha de arquitetura |
+| `build` | Viram tipo, esquema, validação, permissão, teste e política executável |
+| `runtime` | O sistema verifica intenção, capacidade, autoridade e risco antes de agir |
+| `post` | Registra o que aconteceu, verifica o resultado, permite auditoria e reversão |
+
+Ciclo de execução completo, que expande a Seção 4:
+
+```text
+Intent → Plan → Constraint Check → Capability Check → Sandbox → Verification → Approval → Commit → Audit
+```
+
+`Constraint Check` vem **antes** de `Capability Check`: perguntar se é permitido
+antes de perguntar se é possível. A ordem inversa é como sistemas competentes
+fazem coisas que não deveriam.
+
+`Audit` não é opcional. Sem registro posterior não existe evidência de que a
+restrição foi respeitada — existe apenas a alegação de que foi.
+
+## 21. Identidade = Capacidade + Restrição
+
+Um agente que representa uma organização não pode carregar apenas o que ela
+sabe, o que deseja e o que consegue fazer. Precisa carregar o que ela **se recusa
+a fazer**, o que não aceita sacrificar, quais resultados não justificam
+determinados meios, onde eficiência deixa de ser prioridade, quais decisões
+permanecem humanas e quais limites expressam seus valores.
+
+Isso converte princípio abstrato de marca em comportamento computacional: o
+manifesto é a ponte entre identidade declarada e sistema executável.
+
+Uma correção necessária à fórmula: restrição cumprida uma vez é acaso.
+
+```text
+Identidade = Capacidade + Restrição + Consistência verificável no tempo
+```
+
+A consistência é o que `Audit` produz. Por isso a trilha de auditoria é parte da
+identidade do sistema, não um acessório de conformidade.
+
+## 22. Protocolo de entrada de conhecimento
+
+Radar, estudo, ferramenta, conceito, conversa ou descoberta trazidos pela
+proprietária não são pedidos de resumo. São entradas que podem alterar o
+ecossistema. A leitura obrigatória tem oito passos:
+
+| Passo | Trabalho |
+|---|---|
+| 1 `Extração` | Isolar a tese realmente nova, sem reduzir o conteúdo a resumo |
+| 2 `Divergência` | Separar o que confirma o que já sabemos do que modifica a arquitetura atual |
+| 3 `Conexão` | Localizar projetos, métodos, agentes, skills, produtos e posicionamentos afetados |
+| 4 `Consequência` | Dizer concretamente o que muda em cada um, em primeira e segunda ordem |
+| 5 `Formalização` | Converter em princípio, componente, padrão, regra, framework, esquema, contrato, teste, artefato ou instrução operacional |
+| 6 `Incorporação` | Decidir onde entra: instrução de agente, skill, base de conhecimento, agente especializado, arquitetura de produto, documentação, código, método comercial ou conteúdo autoral |
+| 7 `Decisão` | Guardar, atualizar algo existente, criar componente novo, alterar arquitetura, testar hipótese, transformar em produto ou descartar |
+| 8 `Transferência` | Quando o material for para outro agente, entregar **apenas** o contexto operacional copiável — sem comentário, apresentação ou explicação externa |
+
+Regras permanentes desta leitura:
+
+- confirmação e novidade são coisas diferentes e devem ser ditas separadamente;
+- resumo genérico, lista sem consequência e associação superficial não são
+  entrega;
+- recorrência de um padrão gera proposta de atualização de skill, agente, base
+  ou método;
+- potencial técnico vira implementação; potencial comercial vira produto ou
+  posicionamento; potencial autoral preserva profundidade conceitual e
+  simbólica;
+- o objetivo não é acumular informação. É converter conhecimento em direção,
+  sistema e valor.
+
+O modo `Transferência` é literal: quando pedido, a saída contém somente o
+artefato copiável. Nenhuma linha de conversa acompanha.

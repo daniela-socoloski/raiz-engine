@@ -78,6 +78,7 @@ method. On a real contradiction, declare it and stop at the decision point
 | `ARQUITETURA-MOTOR-CRIATIVO-RAIZ.md` | Target architecture, ownership decisions, contracts, bootstrap, and the canonical product phases. Read for every architectural or cross-component change. |
 | `GUIA-ORGANIZACAO-REPOSITORIO.md` | Safe repository consolidation sequence. It exclusively owns the one-time repository Etapas 0–11. Read before inventory, movement, Git-boundary, baseline, or bootstrap work. |
 | `DOUTRINA-ENGENHARIA-TRANSVERSAL.md` | Cross-project engineering doctrine: method, constraints, authority classes, reversibility, validation separation, vendor independence, cost, and verdict. Read before proposing, deciding, or executing anything. |
+| `docs/governanca/CONSTRAINT-MANIFEST.md` | Constraint Manifest format, schema, and deterministic validator, plus this repository's own manifest. Read before designing a new system, agent, skill, or automation — the manifest precedes the architecture choice. |
 | `POLITICA-FONTE-UNICA-FUNCIONAL.md` | Mandatory single-source policy. Read before renaming, merging, replacing, moving, or removing files and components. |
 | `PLANO-MIGRACAO-IDENTIDADE.md` | Identity, compatibility, provenance, and legacy-removal sequencing. Read before changing names, protocols, storage, distribution, or inherited infrastructure. |
 
