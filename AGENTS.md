@@ -61,11 +61,23 @@ inspection of the repository.
 
 ## Authoritative documents
 
+`DOUTRINA-ENGENHARIA-TRANSVERSAL.md` sits above this table as the owner's
+cross-project doctrine. It defines method, limits, and authority — the
+`Think → Simulate → Verify → Approve → Commit` pipeline, the constraint envelope,
+the authority classes, reversibility, `Generator → Validator → Policy Check`,
+vendor independence, AI cost triage, and the required technical verdict. It is
+not repository-specific and must not be copied elsewhere. `CLAUDE.md` at the root
+imports it; `operations/memoria/` installs it into the agent's base memory for
+every project. The documents below own product fact and state; the doctrine owns
+method. On a real contradiction, declare it and stop at the decision point
+(doctrine § 16).
+
 | Document | Authority and when to read it |
 |---|---|
 | `README.md` | Product and repository entry point. Read at the start of every new project task. |
 | `ARQUITETURA-MOTOR-CRIATIVO-RAIZ.md` | Target architecture, ownership decisions, contracts, bootstrap, and the canonical product phases. Read for every architectural or cross-component change. |
 | `GUIA-ORGANIZACAO-REPOSITORIO.md` | Safe repository consolidation sequence. It exclusively owns the one-time repository Etapas 0–11. Read before inventory, movement, Git-boundary, baseline, or bootstrap work. |
+| `DOUTRINA-ENGENHARIA-TRANSVERSAL.md` | Cross-project engineering doctrine: method, constraints, authority classes, reversibility, validation separation, vendor independence, cost, and verdict. Read before proposing, deciding, or executing anything. |
 | `POLITICA-FONTE-UNICA-FUNCIONAL.md` | Mandatory single-source policy. Read before renaming, merging, replacing, moving, or removing files and components. |
 | `PLANO-MIGRACAO-IDENTIDADE.md` | Identity, compatibility, provenance, and legacy-removal sequencing. Read before changing names, protocols, storage, distribution, or inherited infrastructure. |
 
