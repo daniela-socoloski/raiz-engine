@@ -1,0 +1,226 @@
+{
+  "manifest_version": "1",
+  "system": {
+    "name": "raiz-engine",
+    "owner": "Daniela Socoloski",
+    "tier": "completo",
+    "tier_rationale": "Produto proprio, com distribuicao, gasto de modelo, corpus de marca e execucao em ferramentas de terceiros.",
+    "updated": "2026-08-21",
+    "notes": "Entradas ACCEPTED sao derivadas de documento autoritativo existente e citam a fonte. Entradas PROPOSAL exigem decisao da proprietaria e nao valem como regra ate serem aceitas."
+  },
+  "constraints": [
+    {
+      "id": "RE-NN-001",
+      "class": "non_negotiable",
+      "statement": "Uma unica implementacao canonica por responsabilidade. Historico e proveniencia preservam o passado; arquivo duplicado ativo, nao.",
+      "moment": ["design", "build"],
+      "enforcement": { "mechanism": "policy", "reference": "POLITICA-FONTE-UNICA-FUNCIONAL.md secoes 1 e 12" },
+      "status": "ACCEPTED",
+      "source": "POLITICA-FONTE-UNICA-FUNCIONAL.md secao 1"
+    },
+    {
+      "id": "RE-NN-002",
+      "class": "non_negotiable",
+      "statement": "Git LFS e obrigatorio para os assets versionados. Clone sem LFS entrega ponteiro, nao material.",
+      "moment": ["build", "runtime"],
+      "enforcement": { "mechanism": "policy", "reference": ".gitattributes" },
+      "status": "ACCEPTED",
+      "source": "README.md, tabela de estado; AGENTS.md, Etapa 7"
+    },
+    {
+      "id": "RE-FO-001",
+      "class": "forbidden_outcome",
+      "statement": "Publicar release apontando para o armazenamento do fornecedor anterior. Releases permanecem bloqueadas ate existir destino proprio validado.",
+      "authority": "FORBIDDEN",
+      "moment": ["build", "runtime"],
+      "enforcement": { "mechanism": "policy", "reference": "AGENTS.md, Reconciled decisions — 2026-08-20" },
+      "status": "ACCEPTED",
+      "source": "AGENTS.md, Reconciled decisions; README.md, linha Releases",
+      "removal_condition": "Canal de distribuicao proprio validado e lancador assinado."
+    },
+    {
+      "id": "RE-FO-002",
+      "class": "forbidden_outcome",
+      "statement": "Segredo, token, chave ou credencial versionado, impresso, resumido ou anexado.",
+      "authority": "FORBIDDEN",
+      "moment": ["design", "build", "runtime", "post"],
+      "enforcement": { "mechanism": "test", "reference": "varredura de nomes de segredo descrita em AGENTS.md, Etapa 7" },
+      "status": "ACCEPTED",
+      "source": "AGENTS.md, Security and repository hygiene"
+    },
+    {
+      "id": "RE-FM-001",
+      "class": "forbidden_method",
+      "statement": "Criar copia de seguranca dentro do repositorio. Recuperacao adicional fica fora de raiz-engine e e registrada no inventario.",
+      "authority": "FORBIDDEN",
+      "moment": ["build"],
+      "enforcement": { "mechanism": "review" },
+      "status": "ACCEPTED",
+      "source": "POLITICA-FONTE-UNICA-FUNCIONAL.md secao 11"
+    },
+    {
+      "id": "RE-FM-002",
+      "class": "forbidden_method",
+      "statement": "Reescrever o historico publicado ou o commit de baseline sem autorizacao explicita.",
+      "authority": "APPROVAL",
+      "moment": ["build", "runtime"],
+      "enforcement": { "mechanism": "policy", "reference": "AGENTS.md, Reconciled decisions — 2026-08-20" },
+      "status": "ACCEPTED",
+      "source": "AGENTS.md, Reconciled decisions — 2026-08-20"
+    },
+    {
+      "id": "RE-FM-003",
+      "class": "forbidden_method",
+      "statement": "Corrigir, esconder, normalizar ou atribuir silenciosamente ao Raiz Engine um defeito herdado da base Edvid/Cena Raiz.",
+      "authority": "FORBIDDEN",
+      "moment": ["design", "build", "post"],
+      "enforcement": { "mechanism": "review" },
+      "status": "ACCEPTED",
+      "source": "AGENTS.md, Mandatory inherited-base issue disclosure"
+    },
+    {
+      "id": "RE-EV-001",
+      "class": "evidence_requirement",
+      "statement": "Declarar etapa, fase ou entrega concluida exige verificacao executada e relatada como ocorreu, inclusive falhas.",
+      "authority": "EVIDENCE",
+      "moment": ["post"],
+      "enforcement": { "mechanism": "review" },
+      "status": "ACCEPTED",
+      "source": "AGENTS.md, Work protocol; DOUTRINA-ENGENHARIA-TRANSVERSAL.md secao 14"
+    },
+    {
+      "id": "RE-EV-002",
+      "class": "evidence_requirement",
+      "statement": "Apontar um consumidor para nova URL de codigo ou release apenas depois que o artefato e o checksum existirem de fato no destino.",
+      "authority": "EVIDENCE",
+      "moment": ["build", "runtime"],
+      "enforcement": { "mechanism": "review" },
+      "status": "ACCEPTED",
+      "source": "AGENTS.md, System boundaries and invariants"
+    },
+    {
+      "id": "RE-AP-001",
+      "class": "approval_boundary",
+      "statement": "Cada novo push ao remoto exige autorizacao separada. Autorizacao anterior nao se estende ao push seguinte.",
+      "authority": "APPROVAL",
+      "moment": ["runtime"],
+      "enforcement": { "mechanism": "manual", "responsible": "Daniela Socoloski" },
+      "status": "ACCEPTED",
+      "source": "README.md, linha Publicacao Git; AGENTS.md, Reconciled decisions"
+    },
+    {
+      "id": "RE-AP-002",
+      "class": "approval_boundary",
+      "statement": "Alterar documento de governanca — doutrina, constituicao, politica de fonte unica ou este manifesto — exige aprovacao da proprietaria.",
+      "authority": "APPROVAL",
+      "moment": ["design", "build"],
+      "enforcement": { "mechanism": "manual", "responsible": "Daniela Socoloski" },
+      "status": "ACCEPTED",
+      "source": "DOUTRINA-ENGENHARIA-TRANSVERSAL.md secao 17"
+    },
+    {
+      "id": "RE-ST-001",
+      "class": "stop_condition",
+      "statement": "Contradicao real entre a doutrina e um documento autoritativo do repositorio: declarar a contradicao e parar no ponto de decisao.",
+      "authority": "ESCALATE",
+      "moment": ["design", "runtime"],
+      "enforcement": { "mechanism": "review" },
+      "status": "ACCEPTED",
+      "source": "DOUTRINA-ENGENHARIA-TRANSVERSAL.md secao 16"
+    },
+    {
+      "id": "RE-ST-002",
+      "class": "stop_condition",
+      "statement": "Encontrar arquivo de credencial ou artefato de autenticacao desconhecido: parar antes de abrir o conteudo e tratar como segredo.",
+      "authority": "FORBIDDEN",
+      "moment": ["runtime"],
+      "enforcement": { "mechanism": "review" },
+      "status": "ACCEPTED",
+      "source": "AGENTS.md, Security and repository hygiene"
+    },
+    {
+      "id": "RE-ES-001",
+      "class": "escalation_condition",
+      "statement": "Decisao que depende de valor, identidade ou posicionamento de marca sem evidencia documental correspondente vai para a proprietaria, nao para o julgamento do agente.",
+      "authority": "ESCALATE",
+      "moment": ["design", "runtime"],
+      "enforcement": { "mechanism": "review" },
+      "status": "ACCEPTED",
+      "source": "DOUTRINA-ENGENHARIA-TRANSVERSAL.md secoes 9 e 21"
+    },
+    {
+      "id": "RE-OX-001",
+      "class": "optimization_exclusion",
+      "statement": "Velocidade de entrega nao pode ser maximizada as custas de reversibilidade, verificacao ou registro.",
+      "moment": ["design", "build", "post"],
+      "enforcement": { "mechanism": "review" },
+      "status": "ACCEPTED",
+      "source": "DOUTRINA-ENGENHARIA-TRANSVERSAL.md secoes 7 e 14"
+    },
+    {
+      "id": "RE-OX-002",
+      "class": "optimization_exclusion",
+      "statement": "Custo de modelo nao pode ser reduzido as custas da identidade de marca produzida na saida criativa. Falta definir o piso de qualidade que torna a troca inaceitavel.",
+      "moment": ["design", "runtime"],
+      "enforcement": { "mechanism": "manual", "responsible": "Daniela Socoloski" },
+      "status": "PROPOSAL",
+      "source": "Derivado da doutrina secao 12; o piso ainda nao foi declarado"
+    },
+    {
+      "id": "RE-DB-001",
+      "class": "data_boundary",
+      "statement": "marca-raiz-prisma/projetos e corpus canonico versionado e persistente. Nao e material privado de cliente e nao pode ser excluido por tamanho.",
+      "moment": ["build", "runtime"],
+      "enforcement": { "mechanism": "policy", "reference": ".gitignore e AGENTS.md, Reconciled decisions" },
+      "status": "ACCEPTED",
+      "source": "AGENTS.md, Reconciled decisions — 2026-08-20"
+    },
+    {
+      "id": "RE-DB-002",
+      "class": "data_boundary",
+      "statement": "Clones de referencia externa sao external-reference. Nao entram no codigo de produto sem decisao explicita de licenca, proveniencia e origem.",
+      "authority": "APPROVAL",
+      "moment": ["design", "build"],
+      "enforcement": { "mechanism": "policy", "reference": ".gitignore" },
+      "status": "ACCEPTED",
+      "source": "AGENTS.md, Security and repository hygiene"
+    },
+    {
+      "id": "RE-DB-003",
+      "class": "data_boundary",
+      "statement": "Segredo vive fora do repositorio: variavel de ambiente ignorada ou cofre do sistema operacional. Nunca em arquivo versionado.",
+      "moment": ["build", "runtime"],
+      "enforcement": { "mechanism": "policy", "reference": ".gitignore" },
+      "status": "ACCEPTED",
+      "source": "AGENTS.md, Security and repository hygiene"
+    },
+    {
+      "id": "RE-BU-001",
+      "class": "budget_boundary",
+      "statement": "Teto de gasto por execucao de modelo e por periodo, com comportamento definido ao atingir o limite. Ainda nao declarado.",
+      "moment": ["design", "runtime"],
+      "enforcement": { "mechanism": "manual", "responsible": "Daniela Socoloski" },
+      "status": "PROPOSAL",
+      "source": "Exigido pela doutrina secao 12; valor pendente de decisao"
+    },
+    {
+      "id": "RE-RV-001",
+      "class": "reversibility_requirement",
+      "statement": "Toda alteracao precisa ser recuperavel pelo Git, sem copia de seguranca interna, com estado anterior preservado e diff inspecionado.",
+      "moment": ["build", "post"],
+      "enforcement": { "mechanism": "review" },
+      "status": "ACCEPTED",
+      "source": "POLITICA-FONTE-UNICA-FUNCIONAL.md secoes 11 e 12"
+    },
+    {
+      "id": "RE-CP-001",
+      "class": "commit_policy",
+      "statement": "Uma acao preparada so vira alteracao real com verificacao executada, diff inspecionado, autorizacao compativel com a fase corrente e AGENTS.md atualizado quando a mudanca for uma decisao duravel.",
+      "authority": "APPROVAL",
+      "moment": ["runtime", "post"],
+      "enforcement": { "mechanism": "review" },
+      "status": "ACCEPTED",
+      "source": "AGENTS.md, Work protocol e Mandatory context self-maintenance"
+    }
+  ]
+}
